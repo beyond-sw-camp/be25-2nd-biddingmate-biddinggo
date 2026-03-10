@@ -4,3 +4,16 @@ spring:
     url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+
+
+
+
+
+
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.biddingmate.biddinggo
+  configuration:
+    map-underscore-to-camel-case: true

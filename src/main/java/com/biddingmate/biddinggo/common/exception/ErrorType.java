@@ -17,7 +17,11 @@ public enum ErrorType {
 
     // 도메인 별 예시
     // auth
-    EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT);
+    EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT),
+
+
+    // 포인트
+    VIRTUAL_ACCOUNT_ALREADY_EXISTS("point-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT);
 
     private final String errorCode;
     private final String message;
