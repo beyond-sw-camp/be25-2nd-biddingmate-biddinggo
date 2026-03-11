@@ -5,15 +5,11 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
-
-
-
-
-
-
-
 mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.biddingmate.biddinggo
   configuration:
     map-underscore-to-camel-case: true
+
+tosspayments:
+  secret-key: ${TOSS_SECRET_KEY}
