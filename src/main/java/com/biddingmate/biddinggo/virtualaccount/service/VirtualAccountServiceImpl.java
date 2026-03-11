@@ -14,10 +14,12 @@ import com.biddingmate.biddinggo.virtualaccount.model.VirtualAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -49,6 +51,14 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()
+                .onStatus(status -> status.is4xxClientError(), clientResponse ->
+                        clientResponse.bodyToMono(String.class)
+                                .flatMap(body -> Mono.<Throwable>error(new CustomException(ErrorType.TOSS_API_CLIENT_ERROR)))
+                )
+                .onStatus(status -> status.is5xxServerError(), clientResponse ->
+                        clientResponse.bodyToMono(String.class)
+                                .flatMap(body -> Mono.<Throwable>error(new CustomException(ErrorType.TOSS_API_SERVER_ERROR)))
+                )
                 .bodyToMono(TossCreateVirtualAccount.class)
                 .block(); // 동기 호출
 

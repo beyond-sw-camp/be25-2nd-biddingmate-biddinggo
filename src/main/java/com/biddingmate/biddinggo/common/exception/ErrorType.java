@@ -20,8 +20,10 @@ public enum ErrorType {
     EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT),
 
 
-    // 포인트
-    VIRTUAL_ACCOUNT_ALREADY_EXISTS("point-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT);
+    // 가상계좌
+    VIRTUAL_ACCOUNT_ALREADY_EXISTS("point-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT),
+    TOSS_API_CLIENT_ERROR("point-002", "토스 API 요청이 잘못되었습니다. 요청 파라미터와 인증 정보를 확인하세요.", HttpStatus.BAD_REQUEST),
+    TOSS_API_SERVER_ERROR("point-003", "토스 서버 내부 오류가 발생했습니다. 잠시 후 다시 시도하세요.", HttpStatus.BAD_GATEWAY);
 
     private final String errorCode;
     private final String message;
