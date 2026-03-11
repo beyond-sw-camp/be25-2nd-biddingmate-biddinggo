@@ -1,6 +1,5 @@
 package com.biddingmate.biddinggo.point.dto;
 
-import com.biddingmate.biddinggo.point.model.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,5 +13,5 @@ public class CreateVirtualAccountRequest {
     private String orderName;
     private Long amount;
     private String customerName;
-    private String bankCode;
+    private String bank;
 }
