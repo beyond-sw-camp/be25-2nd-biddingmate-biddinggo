@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/points/**").permitAll()
+                        .requestMatchers("/api/v1/virtual-accounts/**").permitAll()
                         .anyRequest().authenticated());
 
 

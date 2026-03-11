@@ -1,24 +1,20 @@
-package com.biddingmate.biddinggo.point.model;
+package com.biddingmate.biddinggo.virtualaccount.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class VirtualAccount {
-    private Long id;
-    private Long paymentId;
+public class CreateVirtualAccountResponse {
+    private String status;
+    private String orderId;
+    private Long amount;
     private String bankCode;
     private String bankAccount;
     private String accountHolderName;
     private LocalDateTime dueDate;
-    private LocalDateTime createdAt;
 }

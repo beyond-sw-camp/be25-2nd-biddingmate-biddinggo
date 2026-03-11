@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.point.dto;
+package com.biddingmate.biddinggo.virtualaccount.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

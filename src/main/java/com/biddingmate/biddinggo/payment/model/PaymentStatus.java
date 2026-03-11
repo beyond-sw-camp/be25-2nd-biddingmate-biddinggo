@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.point.model;
+package com.biddingmate.biddinggo.payment.model;
 
 public enum PaymentStatus {
     WAITING_FOR_DEPOSIT,
