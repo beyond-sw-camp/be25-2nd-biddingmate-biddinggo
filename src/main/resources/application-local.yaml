@@ -5,9 +5,15 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
-  jpa:
-    hibernate:
-      ddl-auto: none
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.biddingmate.biddinggo
+  configuration:
+    map-underscore-to-camel-case: true
+
+tosspayments:
+  secret-key: ${TOSS_SECRET_KEY}
 
   flyway:
     enabled: true
@@ -15,3 +21,4 @@ spring:
     baseline-on-migrate: true
     encoding: UTF-8
     clean-disabled: true
+
