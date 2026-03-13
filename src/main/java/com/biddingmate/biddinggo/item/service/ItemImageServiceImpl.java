@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * item_image 엔티티 생성만 담당하는 서비스 구현체.
@@ -30,6 +32,8 @@ public class ItemImageServiceImpl implements ItemImageService {
         if (itemId == null) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }
+
+        validateDisplayOrders(images);
 
         for (CreateAuctionRequest.Image image : images) {
             if (!fileService.isManagedFileKey(image.getFileKey())) {
@@ -53,6 +57,16 @@ public class ItemImageServiceImpl implements ItemImageService {
 
             if (imageInsertCount != 1 || itemImage.getId() == null) {
                 throw new CustomException(ErrorType.ITEM_IMAGE_SAVE_FAILED);
+            }
+        }
+    }
+
+    private void validateDisplayOrders(List<CreateAuctionRequest.Image> images) {
+        Set<Integer> displayOrders = new HashSet<>();
+
+        for (CreateAuctionRequest.Image image : images) {
+            if (!displayOrders.add(image.getDisplayOrder())) {
+                throw new CustomException(ErrorType.DUPLICATE_ITEM_IMAGE_DISPLAY_ORDER);
             }
         }
     }
