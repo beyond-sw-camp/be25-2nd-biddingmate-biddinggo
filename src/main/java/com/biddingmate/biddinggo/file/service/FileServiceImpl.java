@@ -7,6 +7,7 @@ import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlRequest;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlResponse;
 import com.biddingmate.biddinggo.file.dto.DeleteFileRequest;
 import com.biddingmate.biddinggo.file.dto.DeleteFileResponse;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
@@ -174,6 +176,8 @@ public class FileServiceImpl implements FileService {
             if (!ignoreFailure) {
                 throw new CustomException(ErrorType.FILE_DELETE_FAILED);
             }
+
+            log.warn("R2 파일 삭제 정리 실패 - fileKey: {}", fileKey, exception);
         }
     }
 }
