@@ -21,20 +21,21 @@ public class AuctionItemServiceImpl implements AuctionItemService {
     @Override
     public Long createAuctionItem(CreateAuctionRequest request) {
         if (request == null
-                || request.getSellerId() == null
-                || request.getCategoryId() == null
-                || request.getName() == null || request.getName().isBlank()) {
+                || request.getItem() == null
+                || request.getItem().getSellerId() == null
+                || request.getItem().getCategoryId() == null
+                || request.getItem().getName() == null || request.getItem().getName().isBlank()) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }
 
         // request를 DB 저장용 auction_item 모델로 변환한다.
         AuctionItem auctionItem = AuctionItem.builder()
-                .sellerId(request.getSellerId())
-                .categoryId(request.getCategoryId())
-                .brand(request.getBrand())
-                .name(request.getName())
-                .quality(request.getQuality())
-                .description(request.getDescription())
+                .sellerId(request.getItem().getSellerId())
+                .categoryId(request.getItem().getCategoryId())
+                .brand(request.getItem().getBrand())
+                .name(request.getItem().getName())
+                .quality(request.getItem().getQuality())
+                .description(request.getItem().getDescription())
                 .createdAt(LocalDateTime.now())
                 .build();
 

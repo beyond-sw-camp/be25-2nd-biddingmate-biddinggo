@@ -35,12 +35,14 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
      */
     private void validateRequest(CreateAuctionRequest request) {
         if (request == null
-                || request.getSellerId() == null
-                || request.getCategoryId() == null
-                || request.getName() == null || request.getName().isBlank()
-                || request.getStartDate() == null
-                || request.getEndDate() == null
-                || !request.getEndDate().isAfter(request.getStartDate())) {
+                || request.getItem() == null
+                || request.getAuction() == null
+                || request.getItem().getSellerId() == null
+                || request.getItem().getCategoryId() == null
+                || request.getItem().getName() == null || request.getItem().getName().isBlank()
+                || request.getAuction().getStartDate() == null
+                || request.getAuction().getEndDate() == null
+                || !request.getAuction().getEndDate().isAfter(request.getAuction().getStartDate())) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }
     }

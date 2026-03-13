@@ -2,6 +2,7 @@ package com.biddingmate.biddinggo.auction.dto;
 
 import com.biddingmate.biddinggo.auction.model.AuctionType;
 import com.biddingmate.biddinggo.auction.model.YesNo;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,19 +16,69 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "경매 등록 요청 DTO")
 public class CreateAuctionRequest {
-    private Long sellerId;
-    private Long categoryId;
-    private String brand;
-    private String name;
-    private String quality;
-    private String description;
-    private AuctionType type;
-    private YesNo inspectionYn;
-    private Long startPrice;
-    private Integer bidUnit;
-    private Long vickreyPrice;
-    private Long buyNowPrice;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    @Schema(description = "경매 상품 정보")
+    private Item item;
+
+    @Schema(description = "경매 정보")
+    private Auction auction;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "경매 상품 요청 DTO")
+    public static class Item {
+        @Schema(description = "판매자 ID", example = "1")
+        private Long sellerId;
+
+        @Schema(description = "카테고리 ID", example = "10")
+        private Long categoryId;
+
+        @Schema(description = "브랜드명", example = "Nike")
+        private String brand;
+
+        @Schema(description = "상품명", example = "Air Jordan 1 High")
+        private String name;
+
+        @Schema(description = "상품 상태", example = "최상")
+        private String quality;
+
+        @Schema(description = "상품 설명", example = "실착 2회, 박스 포함")
+        private String description;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "경매 요청 DTO")
+    public static class Auction {
+        @Schema(description = "경매 타입", example = "NORMAL")
+        private AuctionType type;
+
+        @Schema(description = "검수 여부", example = "NO")
+        private YesNo inspectionYn;
+
+        @Schema(description = "시작가", example = "100000")
+        private Long startPrice;
+
+        @Schema(description = "입찰 단위", example = "1000")
+        private Integer bidUnit;
+
+        @Schema(description = "비크리 가격", example = "150000", nullable = true)
+        private Long vickreyPrice;
+
+        @Schema(description = "즉시 구매가", example = "180000", nullable = true)
+        private Long buyNowPrice;
+
+        @Schema(description = "경매 시작일시", example = "2026-03-15T10:00:00")
+        private LocalDateTime startDate;
+
+        @Schema(description = "경매 종료일시", example = "2026-03-16T10:00:00")
+        private LocalDateTime endDate;
+    }
 }
