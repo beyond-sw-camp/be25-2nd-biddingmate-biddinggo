@@ -77,7 +77,7 @@ public class CreateAuctionRequest {
     @Builder
     @Schema(description = "상품 이미지 요청 DTO")
     public static class Image {
-        @Schema(description = "R2에 업로드된 파일 key", example = "items/2026/03/13/uuid.jpg")
+        @Schema(description = "R2에 업로드된 임시 파일 key", example = "temp/items/2026/03/13/uuid.jpg")
         @NotBlank(message = "파일 key는 필수입니다.")
         private String fileKey;
 

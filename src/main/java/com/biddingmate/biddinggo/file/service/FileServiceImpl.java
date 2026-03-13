@@ -31,7 +31,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
-    private static final String FILE_KEY_PREFIX = "items/";
+    private static final String TEMP_FILE_KEY_PREFIX = "temp/items/";
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "image/jpeg",
             "image/png",
@@ -109,8 +109,8 @@ public class FileServiceImpl implements FileService {
     public boolean isManagedFileKey(String fileKey) {
         return fileKey != null
                 && !fileKey.isBlank()
-                && fileKey.startsWith(FILE_KEY_PREFIX)
-                && fileKey.length() > FILE_KEY_PREFIX.length();
+                && fileKey.startsWith(TEMP_FILE_KEY_PREFIX)
+                && fileKey.length() > TEMP_FILE_KEY_PREFIX.length();
     }
 
     @Override
@@ -162,7 +162,7 @@ public class FileServiceImpl implements FileService {
         LocalDate today = LocalDate.now();
 
         return String.format(
-                FILE_KEY_PREFIX + "%d/%02d/%02d/%s.%s",
+                TEMP_FILE_KEY_PREFIX + "%d/%02d/%02d/%s.%s",
                 today.getYear(),
                 today.getMonthValue(),
                 today.getDayOfMonth(),

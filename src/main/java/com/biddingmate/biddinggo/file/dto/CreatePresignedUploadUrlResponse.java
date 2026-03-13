@@ -13,7 +13,7 @@ public class CreatePresignedUploadUrlResponse {
     @Schema(description = "PUT 업로드 URL")
     private String uploadUrl;
 
-    @Schema(description = "R2에 저장될 파일 key", example = "items/2026/03/13/uuid.jpg")
+    @Schema(description = "R2에 저장될 임시 파일 key", example = "temp/items/2026/03/13/uuid.jpg")
     private String fileKey;
 
     @Schema(description = "업로드 후 접근할 공개 URL")

@@ -10,6 +10,6 @@ import lombok.Getter;
 @Builder
 @Schema(description = "R2 임시 파일 삭제 응답 DTO")
 public class DeleteFileResponse {
-    @Schema(description = "삭제된 파일 key", example = "items/2026/03/13/uuid.jpg")
+    @Schema(description = "삭제된 임시 파일 key", example = "temp/items/2026/03/13/uuid.jpg")
     private String fileKey;
 }
