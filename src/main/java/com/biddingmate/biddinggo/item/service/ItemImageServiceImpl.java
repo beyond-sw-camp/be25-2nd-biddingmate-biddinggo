@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.item.service;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.file.service.FileService;
 import com.biddingmate.biddinggo.item.mapper.ItemImageMybatisMapper;
 import com.biddingmate.biddinggo.item.model.ItemImage;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ItemImageServiceImpl implements ItemImageService {
+    private final FileService fileService;
     private final ItemImageMybatisMapper itemImageMybatisMapper;
 
     @Override
@@ -31,16 +33,17 @@ public class ItemImageServiceImpl implements ItemImageService {
 
         for (CreateAuctionRequest.Image image : images) {
             if (image == null
-                    || image.getUrl() == null || image.getUrl().isBlank()
+                    || image.getFileKey() == null || image.getFileKey().isBlank()
                     || image.getDisplayOrder() == null || image.getDisplayOrder() <= 0
                     || image.getType() == null || image.getType().isBlank()
-                    || image.getSize() == null || image.getSize() <= 0) {
+                    || image.getSize() == null || image.getSize() <= 0
+                    || !fileService.isManagedFileKey(image.getFileKey())) {
                 throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
             }
 
             ItemImage itemImage = ItemImage.builder()
                     .itemId(itemId)
-                    .url(image.getUrl())
+                    .url(fileService.buildPublicUrl(image.getFileKey()))
                     .displayOrder(image.getDisplayOrder())
                     .type(image.getType())
                     .size(image.getSize())

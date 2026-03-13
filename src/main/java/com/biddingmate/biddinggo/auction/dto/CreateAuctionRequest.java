@@ -61,8 +61,8 @@ public class CreateAuctionRequest {
     @Builder
     @Schema(description = "상품 이미지 요청 DTO")
     public static class Image {
-        @Schema(description = "R2에 저장된 이미지 URL", example = "https://cdn.example.com/items/1/main.jpg")
-        private String url;
+        @Schema(description = "R2에 업로드된 파일 key", example = "items/2026/03/13/uuid.jpg")
+        private String fileKey;
 
         @Schema(description = "이미지 노출 순서", example = "1")
         private Integer displayOrder;

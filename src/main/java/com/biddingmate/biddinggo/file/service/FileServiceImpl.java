@@ -7,6 +7,8 @@ import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlRequest;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -14,12 +16,14 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
+    private static final String FILE_KEY_PREFIX = "items/";
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
             "image/jpeg",
             "image/png",
@@ -27,6 +31,7 @@ public class FileServiceImpl implements FileService {
             "image/gif"
     );
 
+    private final S3Client s3Client;
     private final S3Presigner s3Presigner;
     private final R2Properties r2Properties;
 
@@ -64,6 +69,50 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    public String buildPublicUrl(String fileKey) {
+        validateFileKey(fileKey);
+
+        String publicBaseUrl = r2Properties.getPublicBaseUrl();
+
+        if (publicBaseUrl == null || publicBaseUrl.isBlank()) {
+            throw new CustomException(ErrorType.R2_PRESIGNED_URL_GENERATION_FAILED);
+        }
+
+        return publicBaseUrl.endsWith("/")
+                ? publicBaseUrl + fileKey
+                : publicBaseUrl + "/" + fileKey;
+    }
+
+    @Override
+    public boolean isManagedFileKey(String fileKey) {
+        return fileKey != null
+                && !fileKey.isBlank()
+                && fileKey.startsWith(FILE_KEY_PREFIX)
+                && fileKey.length() > FILE_KEY_PREFIX.length();
+    }
+
+    @Override
+    public void deleteFiles(List<String> fileKeys) {
+        if (fileKeys == null || fileKeys.isEmpty()) {
+            return;
+        }
+
+        for (String fileKey : fileKeys) {
+            if (!isManagedFileKey(fileKey)) {
+                continue;
+            }
+
+            try {
+                s3Client.deleteObject(DeleteObjectRequest.builder()
+                        .bucket(r2Properties.getBucket())
+                        .key(fileKey)
+                        .build());
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
     private void validateRequest(CreatePresignedUploadUrlRequest request) {
         if (request == null
                 || request.getOriginalFilename() == null || request.getOriginalFilename().isBlank()
@@ -78,7 +127,7 @@ public class FileServiceImpl implements FileService {
         LocalDate today = LocalDate.now();
 
         return String.format(
-                "items/%d/%02d/%02d/%s.%s",
+                FILE_KEY_PREFIX + "%d/%02d/%02d/%s.%s",
                 today.getYear(),
                 today.getMonthValue(),
                 today.getDayOfMonth(),
@@ -97,15 +146,9 @@ public class FileServiceImpl implements FileService {
         return originalFilename.substring(extensionIndex + 1).toLowerCase();
     }
 
-    private String buildPublicUrl(String fileKey) {
-        String publicBaseUrl = r2Properties.getPublicBaseUrl();
-
-        if (publicBaseUrl == null || publicBaseUrl.isBlank()) {
-            throw new CustomException(ErrorType.R2_PRESIGNED_URL_GENERATION_FAILED);
+    private void validateFileKey(String fileKey) {
+        if (!isManagedFileKey(fileKey)) {
+            throw new CustomException(ErrorType.INVALID_FILE_UPLOAD_REQUEST);
         }
-
-        return publicBaseUrl.endsWith("/")
-                ? publicBaseUrl + fileKey
-                : publicBaseUrl + "/" + fileKey;
     }
 }
