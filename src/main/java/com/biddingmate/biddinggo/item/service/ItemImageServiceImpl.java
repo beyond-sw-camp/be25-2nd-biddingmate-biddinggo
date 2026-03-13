@@ -36,6 +36,10 @@ public class ItemImageServiceImpl implements ItemImageService {
                 throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
             }
 
+            if (!fileService.exists(image.getFileKey())) {
+                throw new CustomException(ErrorType.UPLOADED_FILE_NOT_FOUND);
+            }
+
             ItemImage itemImage = ItemImage.builder()
                     .itemId(itemId)
                     .url(fileService.buildPublicUrl(image.getFileKey()))

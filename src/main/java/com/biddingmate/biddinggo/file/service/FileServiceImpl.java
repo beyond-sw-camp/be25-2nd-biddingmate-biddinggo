@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
@@ -107,6 +109,29 @@ public class FileServiceImpl implements FileService {
                 && !fileKey.isBlank()
                 && fileKey.startsWith(FILE_KEY_PREFIX)
                 && fileKey.length() > FILE_KEY_PREFIX.length();
+    }
+
+    @Override
+    public boolean exists(String fileKey) {
+        validateFileKey(fileKey);
+
+        try {
+            s3Client.headObject(HeadObjectRequest.builder()
+                    .bucket(r2Properties.getBucket())
+                    .key(fileKey)
+                    .build());
+            return true;
+        } catch (S3Exception exception) {
+            if (exception.statusCode() == 404) {
+                return false;
+            }
+
+            log.error("R2 파일 존재 여부 조회 실패 - fileKey: {}", fileKey, exception);
+            throw new CustomException(ErrorType.FILE_LOOKUP_FAILED);
+        } catch (Exception exception) {
+            log.error("R2 파일 존재 여부 조회 실패 - fileKey: {}", fileKey, exception);
+            throw new CustomException(ErrorType.FILE_LOOKUP_FAILED);
+        }
     }
 
     @Override

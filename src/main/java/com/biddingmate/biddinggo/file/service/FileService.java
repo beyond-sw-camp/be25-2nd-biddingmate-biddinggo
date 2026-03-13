@@ -16,5 +16,7 @@ public interface FileService {
 
     boolean isManagedFileKey(String fileKey);
 
+    boolean exists(String fileKey);
+
     void deleteFiles(List<String> fileKeys);
 }
