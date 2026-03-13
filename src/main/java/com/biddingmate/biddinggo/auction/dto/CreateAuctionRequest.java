@@ -3,6 +3,12 @@ package com.biddingmate.biddinggo.auction.dto;
 import com.biddingmate.biddinggo.auction.model.AuctionType;
 import com.biddingmate.biddinggo.auction.model.YesNo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,9 +26,13 @@ import java.util.List;
 @Schema(description = "경매 등록 요청 DTO")
 public class CreateAuctionRequest {
     @Schema(description = "경매 상품 정보")
+    @NotNull(message = "상품 정보는 필수입니다.")
+    @Valid
     private Item item;
 
     @Schema(description = "경매 정보")
+    @NotNull(message = "경매 정보는 필수입니다.")
+    @Valid
     private Auction auction;
 
     @Getter
@@ -33,25 +43,31 @@ public class CreateAuctionRequest {
     @Schema(description = "경매 상품 요청 DTO")
     public static class Item {
         @Schema(description = "판매자 ID", example = "1")
+        @NotNull(message = "판매자 ID는 필수입니다.")
         private Long sellerId;
 
         @Schema(description = "카테고리 ID", example = "10")
+        @NotNull(message = "카테고리 ID는 필수입니다.")
         private Long categoryId;
 
         @Schema(description = "브랜드명", example = "Nike")
+        @Size(max = 50, message = "브랜드명은 50자 이하여야 합니다.")
         private String brand;
 
         @Schema(description = "상품명", example = "Air Jordan 1 High")
+        @NotBlank(message = "상품명은 필수입니다.")
+        @Size(max = 50, message = "상품명은 50자 이하여야 합니다.")
         private String name;
 
         @Schema(description = "상품 상태", example = "최상")
+        @Size(max = 20, message = "상품 상태는 20자 이하여야 합니다.")
         private String quality;
 
         @Schema(description = "상품 설명", example = "실착 2회, 박스 포함")
         private String description;
 
         @Schema(description = "상품 이미지 목록")
-        private List<Image> images;
+        private List<@Valid @NotNull(message = "이미지 정보는 null일 수 없습니다.") Image> images;
     }
 
     @Getter
@@ -62,15 +78,22 @@ public class CreateAuctionRequest {
     @Schema(description = "상품 이미지 요청 DTO")
     public static class Image {
         @Schema(description = "R2에 업로드된 파일 key", example = "items/2026/03/13/uuid.jpg")
+        @NotBlank(message = "파일 key는 필수입니다.")
         private String fileKey;
 
         @Schema(description = "이미지 노출 순서", example = "1")
+        @NotNull(message = "이미지 노출 순서는 필수입니다.")
+        @Positive(message = "이미지 노출 순서는 1 이상이어야 합니다.")
         private Integer displayOrder;
 
         @Schema(description = "이미지 확장자 또는 MIME 타입 구분값", example = "jpg")
+        @NotBlank(message = "이미지 타입은 필수입니다.")
+        @Size(max = 20, message = "이미지 타입은 20자 이하여야 합니다.")
         private String type;
 
         @Schema(description = "이미지 파일 크기(byte)", example = "204800")
+        @NotNull(message = "이미지 파일 크기는 필수입니다.")
+        @Positive(message = "이미지 파일 크기는 1 이상이어야 합니다.")
         private Integer size;
     }
 
@@ -88,21 +111,27 @@ public class CreateAuctionRequest {
         private YesNo inspectionYn;
 
         @Schema(description = "시작가", example = "100000")
+        @PositiveOrZero(message = "시작가는 0 이상이어야 합니다.")
         private Long startPrice;
 
         @Schema(description = "입찰 단위", example = "1000")
+        @Positive(message = "입찰 단위는 1 이상이어야 합니다.")
         private Integer bidUnit;
 
         @Schema(description = "비크리 가격", example = "150000", nullable = true)
+        @PositiveOrZero(message = "비크리 가격은 0 이상이어야 합니다.")
         private Long vickreyPrice;
 
         @Schema(description = "즉시 구매가", example = "180000", nullable = true)
+        @PositiveOrZero(message = "즉시 구매가는 0 이상이어야 합니다.")
         private Long buyNowPrice;
 
         @Schema(description = "경매 시작일시", example = "2026-03-15T10:00:00")
+        @NotNull(message = "경매 시작일시는 필수입니다.")
         private LocalDateTime startDate;
 
         @Schema(description = "경매 종료일시", example = "2026-03-16T10:00:00")
+        @NotNull(message = "경매 종료일시는 필수입니다.")
         private LocalDateTime endDate;
     }
 }

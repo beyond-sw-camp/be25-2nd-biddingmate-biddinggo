@@ -47,18 +47,11 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
     }
 
     /**
-     * 두 하위 서비스가 공통으로 사용하는 필수 입력값을 선검증한다.
+     * DTO 기본 검증은 컨트롤러에서 처리하고,
+     * 여기서는 비즈니스 규칙만 검증한다.
      */
     private void validateRequest(CreateAuctionRequest request) {
-        if (request == null
-                || request.getItem() == null
-                || request.getAuction() == null
-                || request.getItem().getSellerId() == null
-                || request.getItem().getCategoryId() == null
-                || request.getItem().getName() == null || request.getItem().getName().isBlank()
-                || request.getAuction().getStartDate() == null
-                || request.getAuction().getEndDate() == null
-                || !request.getAuction().getEndDate().isAfter(request.getAuction().getStartDate())) {
+        if (!request.getAuction().getEndDate().isAfter(request.getAuction().getStartDate())) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }
     }

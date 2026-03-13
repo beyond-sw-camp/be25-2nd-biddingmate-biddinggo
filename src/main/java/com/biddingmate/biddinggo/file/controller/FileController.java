@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.file.dto.DeleteFileResponse;
 import com.biddingmate.biddinggo.file.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class FileController {
     @PostMapping("/presigned-upload")
     @Operation(summary = "R2 presigned upload URL 발급", description = "이미지를 R2에 직접 업로드할 수 있는 presigned PUT URL을 발급합니다.")
     public ResponseEntity<ApiResponse<CreatePresignedUploadUrlResponse>> createPresignedUploadUrl(
-            @RequestBody CreatePresignedUploadUrlRequest request) {
+            @Valid @RequestBody CreatePresignedUploadUrlRequest request) {
 
         CreatePresignedUploadUrlResponse result = fileService.createPresignedUploadUrl(request);
 
@@ -36,7 +37,7 @@ public class FileController {
     @PostMapping("/delete")
     @Operation(summary = "R2 임시 파일 삭제", description = "아이템 등록 과정에서 업로드한 임시 이미지를 삭제합니다.")
     public ResponseEntity<ApiResponse<DeleteFileResponse>> deleteFile(
-            @RequestBody DeleteFileRequest request) {
+            @Valid @RequestBody DeleteFileRequest request) {
 
         DeleteFileResponse result = fileService.deleteFile(request);
 

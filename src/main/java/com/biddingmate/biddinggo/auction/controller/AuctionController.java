@@ -5,6 +5,7 @@ import com.biddingmate.biddinggo.auction.dto.CreateAuctionResponse;
 import com.biddingmate.biddinggo.auction.service.AuctionApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class AuctionController {
     @PostMapping("")
     @Operation(summary = "경매 등록", description = "경매 상품과 경매 정보를 함께 등록합니다.")
     public ResponseEntity<ApiResponse<CreateAuctionResponse>> createAuction(
-            @RequestBody CreateAuctionRequest request) {
+            @Valid @RequestBody CreateAuctionRequest request) {
 
         Long auctionId = auctionApplicationService.createAuction(request);
 

@@ -32,12 +32,7 @@ public class ItemImageServiceImpl implements ItemImageService {
         }
 
         for (CreateAuctionRequest.Image image : images) {
-            if (image == null
-                    || image.getFileKey() == null || image.getFileKey().isBlank()
-                    || image.getDisplayOrder() == null || image.getDisplayOrder() <= 0
-                    || image.getType() == null || image.getType().isBlank()
-                    || image.getSize() == null || image.getSize() <= 0
-                    || !fileService.isManagedFileKey(image.getFileKey())) {
+            if (!fileService.isManagedFileKey(image.getFileKey())) {
                 throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
             }
 

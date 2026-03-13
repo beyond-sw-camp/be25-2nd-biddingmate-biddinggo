@@ -21,14 +21,7 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     public Long createAuction(CreateAuctionRequest request, Long itemId) {
-        if (request == null
-                || request.getItem() == null
-                || request.getAuction() == null
-                || itemId == null
-                || request.getItem().getSellerId() == null
-                || request.getAuction().getStartDate() == null
-                || request.getAuction().getEndDate() == null
-                || !request.getAuction().getEndDate().isAfter(request.getAuction().getStartDate())) {
+        if (itemId == null) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }
 
