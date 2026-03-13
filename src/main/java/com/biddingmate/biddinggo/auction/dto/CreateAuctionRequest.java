@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -48,6 +49,29 @@ public class CreateAuctionRequest {
 
         @Schema(description = "상품 설명", example = "실착 2회, 박스 포함")
         private String description;
+
+        @Schema(description = "상품 이미지 목록")
+        private List<Image> images;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @Schema(description = "상품 이미지 요청 DTO")
+    public static class Image {
+        @Schema(description = "R2에 저장된 이미지 URL", example = "https://cdn.example.com/items/1/main.jpg")
+        private String url;
+
+        @Schema(description = "이미지 노출 순서", example = "1")
+        private Integer displayOrder;
+
+        @Schema(description = "이미지 확장자 또는 MIME 타입 구분값", example = "jpg")
+        private String type;
+
+        @Schema(description = "이미지 파일 크기(byte)", example = "204800")
+        private Integer size;
     }
 
     @Getter

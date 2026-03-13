@@ -28,7 +28,8 @@ public enum ErrorType {
     // 경매
     INVALID_AUCTION_CREATE_REQUEST("auction-001", "경매 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_ITEM_SAVE_FAILED("auction-002", "경매 상품 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    AUCTION_SAVE_FAILED("auction-003", "경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    AUCTION_SAVE_FAILED("auction-003", "경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ITEM_IMAGE_SAVE_FAILED("auction-004", "상품 이미지 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 
     private final String errorCode;

@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
+import com.biddingmate.biddinggo.item.service.ItemImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuctionApplicationServiceImpl implements AuctionApplicationService {
     private final AuctionItemService auctionItemService;
+    private final ItemImageService itemImageService;
     private final AuctionService auctionService;
 
     @Override
@@ -26,7 +28,10 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
         // 1. auction_item 먼저 생성하여 itemId를 확보한다.
         Long itemId = auctionItemService.createAuctionItem(request);
 
-        // 2. 생성된 itemId로 auction을 생성한다.
+        // 2. 업로드된 이미지 메타데이터를 item_image에 저장한다.
+        itemImageService.createItemImages(itemId, request.getItem().getImages());
+
+        // 3. 생성된 itemId로 auction을 생성한다.
         return auctionService.createAuction(request, itemId);
     }
 
