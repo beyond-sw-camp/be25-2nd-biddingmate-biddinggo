@@ -5,6 +5,8 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.config.R2Properties;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlRequest;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlResponse;
+import com.biddingmate.biddinggo.file.dto.DeleteFileRequest;
+import com.biddingmate.biddinggo.file.dto.DeleteFileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -70,6 +72,19 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public DeleteFileResponse deleteFile(DeleteFileRequest request) {
+        if (request == null || request.getFileKey() == null || request.getFileKey().isBlank()) {
+            throw new CustomException(ErrorType.INVALID_FILE_UPLOAD_REQUEST);
+        }
+
+        deleteFile(request.getFileKey(), false);
+
+        return DeleteFileResponse.builder()
+                .fileKey(request.getFileKey())
+                .build();
+    }
+
+    @Override
     public String buildPublicUrl(String fileKey) {
         validateFileKey(fileKey);
 
@@ -99,17 +114,7 @@ public class FileServiceImpl implements FileService {
         }
 
         for (String fileKey : fileKeys) {
-            if (!isManagedFileKey(fileKey)) {
-                continue;
-            }
-
-            try {
-                s3Client.deleteObject(DeleteObjectRequest.builder()
-                        .bucket(r2Properties.getBucket())
-                        .key(fileKey)
-                        .build());
-            } catch (Exception ignored) {
-            }
+            deleteFile(fileKey, true);
         }
     }
 
@@ -149,6 +154,26 @@ public class FileServiceImpl implements FileService {
     private void validateFileKey(String fileKey) {
         if (!isManagedFileKey(fileKey)) {
             throw new CustomException(ErrorType.INVALID_FILE_UPLOAD_REQUEST);
+        }
+    }
+
+    private void deleteFile(String fileKey, boolean ignoreFailure) {
+        if (!isManagedFileKey(fileKey)) {
+            if (ignoreFailure) {
+                return;
+            }
+            throw new CustomException(ErrorType.INVALID_FILE_UPLOAD_REQUEST);
+        }
+
+        try {
+            s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(r2Properties.getBucket())
+                    .key(fileKey)
+                    .build());
+        } catch (Exception exception) {
+            if (!ignoreFailure) {
+                throw new CustomException(ErrorType.FILE_DELETE_FAILED);
+            }
         }
     }
 }

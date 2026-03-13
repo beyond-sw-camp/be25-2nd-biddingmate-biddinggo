@@ -2,11 +2,15 @@ package com.biddingmate.biddinggo.file.service;
 
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlRequest;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlResponse;
+import com.biddingmate.biddinggo.file.dto.DeleteFileRequest;
+import com.biddingmate.biddinggo.file.dto.DeleteFileResponse;
 
 import java.util.List;
 
 public interface FileService {
     CreatePresignedUploadUrlResponse createPresignedUploadUrl(CreatePresignedUploadUrlRequest request);
+
+    DeleteFileResponse deleteFile(DeleteFileRequest request);
 
     String buildPublicUrl(String fileKey);
 

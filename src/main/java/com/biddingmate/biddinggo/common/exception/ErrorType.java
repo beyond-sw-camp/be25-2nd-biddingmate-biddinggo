@@ -33,7 +33,8 @@ public enum ErrorType {
 
     // 파일
     INVALID_FILE_UPLOAD_REQUEST("file-001", "파일 업로드 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
-    R2_PRESIGNED_URL_GENERATION_FAILED("file-002", "R2 업로드 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    R2_PRESIGNED_URL_GENERATION_FAILED("file-002", "R2 업로드 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_DELETE_FAILED("file-003", "파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 
     private final String errorCode;

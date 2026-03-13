@@ -3,6 +3,8 @@ package com.biddingmate.biddinggo.file.controller;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlRequest;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlResponse;
+import com.biddingmate.biddinggo.file.dto.DeleteFileRequest;
+import com.biddingmate.biddinggo.file.dto.DeleteFileResponse;
 import com.biddingmate.biddinggo.file.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,5 +31,15 @@ public class FileController {
         CreatePresignedUploadUrlResponse result = fileService.createPresignedUploadUrl(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "Presigned upload URL 발급 완료", result);
+    }
+
+    @PostMapping("/delete")
+    @Operation(summary = "R2 임시 파일 삭제", description = "아이템 등록 과정에서 업로드한 임시 이미지를 삭제합니다.")
+    public ResponseEntity<ApiResponse<DeleteFileResponse>> deleteFile(
+            @RequestBody DeleteFileRequest request) {
+
+        DeleteFileResponse result = fileService.deleteFile(request);
+
+        return ApiResponse.of(HttpStatus.OK, null, "파일 삭제 완료", result);
     }
 }
