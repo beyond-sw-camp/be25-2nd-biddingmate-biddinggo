@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.item.service;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.file.model.FileMetadata;
 import com.biddingmate.biddinggo.file.service.FileService;
 import com.biddingmate.biddinggo.item.mapper.ItemImageMybatisMapper;
 import com.biddingmate.biddinggo.item.model.ItemImage;
@@ -40,16 +41,14 @@ public class ItemImageServiceImpl implements ItemImageService {
                 throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
             }
 
-            if (!fileService.exists(image.getFileKey())) {
-                throw new CustomException(ErrorType.UPLOADED_FILE_NOT_FOUND);
-            }
+            FileMetadata fileMetadata = fileService.getFileMetadata(image.getFileKey());
 
             ItemImage itemImage = ItemImage.builder()
                     .itemId(itemId)
                     .url(fileService.buildPublicUrl(image.getFileKey()))
                     .displayOrder(image.getDisplayOrder())
-                    .type(image.getType())
-                    .size(image.getSize())
+                    .type(fileMetadata.getContentType())
+                    .size(fileMetadata.getSize())
                     .createdAt(LocalDateTime.now())
                     .build();
 

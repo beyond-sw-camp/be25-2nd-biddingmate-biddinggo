@@ -37,7 +37,8 @@ public enum ErrorType {
     R2_PRESIGNED_URL_GENERATION_FAILED("file-002", "R2 업로드 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_DELETE_FAILED("file-003", "파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_LOOKUP_FAILED("file-004", "업로드된 파일 조회에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    UPLOADED_FILE_NOT_FOUND("file-005", "업로드된 파일을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+    UPLOADED_FILE_NOT_FOUND("file-005", "업로드된 파일을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_UPLOADED_FILE_METADATA("file-006", "업로드된 파일 메타데이터가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 
 
     private final String errorCode;

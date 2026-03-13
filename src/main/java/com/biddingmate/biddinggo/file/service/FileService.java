@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlRequest;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlResponse;
 import com.biddingmate.biddinggo.file.dto.DeleteFileRequest;
 import com.biddingmate.biddinggo.file.dto.DeleteFileResponse;
+import com.biddingmate.biddinggo.file.model.FileMetadata;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface FileService {
 
     boolean isManagedFileKey(String fileKey);
 
-    boolean exists(String fileKey);
+    FileMetadata getFileMetadata(String fileKey);
 
     void deleteFiles(List<String> fileKeys);
 }

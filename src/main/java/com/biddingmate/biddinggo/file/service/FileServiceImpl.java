@@ -7,12 +7,14 @@ import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlRequest;
 import com.biddingmate.biddinggo.file.dto.CreatePresignedUploadUrlResponse;
 import com.biddingmate.biddinggo.file.dto.DeleteFileRequest;
 import com.biddingmate.biddinggo.file.dto.DeleteFileResponse;
+import com.biddingmate.biddinggo.file.model.FileMetadata;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -112,18 +114,19 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public boolean exists(String fileKey) {
+    public FileMetadata getFileMetadata(String fileKey) {
         validateFileKey(fileKey);
 
         try {
-            s3Client.headObject(HeadObjectRequest.builder()
+            HeadObjectResponse response = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(r2Properties.getBucket())
                     .key(fileKey)
                     .build());
-            return true;
+
+            return extractFileMetadata(response);
         } catch (S3Exception exception) {
             if (exception.statusCode() == 404) {
-                return false;
+                throw new CustomException(ErrorType.UPLOADED_FILE_NOT_FOUND);
             }
 
             log.error("R2 파일 존재 여부 조회 실패 - fileKey: {}", fileKey, exception);
@@ -182,6 +185,25 @@ public class FileServiceImpl implements FileService {
         if (!isManagedFileKey(fileKey)) {
             throw new CustomException(ErrorType.INVALID_FILE_UPLOAD_REQUEST);
         }
+    }
+
+    private FileMetadata extractFileMetadata(HeadObjectResponse response) {
+        String contentType = response.contentType();
+        Long contentLength = response.contentLength();
+
+        if (contentType == null
+                || contentType.isBlank()
+                || !ALLOWED_CONTENT_TYPES.contains(contentType)
+                || contentLength == null
+                || contentLength <= 0
+                || contentLength > Integer.MAX_VALUE) {
+            throw new CustomException(ErrorType.INVALID_UPLOADED_FILE_METADATA);
+        }
+
+        return FileMetadata.builder()
+                .contentType(contentType)
+                .size(contentLength.intValue())
+                .build();
     }
 
     private void deleteFile(String fileKey, boolean ignoreFailure) {

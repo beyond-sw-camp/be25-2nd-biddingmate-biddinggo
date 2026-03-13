@@ -85,16 +85,6 @@ public class CreateAuctionRequest {
         @NotNull(message = "이미지 노출 순서는 필수입니다.")
         @Positive(message = "이미지 노출 순서는 1 이상이어야 합니다.")
         private Integer displayOrder;
-
-        @Schema(description = "이미지 확장자 또는 MIME 타입 구분값", example = "jpg")
-        @NotBlank(message = "이미지 타입은 필수입니다.")
-        @Size(max = 20, message = "이미지 타입은 20자 이하여야 합니다.")
-        private String type;
-
-        @Schema(description = "이미지 파일 크기(byte)", example = "204800")
-        @NotNull(message = "이미지 파일 크기는 필수입니다.")
-        @Positive(message = "이미지 파일 크기는 1 이상이어야 합니다.")
-        private Integer size;
     }
 
     @Getter
