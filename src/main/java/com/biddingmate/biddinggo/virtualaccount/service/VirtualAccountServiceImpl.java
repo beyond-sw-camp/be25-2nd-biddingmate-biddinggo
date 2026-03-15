@@ -5,8 +5,9 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.util.DateTimeUtils;
 import com.biddingmate.biddinggo.virtualaccount.dto.CreateVirtualAccountRequest;
 import com.biddingmate.biddinggo.virtualaccount.dto.CreateVirtualAccountResponse;
+import com.biddingmate.biddinggo.virtualaccount.dto.GetVirtualAccountResponse;
 import com.biddingmate.biddinggo.virtualaccount.dto.TossCreateVirtualAccount;
-import com.biddingmate.biddinggo.payment.mapper.PaymentMybatisMapper;
+import com.biddingmate.biddinggo.payment.mapper.PaymentMapper;
 import com.biddingmate.biddinggo.virtualaccount.mapper.VirtualAccountMapper;
 import com.biddingmate.biddinggo.payment.model.Payment;
 import com.biddingmate.biddinggo.payment.model.PaymentStatus;
@@ -14,7 +15,6 @@ import com.biddingmate.biddinggo.virtualaccount.model.VirtualAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,14 +31,14 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
     @Value("${tosspayments.secret-key}")
     private String secretKey;
     private final WebClient webClient;
-    private final PaymentMybatisMapper paymentMybatisMapper;
+    private final PaymentMapper paymentMapper;
     private final VirtualAccountMapper virtualAccountMapper;
     // private final PointMybatisMapper pointMybatisMapper;
 
     @Override
     @Transactional
     public CreateVirtualAccountResponse createVirtualAccount(CreateVirtualAccountRequest request) {
-        if (paymentMybatisMapper.existsByOrderId(request.getOrderId())) {
+        if (paymentMapper.existsByOrderId(request.getOrderId())) {
             throw new CustomException(ErrorType.VIRTUAL_ACCOUNT_ALREADY_EXISTS);
         }
 
@@ -73,7 +74,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        int p_insert = paymentMybatisMapper.insert(payment);
+        int p_insert = paymentMapper.insert(payment);
         System.out.println("payment 디버깅 = " + p_insert);
 
         if (responseData.getVirtualAccount() != null) {
@@ -99,5 +100,13 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
                 .accountHolderName(responseData.getVirtualAccount() != null ? responseData.getVirtualAccount().getCustomerName() : null)
                 .dueDate(responseData.getVirtualAccount() != null ? DateTimeUtils.toLocalDateTime(responseData.getVirtualAccount().getDueDate()) : null)
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<GetVirtualAccountResponse> getVirtualAccount(Long memberId) {
+        List<GetVirtualAccountResponse> list =  paymentMapper.findByMemberId(memberId, PaymentStatus.WAITING_FOR_DEPOSIT);
+
+        return list;
     }
 }
