@@ -1,13 +1,12 @@
 spring:
+  config:
+    import: optional:file:.env
+
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-jwt:
-  secret: "XzMUp0gA89aaJTGaEe2g08FPsffQfhkZnHZSAesw75g="
-  access-token-validity-in-seconds: 3600
-  refresh-token-validity-in-seconds: 1209600
 
   jpa:
     hibernate:
@@ -19,3 +18,8 @@ jwt:
     baseline-on-migrate: true
     encoding: UTF-8
     clean-disabled: true
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-validity-in-seconds: 3600
+  refresh-token-validity-in-seconds: 1209600
