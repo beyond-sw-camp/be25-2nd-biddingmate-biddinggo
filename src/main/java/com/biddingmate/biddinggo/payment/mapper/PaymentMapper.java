@@ -3,7 +3,7 @@ package com.biddingmate.biddinggo.payment.mapper;
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import com.biddingmate.biddinggo.payment.model.Payment;
 import com.biddingmate.biddinggo.payment.model.PaymentStatus;
-import com.biddingmate.biddinggo.virtualaccount.dto.GetVirtualAccountResponse;
+import com.biddingmate.biddinggo.payment.dto.GetVirtualAccountResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.virtualaccount.dto;
+package com.biddingmate.biddinggo.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

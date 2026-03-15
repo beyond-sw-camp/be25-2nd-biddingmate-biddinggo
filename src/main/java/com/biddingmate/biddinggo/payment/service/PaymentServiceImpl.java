@@ -1,17 +1,17 @@
-package com.biddingmate.biddinggo.virtualaccount.service;
+package com.biddingmate.biddinggo.payment.service;
 
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.util.DateTimeUtils;
-import com.biddingmate.biddinggo.virtualaccount.dto.CreateVirtualAccountRequest;
-import com.biddingmate.biddinggo.virtualaccount.dto.CreateVirtualAccountResponse;
-import com.biddingmate.biddinggo.virtualaccount.dto.GetVirtualAccountResponse;
-import com.biddingmate.biddinggo.virtualaccount.dto.TossCreateVirtualAccount;
+import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountRequest;
+import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountResponse;
+import com.biddingmate.biddinggo.payment.dto.GetVirtualAccountResponse;
+import com.biddingmate.biddinggo.payment.dto.TossCreateVirtualAccount;
 import com.biddingmate.biddinggo.payment.mapper.PaymentMapper;
-import com.biddingmate.biddinggo.virtualaccount.mapper.VirtualAccountMapper;
+import com.biddingmate.biddinggo.payment.mapper.VirtualAccountMapper;
 import com.biddingmate.biddinggo.payment.model.Payment;
 import com.biddingmate.biddinggo.payment.model.PaymentStatus;
-import com.biddingmate.biddinggo.virtualaccount.model.VirtualAccount;
+import com.biddingmate.biddinggo.payment.model.VirtualAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +27,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class VirtualAccountServiceImpl implements VirtualAccountService {
+public class PaymentServiceImpl implements PaymentService {
     @Value("${tosspayments.secret-key}")
     private String secretKey;
     private final WebClient webClient;
