@@ -10,10 +10,20 @@ import org.springframework.http.ResponseEntity;
 @AllArgsConstructor
 @Builder
 public class ApiResponse<T> {
-    private int status;
-    private String errorCode;
-    private String message;
-    private T result;
+    private int status;         //HTTP 상태 코드(200,400등)
+    private String errorCode;   // 에러 발생 시 구분 용 코드
+    private String message;     // 사용자에게 보여줄 메세지
+    private T result;           // 실제 데이터 (JSON객체)
+
+    // 성공 시 사용하는 매서드
+    public static <T> ResponseEntity<ApiResponse<T>> success(T data) {
+        return of(HttpStatus.OK, null, "요청이 성공적으로 처리되었습니다.", data);
+    }
+
+    // 예외를 던지지 않고 직접 에러를 응답할 때 사용
+    public static <T> ResponseEntity<ApiResponse<T>> error(String errorCode, String message) {
+        return of(HttpStatus.BAD_REQUEST, errorCode, message, null);
+    }
 
     /*
      * 제네릭 정적 팩토리 메서드
