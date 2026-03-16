@@ -42,6 +42,6 @@ public class PaymentController {
 
 
 
-        return ApiResponse.of(HttpStatus.OK, null, "가삭계좌 조회 성공", result);
+        return ApiResponse.of(HttpStatus.OK, null, "가상계좌 조회 성공", result);
     }
 }
