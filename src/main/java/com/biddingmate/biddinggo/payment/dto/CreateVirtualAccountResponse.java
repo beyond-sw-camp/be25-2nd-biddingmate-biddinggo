@@ -1,5 +1,6 @@
-package com.biddingmate.biddinggo.virtualaccount.dto;
+package com.biddingmate.biddinggo.payment.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,5 +17,6 @@ public class CreateVirtualAccountResponse {
     private String bankCode;
     private String bankAccount;
     private String accountHolderName;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dueDate;
 }

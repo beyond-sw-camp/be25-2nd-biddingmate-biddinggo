@@ -1,0 +1,12 @@
+package com.biddingmate.biddinggo.payment.service;
+
+import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountRequest;
+import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountResponse;
+import com.biddingmate.biddinggo.payment.dto.GetVirtualAccountResponse;
+
+import java.util.List;
+
+public interface PaymentService {
+    CreateVirtualAccountResponse createVirtualAccount(CreateVirtualAccountRequest request);
+    List<GetVirtualAccountResponse> getVirtualAccount(Long id);
+}
