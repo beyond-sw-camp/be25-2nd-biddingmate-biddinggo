@@ -68,8 +68,15 @@
     </select>
 
     <!-- 멱등성 검사 후 결제 업데이트 -->
-    <update id="completeIfWaiting">
-
+    <update id="completeIfWaiting" >
+        UPDATE
+            payment p
+        SET
+            p.status = 'DONE',
+            p.approved_at = #{approvedAt}
+        WHERE
+            p.order_id = #{orderId}
+          AND p.status = 'WAITING_FOR_DEPOSIT'
     </update>
 </mapper>
 
