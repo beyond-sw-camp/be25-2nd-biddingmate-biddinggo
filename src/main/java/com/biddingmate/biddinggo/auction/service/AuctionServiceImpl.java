@@ -1,7 +1,7 @@
 package com.biddingmate.biddinggo.auction.service;
 
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
-import com.biddingmate.biddinggo.auction.mapper.AuctionMybatisMapper;
+import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
-    private final AuctionMybatisMapper auctionMybatisMapper;
+    private final AuctionMapper auctionMapper;
 
     @Override
     public Long createAuction(CreateAuctionRequest request, Long itemId) {
@@ -41,7 +41,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .build();
 
         // auction 저장 후 생성된 PK를 모델에 주입받는다.
-        int auctionInsertCount = auctionMybatisMapper.insert(auction);
+        int auctionInsertCount = auctionMapper.insert(auction);
 
         if (auctionInsertCount != 1 || auction.getId() == null) {
             throw new CustomException(ErrorType.AUCTION_SAVE_FAILED);

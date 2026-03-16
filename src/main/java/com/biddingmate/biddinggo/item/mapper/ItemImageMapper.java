@@ -8,6 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface ItemImageMybatisMapper extends IMybatisCRUD<ItemImage> {
+public interface ItemImageMapper extends IMybatisCRUD<ItemImage> {
     List<AuctionDetailResponse.Image> findDetailImagesByItemId(Long itemId);
 }

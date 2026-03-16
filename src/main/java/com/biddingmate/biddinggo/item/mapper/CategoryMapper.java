@@ -1,9 +1,10 @@
 package com.biddingmate.biddinggo.item.mapper;
 
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
-import com.biddingmate.biddinggo.item.model.AuctionItem;
+import com.biddingmate.biddinggo.item.model.Category;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface AuctionItemMybatisMapper extends IMybatisCRUD<AuctionItem> {
+public interface CategoryMapper extends IMybatisCRUD<Category> {
+    Category findById(Long id);
 }

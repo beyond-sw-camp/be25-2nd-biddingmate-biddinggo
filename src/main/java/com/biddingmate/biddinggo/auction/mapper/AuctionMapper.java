@@ -6,6 +6,6 @@ import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface AuctionMybatisMapper extends IMybatisCRUD<Auction> {
+public interface AuctionMapper extends IMybatisCRUD<Auction> {
     AuctionDetailResponse findDetailById(Long auctionId);
 }

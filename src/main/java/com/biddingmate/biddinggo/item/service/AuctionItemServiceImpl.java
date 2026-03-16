@@ -3,8 +3,8 @@ package com.biddingmate.biddinggo.item.service;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
-import com.biddingmate.biddinggo.item.mapper.AuctionItemMybatisMapper;
-import com.biddingmate.biddinggo.item.mapper.CategoryMybatisMapper;
+import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
+import com.biddingmate.biddinggo.item.mapper.CategoryMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.Category;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuctionItemServiceImpl implements AuctionItemService {
-    private final AuctionItemMybatisMapper auctionItemMybatisMapper;
-    private final CategoryMybatisMapper categoryMybatisMapper;
+    private final AuctionItemMapper auctionItemMapper;
+    private final CategoryMapper categoryMapper;
 
     @Override
     public Long createAuctionItem(CreateAuctionRequest request) {
         // 등록 요청에서 선택한 categoryId가 실제 존재하는지 확인한다.
-        Category category = categoryMybatisMapper.findById(request.getItem().getCategoryId());
+        Category category = categoryMapper.findById(request.getItem().getCategoryId());
 
         if (category == null) {
             throw new CustomException(ErrorType.CATEGORY_NOT_FOUND);
@@ -48,7 +48,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
                 .build();
 
         // auction_item 저장 후 생성된 PK를 모델에 주입받는다.
-        int itemInsertCount = auctionItemMybatisMapper.insert(auctionItem);
+        int itemInsertCount = auctionItemMapper.insert(auctionItem);
 
         if (itemInsertCount != 1 || auctionItem.getId() == null) {
             throw new CustomException(ErrorType.AUCTION_ITEM_SAVE_FAILED);

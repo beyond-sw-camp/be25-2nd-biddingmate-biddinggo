@@ -1,10 +1,10 @@
 package com.biddingmate.biddinggo.auction.service;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
-import com.biddingmate.biddinggo.auction.mapper.AuctionMybatisMapper;
+import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
-import com.biddingmate.biddinggo.item.mapper.ItemImageMybatisMapper;
+import com.biddingmate.biddinggo.item.mapper.ItemImageMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +18,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AuctionQueryServiceImpl implements AuctionQueryService {
-    private final AuctionMybatisMapper auctionMybatisMapper;
-    private final ItemImageMybatisMapper itemImageMybatisMapper;
+    private final AuctionMapper auctionMapper;
+    private final ItemImageMapper itemImageMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -35,14 +35,14 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         }
 
         // 경매 기본 정보와 상품 본문 정보를 먼저 조회한다.
-        AuctionDetailResponse detail = auctionMybatisMapper.findDetailById(auctionId);
+        AuctionDetailResponse detail = auctionMapper.findDetailById(auctionId);
 
         if (detail == null) {
             throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
         }
 
         // item_id 기준으로 이미지 목록을 별도 조회해 노출 순서대로 붙인다.
-        List<AuctionDetailResponse.Image> images = itemImageMybatisMapper.findDetailImagesByItemId(detail.getItem().getItemId());
+        List<AuctionDetailResponse.Image> images = itemImageMapper.findDetailImagesByItemId(detail.getItem().getItemId());
         detail.getItem().setImages(images);
 
         return detail;
