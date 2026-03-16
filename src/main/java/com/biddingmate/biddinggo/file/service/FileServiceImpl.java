@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Cloudflare R2 파일 업로드/조회/삭제를 담당하는 서비스 구현체.
+ * presigned URL 발급과 임시 업로드 파일 검증/정리를 함께 처리한다.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -44,9 +48,13 @@ public class FileServiceImpl implements FileService {
     private final R2Properties r2Properties;
 
     @Override
+    /**
+     * 프론트가 R2에 직접 업로드할 수 있도록 presigned PUT URL을 발급한다.
+     */
     public CreatePresignedUploadUrlResponse createPresignedUploadUrl(CreatePresignedUploadUrlRequest request) {
         validateRequest(request);
 
+        // 임시 업로드 전용 key를 생성한다.
         String fileKey = generateFileKey(request.getOriginalFilename());
 
         try {
@@ -56,6 +64,7 @@ public class FileServiceImpl implements FileService {
                     .contentType(request.getContentType())
                     .build();
 
+            // 설정된 만료 시간 동안만 유효한 presigned URL을 생성한다.
             Duration signatureDuration = Duration.ofMinutes(r2Properties.getPresignedUrlDurationMinutes());
 
             PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
@@ -78,6 +87,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    /**
+     * 등록 화면에서 제거한 임시 파일을 즉시 삭제한다.
+     */
     public DeleteFileResponse deleteFile(DeleteFileRequest request) {
         if (request == null || request.getFileKey() == null || request.getFileKey().isBlank()) {
             throw new CustomException(ErrorType.INVALID_FILE_UPLOAD_REQUEST);
@@ -91,6 +103,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    /**
+     * fileKey로 최종 접근 가능한 공개 URL을 만든다.
+     */
     public String buildPublicUrl(String fileKey) {
         validateFileKey(fileKey);
 
@@ -106,6 +121,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    /**
+     * 우리 서비스가 관리하는 임시 업로드 파일 key 형식인지 확인한다.
+     */
     public boolean isManagedFileKey(String fileKey) {
         return fileKey != null
                 && !fileKey.isBlank()
@@ -114,6 +132,10 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    /**
+     * R2에서 실제 객체 메타데이터를 조회한다.
+     * 존재 여부 확인과 contentType/contentLength 검증을 한 번에 처리한다.
+     */
     public FileMetadata getFileMetadata(String fileKey) {
         validateFileKey(fileKey);
 
@@ -123,6 +145,7 @@ public class FileServiceImpl implements FileService {
                     .key(fileKey)
                     .build());
 
+            // 조회한 실제 메타데이터를 DB 저장용 값으로 변환한다.
             return extractFileMetadata(response);
         } catch (S3Exception exception) {
             if (exception.statusCode() == 404) {
@@ -138,6 +161,10 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    /**
+     * 등록 실패 cleanup처럼 여러 임시 파일을 한 번에 정리할 때 사용한다.
+     * 개별 삭제 실패가 전체 비즈니스 예외를 덮지 않도록 내부적으로만 로그를 남긴다.
+     */
     public void deleteFiles(List<String> fileKeys) {
         if (fileKeys == null || fileKeys.isEmpty()) {
             return;
@@ -148,6 +175,9 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    /**
+     * presigned URL 발급 요청의 기본 형식을 검증한다.
+     */
     private void validateRequest(CreatePresignedUploadUrlRequest request) {
         if (request == null
                 || request.getOriginalFilename() == null || request.getOriginalFilename().isBlank()
@@ -157,6 +187,10 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    /**
+     * 임시 업로드 파일 key를 생성한다.
+     * 날짜 경로와 UUID를 사용해 충돌 가능성을 낮춘다.
+     */
     private String generateFileKey(String originalFilename) {
         String extension = extractExtension(originalFilename);
         LocalDate today = LocalDate.now();
@@ -171,6 +205,9 @@ public class FileServiceImpl implements FileService {
         );
     }
 
+    /**
+     * 원본 파일명에서 확장자를 추출한다.
+     */
     private String extractExtension(String originalFilename) {
         int extensionIndex = originalFilename.lastIndexOf('.');
 
@@ -181,12 +218,19 @@ public class FileServiceImpl implements FileService {
         return originalFilename.substring(extensionIndex + 1).toLowerCase();
     }
 
+    /**
+     * fileKey가 우리 서비스의 임시 업로드 정책에 맞는지 검증한다.
+     */
     private void validateFileKey(String fileKey) {
         if (!isManagedFileKey(fileKey)) {
             throw new CustomException(ErrorType.INVALID_FILE_UPLOAD_REQUEST);
         }
     }
 
+    /**
+     * R2에서 조회한 메타데이터를 애플리케이션에서 사용할 값으로 변환한다.
+     * 허용하지 않은 MIME 타입이나 비정상 크기는 여기서 차단한다.
+     */
     private FileMetadata extractFileMetadata(HeadObjectResponse response) {
         String contentType = response.contentType();
         Long contentLength = response.contentLength();
@@ -206,6 +250,11 @@ public class FileServiceImpl implements FileService {
                 .build();
     }
 
+    /**
+     * 단건 파일 삭제 공통 로직.
+     * cleanup 상황에서는 실패를 무시하고 로그만 남기고,
+     * 직접 호출한 삭제 API에서는 예외를 반환한다.
+     */
     private void deleteFile(String fileKey, boolean ignoreFailure) {
         if (!isManagedFileKey(fileKey)) {
             if (ignoreFailure) {

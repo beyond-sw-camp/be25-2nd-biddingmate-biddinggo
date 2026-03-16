@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * 경매 등록 전체 흐름을 조율하는 애플리케이션 서비스.
  * 트랜잭션 경계는 이 클래스에서만 관리한다.
+ * auction_item, item_image, auction 생성을 하나의 유스케이스로 묶는다.
  */
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,11 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
 
     @Override
     @Transactional
+    /**
+     * 경매 등록 메인 플로우.
+     * 업로드된 임시 파일 목록을 먼저 확보해두고,
+     * 중간 실패 시 R2 cleanup까지 함께 처리한다.
+     */
     public Long createAuction(CreateAuctionRequest request) {
         List<String> uploadedFileKeys = extractUploadedFileKeys(request);
 
@@ -56,6 +62,10 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
         }
     }
 
+    /**
+     * 등록 요청에 포함된 임시 업로드 파일 key 목록을 추출한다.
+     * 실패 시 cleanup 대상으로 사용한다.
+     */
     private List<String> extractUploadedFileKeys(CreateAuctionRequest request) {
         if (request == null || request.getItem() == null || request.getItem().getImages() == null) {
             return List.of();

@@ -17,6 +17,7 @@ import java.util.Set;
 
 /**
  * item_image 엔티티 생성만 담당하는 서비스 구현체.
+ * 업로드된 임시 파일 key를 기준으로 R2 메타데이터를 조회한 뒤 저장한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,11 @@ public class ItemImageServiceImpl implements ItemImageService {
     private final ItemImageMybatisMapper itemImageMybatisMapper;
 
     @Override
+    /**
+     * item_image 목록 저장 로직.
+     * displayOrder 중복 여부를 먼저 확인하고,
+     * 각 파일의 실제 R2 메타데이터를 조회해 DB에 저장한다.
+     */
     public void createItemImages(Long itemId, List<CreateAuctionRequest.Image> images) {
         if (images == null || images.isEmpty()) {
             return;
@@ -60,6 +66,9 @@ public class ItemImageServiceImpl implements ItemImageService {
         }
     }
 
+    /**
+     * 같은 item 안에서 이미지 노출 순서가 중복되지 않도록 검증한다.
+     */
     private void validateDisplayOrders(List<CreateAuctionRequest.Image> images) {
         Set<Integer> displayOrders = new HashSet<>();
 
