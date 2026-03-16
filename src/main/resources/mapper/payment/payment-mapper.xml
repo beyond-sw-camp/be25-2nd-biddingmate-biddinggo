@@ -66,5 +66,10 @@
             p.created_at DESC
             LIMIT 3;
     </select>
+
+    <!-- 멱등성 검사 후 결제 업데이트 -->
+    <update id="completeIfWaiting">
+
+    </update>
 </mapper>
 

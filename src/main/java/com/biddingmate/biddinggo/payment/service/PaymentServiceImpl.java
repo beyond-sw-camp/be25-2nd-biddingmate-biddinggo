@@ -134,7 +134,7 @@ public class PaymentServiceImpl implements PaymentService {
         LocalDateTime approvedAt = DateTimeUtils.toLocalDateTime(responseData.getApprovedAt());
 
         // 멱등성 검사
-        int updated = paymentRepository.completeIfWaiting(request.getOrderId(), approvedAt);
+        int updated = paymentMapper.completeIfWaiting(request.getOrderId(), approvedAt);
 
         if (updated == 0) {
             return; // 이미 처리된 웹훅
