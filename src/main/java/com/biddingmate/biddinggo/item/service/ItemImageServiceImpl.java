@@ -5,7 +5,7 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.file.model.FileMetadata;
 import com.biddingmate.biddinggo.file.service.FileService;
-import com.biddingmate.biddinggo.item.mapper.ItemImageMybatisMapper;
+import com.biddingmate.biddinggo.item.mapper.ItemImageMapper;
 import com.biddingmate.biddinggo.item.model.ItemImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ItemImageServiceImpl implements ItemImageService {
     private final FileService fileService;
-    private final ItemImageMybatisMapper itemImageMybatisMapper;
+    private final ItemImageMapper itemImageMapper;
 
     @Override
     /**
@@ -58,7 +58,7 @@ public class ItemImageServiceImpl implements ItemImageService {
                     .createdAt(LocalDateTime.now())
                     .build();
 
-            int imageInsertCount = itemImageMybatisMapper.insert(itemImage);
+            int imageInsertCount = itemImageMapper.insert(itemImage);
 
             if (imageInsertCount != 1 || itemImage.getId() == null) {
                 throw new CustomException(ErrorType.ITEM_IMAGE_SAVE_FAILED);

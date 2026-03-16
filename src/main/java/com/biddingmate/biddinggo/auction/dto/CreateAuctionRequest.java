@@ -67,6 +67,7 @@ public class CreateAuctionRequest {
         private String description;
 
         @Schema(description = "상품 이미지 목록")
+        @Size(max = 10, message = "상품 이미지는 최대 10장까지 등록할 수 있습니다.")
         private List<@Valid @NotNull(message = "이미지 정보는 null일 수 없습니다.") Image> images;
     }
 
