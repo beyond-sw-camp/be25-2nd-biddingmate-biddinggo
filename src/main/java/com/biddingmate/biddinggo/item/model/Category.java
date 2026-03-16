@@ -13,7 +13,7 @@ import lombok.Setter;
 @Builder
 public class Category {
     private Long id;
-    private String large;
-    private String mid;
-    private String small;
+    private Long parentId;
+    private String name;
+    private Integer level;
 }
