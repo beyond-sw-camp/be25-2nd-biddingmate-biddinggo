@@ -31,6 +31,7 @@ public enum ErrorType {
     AUCTION_SAVE_FAILED("auction-003", "경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     ITEM_IMAGE_SAVE_FAILED("auction-004", "상품 이미지 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DUPLICATE_ITEM_IMAGE_DISPLAY_ORDER("auction-005", "상품 이미지 노출 순서는 중복될 수 없습니다.", HttpStatus.BAD_REQUEST),
+    AUCTION_NOT_FOUND("auction-006", "경매를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
     // 파일
     INVALID_FILE_UPLOAD_REQUEST("file-001", "파일 업로드 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
