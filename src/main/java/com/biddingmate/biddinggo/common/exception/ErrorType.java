@@ -19,11 +19,14 @@ public enum ErrorType {
     // auth
     EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT),
 
+    // 결제
+    VIRTUAL_ACCOUNT_ALREADY_EXISTS("payment-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT),
+    TOSS_API_CLIENT_ERROR("payment-002", "토스 API 요청이 잘못되었습니다. 요청 파라미터와 인증 정보를 확인하세요.", HttpStatus.BAD_REQUEST),
+    TOSS_API_SERVER_ERROR("payment-003", "토스 서버 내부 오류가 발생했습니다. 잠시 후 다시 시도하세요.", HttpStatus.BAD_GATEWAY),
+    PAYMENT_NOT_FOUND("payment-004", "해당 주문의 결제 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
-    // 가상계좌
-    VIRTUAL_ACCOUNT_ALREADY_EXISTS("point-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT),
-    TOSS_API_CLIENT_ERROR("point-002", "토스 API 요청이 잘못되었습니다. 요청 파라미터와 인증 정보를 확인하세요.", HttpStatus.BAD_REQUEST),
-    TOSS_API_SERVER_ERROR("point-003", "토스 서버 내부 오류가 발생했습니다. 잠시 후 다시 시도하세요.", HttpStatus.BAD_GATEWAY),
+    // 포인트 히스토리
+    POINT_HISTORY_SAVE_FAILED("point-history-001", "포인트 히스토리 저장 실패", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 경매
     INVALID_AUCTION_CREATE_REQUEST("auction-001", "경매 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
