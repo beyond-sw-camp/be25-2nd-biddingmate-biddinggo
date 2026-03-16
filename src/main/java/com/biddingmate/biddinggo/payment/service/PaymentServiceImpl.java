@@ -7,6 +7,8 @@ import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountRequest;
 import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountResponse;
 import com.biddingmate.biddinggo.payment.dto.GetVirtualAccountResponse;
 import com.biddingmate.biddinggo.payment.dto.TossCreateVirtualAccount;
+import com.biddingmate.biddinggo.payment.dto.TossDepositWebhook;
+import com.biddingmate.biddinggo.payment.dto.TossPaymentOrderDetails;
 import com.biddingmate.biddinggo.payment.mapper.PaymentMapper;
 import com.biddingmate.biddinggo.payment.mapper.VirtualAccountMapper;
 import com.biddingmate.biddinggo.payment.model.Payment;
@@ -30,6 +32,7 @@ import java.util.List;
 public class PaymentServiceImpl implements PaymentService {
     @Value("${tosspayments.secret-key}")
     private String secretKey;
+
     private final WebClient webClient;
     private final PaymentMapper paymentMapper;
     private final VirtualAccountMapper virtualAccountMapper;
@@ -108,5 +111,34 @@ public class PaymentServiceImpl implements PaymentService {
         List<GetVirtualAccountResponse> list =  paymentMapper.findByMemberId(memberId, PaymentStatus.WAITING_FOR_DEPOSIT);
 
         return list;
+    }
+
+    @Override
+    public void processDeposit(TossDepositWebhook request) {
+        // Authorization 헤더
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
+
+        // 승인된 결제를 orderId로 조회
+        TossPaymentOrderDetails responseData = webClient.get()
+                .uri("https://api.tosspayments.com/v1/payments/orders/" + request.getOrderId())
+                .header(HttpHeaders.AUTHORIZATION, authHeader) // 내 시크릿 키 사용
+                .retrieve()
+                .bodyToMono(TossPaymentOrderDetails.class)
+                .block();
+
+        if (responseData == null && "DONE".equals(responseData.getStatus())) {
+            System.out.println("여기");
+            return;
+        }
+
+        LocalDateTime approvedAt = DateTimeUtils.toLocalDateTime(responseData.getApprovedAt());
+
+        // 멱등성 검사
+        int updated = paymentRepository.completeIfWaiting(request.getOrderId(), approvedAt);
+
+        if (updated == 0) {
+            return; // 이미 처리된 웹훅
+        }
+
     }
 }
