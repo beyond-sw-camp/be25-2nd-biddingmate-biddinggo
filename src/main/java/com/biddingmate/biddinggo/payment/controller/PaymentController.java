@@ -34,6 +34,7 @@ public class PaymentController {
     }
 
     @GetMapping("virtual-accounts")
+// 인증 구현 전이므로 인증 Principal을 담을 수 없기 때문에 @RequestParam으로 memberId 대체
 //    public ResponseEntity<ApiResponse<List<GetVirtualAccountResponse>>> getVirtualAccount(@AuthenticationPrincipal PrincipalDetails principal) {
 //        Member member = principal.getMember();
 //        Long memberId = member.getId();
