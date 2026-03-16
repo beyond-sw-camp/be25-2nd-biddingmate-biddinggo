@@ -1,7 +1,7 @@
-package com.biddingmate.biddinggo.virtualaccount.mapper;
+package com.biddingmate.biddinggo.payment.mapper;
 
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
-import com.biddingmate.biddinggo.virtualaccount.model.VirtualAccount;
+import com.biddingmate.biddinggo.payment.model.VirtualAccount;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
