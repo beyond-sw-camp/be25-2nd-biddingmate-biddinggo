@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biddingmate.biddinggo.auction.mapper.AuctionMybatisMapper">
+
+    <insert id="insert" parameterType="Auction" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO auction
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            item_id,
+            seller_id,
+            <if test="winnerId != null">winner_id,</if>
+            <if test="type != null">type,</if>
+            <if test="inspectionYn != null">inspection_yn,</if>
+            <if test="status != null">status,</if>
+            <if test="startPrice != null">start_price,</if>
+            <if test="bidUnit != null">bid_unit,</if>
+            <if test="vickreyPrice != null">vickrey_price,</if>
+            <if test="bidCount != null">bid_count,</if>
+            <if test="buyNowPrice != null">buy_now_price,</if>
+            <if test="wishCount != null">wish_count,</if>
+            start_date,
+            end_date,
+            <if test="cancelDate != null">cancel_date,</if>
+            <if test="winnerPrice != null">winner_price,</if>
+            created_at
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{itemId},
+            #{sellerId},
+            <if test="winnerId != null">#{winnerId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="inspectionYn != null">#{inspectionYn},</if>
+            <if test="status != null">#{status},</if>
+            <if test="startPrice != null">#{startPrice},</if>
+            <if test="bidUnit != null">#{bidUnit},</if>
+            <if test="vickreyPrice != null">#{vickreyPrice},</if>
+            <if test="bidCount != null">#{bidCount},</if>
+            <if test="buyNowPrice != null">#{buyNowPrice},</if>
+            <if test="wishCount != null">#{wishCount},</if>
+            #{startDate},
+            #{endDate},
+            <if test="cancelDate != null">#{cancelDate},</if>
+            <if test="winnerPrice != null">#{winnerPrice},</if>
+            #{createdAt}
+        </trim>
+    </insert>
+
+</mapper>
