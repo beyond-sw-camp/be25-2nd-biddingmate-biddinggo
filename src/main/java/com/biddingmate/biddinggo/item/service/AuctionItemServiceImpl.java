@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 /**
  * auction_item 엔티티 생성만 담당하는 서비스 구현체.
  * 경매 등록 시 선택한 카테고리가 실제 최하위 카테고리인지 함께 검증한다.
+ * {@code auction_item.status}, {@code auction_item.inspection_status} 결정도 이 클래스가 담당한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -25,15 +26,30 @@ public class AuctionItemServiceImpl implements AuctionItemService {
     private final CategoryMapper categoryMapper;
 
     @Override
+    /**
+     * 경매 등록용 item 생성.
+     * status/inspectionStatus를 null로 넘겨 DB 기본값을 사용한다.
+     */
     public Long createAuctionItem(AuctionItemCreateSource item) {
         return createItem(item, null, null);
     }
 
     @Override
+    /**
+     * 검수 등록용 item 생성.
+     * 검수 대기 상품이므로 status와 inspectionStatus를 모두 PENDING으로 명시한다.
+     */
     public Long createInspectionItem(AuctionItemCreateSource item) {
         return createItem(item, AuctionItemStatus.PENDING, InspectionStatus.PENDING);
     }
 
+    /**
+     * 공통 auction_item 저장 로직.
+     *
+     * <p>이 메서드는 상품 기본 정보 저장뿐 아니라
+     * {@code auction_item.status}, {@code auction_item.inspection_status} 초기값도 함께 결정한다.</p>
+     * <p>두 값이 null이면 mapper에서 해당 컬럼을 INSERT에서 제외하고 DB 기본값을 사용한다.</p>
+     */
     private Long createItem(AuctionItemCreateSource item, AuctionItemStatus status, InspectionStatus inspectionStatus) {
         // 등록 요청에서 선택한 categoryId가 실제 존재하는지 확인한다.
         Category category = categoryMapper.findById(item.getCategoryId());
@@ -48,6 +64,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         }
 
         // request를 DB 저장용 auction_item 모델로 변환한다.
+        // inspection_status는 AuctionService/InspectionService가 아니라 여기서 세팅된다.
         AuctionItem auctionItem = AuctionItem.builder()
                 .sellerId(item.getSellerId())
                 .categoryId(item.getCategoryId())

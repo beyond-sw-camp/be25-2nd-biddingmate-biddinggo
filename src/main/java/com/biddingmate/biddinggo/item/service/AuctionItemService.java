@@ -7,12 +7,19 @@ import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
  */
 public interface AuctionItemService {
     /**
-     * 경매 등록 요청에서 상품 정보만 분리하여 auction_item을 생성한다.
+     * 경매 등록용 auction_item을 생성한다.
+     *
+     * <p>{@code auction_item.inspection_status}는 이 단계에서 명시하지 않고,
+     * DB 기본값({@code NONE})을 사용한다.</p>
      */
     Long createAuctionItem(AuctionItemCreateSource item);
 
     /**
-     * 검수 등록용 상품을 생성한다.
+     * 검수 등록용 auction_item을 생성한다.
+     *
+     * <p>검수 등록은 일반 경매 등록과 달리,
+     * {@code auction_item.status = PENDING},
+     * {@code auction_item.inspection_status = PENDING}을 명시 저장한다.</p>
      */
     Long createInspectionItem(AuctionItemCreateSource item);
 }
