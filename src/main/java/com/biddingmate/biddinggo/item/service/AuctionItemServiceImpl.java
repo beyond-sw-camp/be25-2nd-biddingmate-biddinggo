@@ -1,12 +1,14 @@
 package com.biddingmate.biddinggo.item.service;
 
-import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.mapper.CategoryMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
+import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.item.model.Category;
+import com.biddingmate.biddinggo.item.model.InspectionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +25,18 @@ public class AuctionItemServiceImpl implements AuctionItemService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public Long createAuctionItem(CreateAuctionRequest request) {
+    public Long createAuctionItem(AuctionItemCreateSource item) {
+        return createItem(item, null, null);
+    }
+
+    @Override
+    public Long createInspectionItem(AuctionItemCreateSource item) {
+        return createItem(item, AuctionItemStatus.PENDING, InspectionStatus.PENDING);
+    }
+
+    private Long createItem(AuctionItemCreateSource item, AuctionItemStatus status, InspectionStatus inspectionStatus) {
         // 등록 요청에서 선택한 categoryId가 실제 존재하는지 확인한다.
-        Category category = categoryMapper.findById(request.getItem().getCategoryId());
+        Category category = categoryMapper.findById(item.getCategoryId());
 
         if (category == null) {
             throw new CustomException(ErrorType.CATEGORY_NOT_FOUND);
@@ -38,12 +49,14 @@ public class AuctionItemServiceImpl implements AuctionItemService {
 
         // request를 DB 저장용 auction_item 모델로 변환한다.
         AuctionItem auctionItem = AuctionItem.builder()
-                .sellerId(request.getItem().getSellerId())
-                .categoryId(request.getItem().getCategoryId())
-                .brand(request.getItem().getBrand())
-                .name(request.getItem().getName())
-                .quality(request.getItem().getQuality())
-                .description(request.getItem().getDescription())
+                .sellerId(item.getSellerId())
+                .categoryId(item.getCategoryId())
+                .brand(item.getBrand())
+                .name(item.getName())
+                .quality(item.getQuality())
+                .description(item.getDescription())
+                .status(status)
+                .inspectionStatus(inspectionStatus)
                 .createdAt(LocalDateTime.now())
                 .build();
 

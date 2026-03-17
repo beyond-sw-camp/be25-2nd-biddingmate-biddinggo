@@ -1,6 +1,6 @@
 package com.biddingmate.biddinggo.item.service;
 
-import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
+import com.biddingmate.biddinggo.item.dto.ItemImageCreateSource;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ public interface ItemImageService {
     /**
      * 업로드된 이미지 메타데이터를 item_image 테이블에 저장한다.
      */
-    void createItemImages(Long itemId, List<CreateAuctionRequest.Image> images);
+    void createItemImages(Long itemId, List<? extends ItemImageCreateSource> images);
 }

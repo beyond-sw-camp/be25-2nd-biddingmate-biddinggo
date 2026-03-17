@@ -39,7 +39,7 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
             validateRequest(request);
 
             // 1. auction_item 먼저 생성하여 itemId를 확보한다.
-            Long itemId = auctionItemService.createAuctionItem(request);
+            Long itemId = auctionItemService.createAuctionItem(request.getItem());
 
             // 2. 업로드된 이미지 메타데이터를 item_image에 저장한다.
             itemImageService.createItemImages(itemId, request.getItem().getImages());

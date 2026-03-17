@@ -2,6 +2,8 @@ package com.biddingmate.biddinggo.auction.dto;
 
 import com.biddingmate.biddinggo.auction.model.AuctionType;
 import com.biddingmate.biddinggo.auction.model.YesNo;
+import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
+import com.biddingmate.biddinggo.item.dto.ItemImageCreateSource;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -41,7 +43,7 @@ public class CreateAuctionRequest {
     @AllArgsConstructor
     @Builder
     @Schema(description = "경매 상품 요청 DTO")
-    public static class Item {
+    public static class Item implements AuctionItemCreateSource {
         @Schema(description = "판매자 ID", example = "1")
         @NotNull(message = "판매자 ID는 필수입니다.")
         private Long sellerId;
@@ -77,7 +79,7 @@ public class CreateAuctionRequest {
     @AllArgsConstructor
     @Builder
     @Schema(description = "상품 이미지 요청 DTO")
-    public static class Image {
+    public static class Image implements ItemImageCreateSource {
         @Schema(description = "R2에 업로드된 임시 파일 key", example = "temp/items/2026/03/13/uuid.jpg")
         @NotBlank(message = "파일 key는 필수입니다.")
         private String fileKey;
