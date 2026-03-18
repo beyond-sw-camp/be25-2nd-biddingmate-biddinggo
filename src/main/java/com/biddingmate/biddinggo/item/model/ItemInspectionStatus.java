@@ -1,6 +1,6 @@
 package com.biddingmate.biddinggo.item.model;
 
-public enum InspectionStatus {
+public enum ItemInspectionStatus {
     NONE,
     PENDING,
     PASSED,

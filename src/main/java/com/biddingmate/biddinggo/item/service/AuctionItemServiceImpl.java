@@ -8,7 +8,7 @@ import com.biddingmate.biddinggo.item.mapper.CategoryMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.item.model.Category;
-import com.biddingmate.biddinggo.item.model.InspectionStatus;
+import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +40,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
      * 검수 대기 상품이므로 status와 inspectionStatus를 모두 PENDING으로 명시한다.
      */
     public Long createInspectionItem(AuctionItemCreateSource item) {
-        return createItem(item, AuctionItemStatus.PENDING, InspectionStatus.PENDING);
+        return createItem(item, AuctionItemStatus.PENDING, ItemInspectionStatus.PENDING);
     }
 
     /**
@@ -50,7 +50,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
      * {@code auction_item.status}, {@code auction_item.inspection_status} 초기값도 함께 결정한다.</p>
      * <p>두 값이 null이면 mapper에서 해당 컬럼을 INSERT에서 제외하고 DB 기본값을 사용한다.</p>
      */
-    private Long createItem(AuctionItemCreateSource item, AuctionItemStatus status, InspectionStatus inspectionStatus) {
+    private Long createItem(AuctionItemCreateSource item, AuctionItemStatus status, ItemInspectionStatus inspectionStatus) {
         // 등록 요청에서 선택한 categoryId가 실제 존재하는지 확인한다.
         Category category = categoryMapper.findById(item.getCategoryId());
 
