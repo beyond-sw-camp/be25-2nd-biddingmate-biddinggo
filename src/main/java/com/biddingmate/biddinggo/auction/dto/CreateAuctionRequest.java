@@ -1,7 +1,6 @@
 package com.biddingmate.biddinggo.auction.dto;
 
 import com.biddingmate.biddinggo.auction.model.AuctionType;
-import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
 import com.biddingmate.biddinggo.item.dto.ItemImageCreateSource;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -99,9 +98,6 @@ public class CreateAuctionRequest {
     public static class Auction {
         @Schema(description = "경매 타입", example = "NORMAL")
         private AuctionType type;
-
-        @Schema(description = "검수 여부", example = "NO")
-        private YesNo inspectionYn;
 
         @Schema(description = "시작가", example = "100000")
         @PositiveOrZero(message = "시작가는 0 이상이어야 합니다.")
