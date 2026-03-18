@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.inspection.service;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionRequest;
+import com.biddingmate.biddinggo.inspection.dto.UpdateInspectionShippingRequest;
 import com.biddingmate.biddinggo.inspection.mapper.InspectionMapper;
 import com.biddingmate.biddinggo.inspection.model.Inspection;
 import com.biddingmate.biddinggo.inspection.model.InspectionStatus;
@@ -50,5 +51,37 @@ public class InspectionServiceImpl implements InspectionService {
         }
 
         return inspection.getId();
+    }
+
+    @Override
+    /**
+     * 검수 배송 정보(택배사, 송장 번호)를 사후 등록한다.
+     * 배송 정보는 PENDING 상태의 검수에만 최초 1회 등록 가능하다.
+     */
+    public void updateShippingInfo(Long inspectionId, UpdateInspectionShippingRequest request) {
+        Inspection inspection = inspectionMapper.findById(inspectionId);
+
+        if (inspection == null) {
+            throw new CustomException(ErrorType.INSPECTION_NOT_FOUND);
+        }
+
+        if (inspection.getStatus() != InspectionStatus.PENDING) {
+            throw new CustomException(ErrorType.INVALID_INSPECTION_STATUS);
+        }
+
+        if (inspection.getCarrier() != null || inspection.getTrackingNumber() != null) {
+            throw new CustomException(ErrorType.INSPECTION_SHIPPING_INFO_ALREADY_EXISTS);
+        }
+
+        int updatedCount = inspectionMapper.updateShippingInfo(
+                inspectionId,
+                request.getCarrier(),
+                request.getTrackingNumber(),
+                InspectionStatus.PENDING
+        );
+
+        if (updatedCount != 1) {
+            throw new CustomException(ErrorType.INSPECTION_SHIPPING_UPDATE_FAILED);
+        }
     }
 }
