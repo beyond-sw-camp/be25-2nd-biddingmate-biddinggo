@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.biddingmate.biddinggo.payment.mapper.PaymentMapper">
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="Payment" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO payment(
             member_id,
             order_id,
@@ -25,7 +25,7 @@
         )
     </insert>
 
-    <select id="existsByOrderId" resultType="boolean">
+    <select id="existsByOrderId" parameterType="string" resultType="boolean">
         SELECT EXISTS(
             SELECT 1
             FROM payment
@@ -43,8 +43,7 @@
         <result property="accountHolderName" column="account_holder_name"/>
         <result property="dueDate" column="due_date"/>
     </resultMap>
-
-    <select id="findByMemberId" resultMap="virtualAccountResponseMap">
+    <select id="findByMemberId" parameterType="map" resultMap="virtualAccountResponseMap">
         SELECT
             v.bank_code,
             p.order_id,
@@ -66,5 +65,30 @@
             p.created_at DESC
             LIMIT 3;
     </select>
+
+    <!-- 멱등성 검사 후 결제 업데이트 -->
+    <update id="completeIfWaiting" parameterType="map">
+        UPDATE
+            payment p
+        SET
+            p.status = #{status},
+            p.approved_at = #{approvedAt}
+        WHERE
+            p.order_id = #{orderId}
+          AND p.status = 'WAITING_FOR_DEPOSIT'
+    </update>
+
+    <!-- -->
+    <select id="findPaymentInfoByOrderId" parameterType="string">
+        SELECT
+            id AS paymentId,
+            member_id AS memberId,
+            amount
+        FROM
+            payment
+        WHERE
+            order_id = #{orderId};
+    </select>
+
 </mapper>
 

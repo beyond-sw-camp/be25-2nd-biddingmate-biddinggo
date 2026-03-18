@@ -1,10 +1,10 @@
 package com.biddingmate.biddinggo.item.service;
 
-import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.file.model.FileMetadata;
 import com.biddingmate.biddinggo.file.service.FileService;
+import com.biddingmate.biddinggo.item.dto.ItemImageCreateSource;
 import com.biddingmate.biddinggo.item.mapper.ItemImageMapper;
 import com.biddingmate.biddinggo.item.model.ItemImage;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class ItemImageServiceImpl implements ItemImageService {
      * displayOrder 중복 여부를 먼저 확인하고,
      * 각 파일의 실제 R2 메타데이터를 조회해 DB에 저장한다.
      */
-    public void createItemImages(Long itemId, List<CreateAuctionRequest.Image> images) {
+    public void createItemImages(Long itemId, List<? extends ItemImageCreateSource> images) {
         if (images == null || images.isEmpty()) {
             return;
         }
@@ -42,7 +42,7 @@ public class ItemImageServiceImpl implements ItemImageService {
 
         validateDisplayOrders(images);
 
-        for (CreateAuctionRequest.Image image : images) {
+        for (ItemImageCreateSource image : images) {
             if (!fileService.isManagedFileKey(image.getFileKey())) {
                 throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
             }
@@ -69,10 +69,10 @@ public class ItemImageServiceImpl implements ItemImageService {
     /**
      * 같은 item 안에서 이미지 노출 순서가 중복되지 않도록 검증한다.
      */
-    private void validateDisplayOrders(List<CreateAuctionRequest.Image> images) {
+    private void validateDisplayOrders(List<? extends ItemImageCreateSource> images) {
         Set<Integer> displayOrders = new HashSet<>();
 
-        for (CreateAuctionRequest.Image image : images) {
+        for (ItemImageCreateSource image : images) {
             if (!displayOrders.add(image.getDisplayOrder())) {
                 throw new CustomException(ErrorType.DUPLICATE_ITEM_IMAGE_DISPLAY_ORDER);
             }

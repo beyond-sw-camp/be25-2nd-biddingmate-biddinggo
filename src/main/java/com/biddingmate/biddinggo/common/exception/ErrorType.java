@@ -19,11 +19,14 @@ public enum ErrorType {
     // auth
     EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT),
 
+    // 결제
+    VIRTUAL_ACCOUNT_ALREADY_EXISTS("payment-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT),
+    TOSS_API_CLIENT_ERROR("payment-002", "토스 API 요청이 잘못되었습니다. 요청 파라미터와 인증 정보를 확인하세요.", HttpStatus.BAD_REQUEST),
+    TOSS_API_SERVER_ERROR("payment-003", "토스 서버 내부 오류가 발생했습니다. 잠시 후 다시 시도하세요.", HttpStatus.BAD_GATEWAY),
+    PAYMENT_NOT_FOUND("payment-004", "해당 주문의 결제 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
-    // 가상계좌
-    VIRTUAL_ACCOUNT_ALREADY_EXISTS("point-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT),
-    TOSS_API_CLIENT_ERROR("point-002", "토스 API 요청이 잘못되었습니다. 요청 파라미터와 인증 정보를 확인하세요.", HttpStatus.BAD_REQUEST),
-    TOSS_API_SERVER_ERROR("point-003", "토스 서버 내부 오류가 발생했습니다. 잠시 후 다시 시도하세요.", HttpStatus.BAD_GATEWAY),
+    // 포인트 히스토리
+    POINT_HISTORY_SAVE_FAILED("point-history-001", "포인트 히스토리 저장 실패", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 경매
     INVALID_AUCTION_CREATE_REQUEST("auction-001", "경매 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
@@ -34,6 +37,14 @@ public enum ErrorType {
     AUCTION_NOT_FOUND("auction-006", "경매를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     CATEGORY_NOT_FOUND("auction-007", "카테고리를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     INVALID_CATEGORY_LEVEL("auction-008", "최하위 카테고리만 선택할 수 있습니다.", HttpStatus.BAD_REQUEST),
+    AUCTION_ITEM_NOT_FOUND("auction-009", "경매 등록 대상 상품을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    AUCTION_ITEM_SELLER_MISMATCH("auction-010", "상품 판매자와 요청 판매자가 일치하지 않습니다.", HttpStatus.FORBIDDEN),
+    INSPECTION_NOT_PASSED("auction-011", "검수 완료된 상품만 경매 등록할 수 있습니다.", HttpStatus.CONFLICT),
+    ITEM_NOT_AUCTIONABLE("auction-012", "현재 상태에서는 경매 등록할 수 없습니다.", HttpStatus.CONFLICT),
+
+    // 검수
+    INVALID_INSPECTION_CREATE_REQUEST("inspection-001", "검수 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    INSPECTION_SAVE_FAILED("inspection-002", "검수 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 파일
     INVALID_FILE_UPLOAD_REQUEST("file-001", "파일 업로드 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),

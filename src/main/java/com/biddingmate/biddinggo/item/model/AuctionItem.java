@@ -22,7 +22,7 @@ public class AuctionItem {
     private String quality;
     private String description;
     private AuctionItemStatus status;
-    private InspectionStatus inspectionStatus;
+    private ItemInspectionStatus inspectionStatus;
     private LocalDateTime returnedAt;
     private LocalDateTime createdAt;
 }

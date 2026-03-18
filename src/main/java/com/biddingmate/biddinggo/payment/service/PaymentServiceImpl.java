@@ -3,15 +3,22 @@ package com.biddingmate.biddinggo.payment.service;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.util.DateTimeUtils;
+import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountRequest;
 import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountResponse;
 import com.biddingmate.biddinggo.payment.dto.GetVirtualAccountResponse;
+import com.biddingmate.biddinggo.payment.dto.PaymentInfo;
 import com.biddingmate.biddinggo.payment.dto.TossCreateVirtualAccount;
+import com.biddingmate.biddinggo.payment.dto.TossDepositWebhook;
+import com.biddingmate.biddinggo.payment.dto.TossPaymentOrderDetails;
 import com.biddingmate.biddinggo.payment.mapper.PaymentMapper;
 import com.biddingmate.biddinggo.payment.mapper.VirtualAccountMapper;
 import com.biddingmate.biddinggo.payment.model.Payment;
 import com.biddingmate.biddinggo.payment.model.PaymentStatus;
 import com.biddingmate.biddinggo.payment.model.VirtualAccount;
+import com.biddingmate.biddinggo.point.mapper.PointHistoryMapper;
+import com.biddingmate.biddinggo.point.model.PointHistory;
+import com.biddingmate.biddinggo.point.model.PointHistoryType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -30,9 +37,12 @@ import java.util.List;
 public class PaymentServiceImpl implements PaymentService {
     @Value("${tosspayments.secret-key}")
     private String secretKey;
+
     private final WebClient webClient;
     private final PaymentMapper paymentMapper;
     private final VirtualAccountMapper virtualAccountMapper;
+    private final MemberMapper memberMapper;
+    private final PointHistoryMapper pointHistoryMapper;
     // private final PointMybatisMapper pointMybatisMapper;
 
     @Override
@@ -108,5 +118,62 @@ public class PaymentServiceImpl implements PaymentService {
         List<GetVirtualAccountResponse> list =  paymentMapper.findByMemberId(memberId, PaymentStatus.WAITING_FOR_DEPOSIT);
 
         return list;
+    }
+
+    @Override
+    @Transactional
+    public void processDeposit(TossDepositWebhook request) {
+        // Authorization 헤더
+        String authHeader = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
+
+        // 승인된 결제를 orderId로 조회
+        TossPaymentOrderDetails responseData = webClient.get()
+                .uri("https://api.tosspayments.com/v1/payments/orders/" + request.getOrderId())
+                .header(HttpHeaders.AUTHORIZATION, authHeader) // 내 시크릿 키 사용
+                .retrieve()
+                .bodyToMono(TossPaymentOrderDetails.class)
+                .block();
+
+        if (responseData == null) {
+            return;
+        }
+
+        LocalDateTime approvedAt = DateTimeUtils.toLocalDateTime(responseData.getApprovedAt());
+        PaymentStatus status = PaymentStatus.valueOf(request.getStatus());
+
+        // 멱등성 검사
+        int updated = paymentMapper.completeIfWaiting(request.getOrderId(), status, approvedAt);
+
+        if (updated == 0) {
+            return; // 이미 처리된 웹훅
+        }
+
+        if (status != PaymentStatus.DONE) {
+            return; // DONE이 아니면 종료
+        }
+
+        PaymentInfo payment = paymentMapper.findPaymentInfoByOrderId(request.getOrderId());
+
+        if (payment == null) {
+            throw new CustomException(ErrorType.PAYMENT_NOT_FOUND);
+        }
+
+
+        // 결제 대상자 포인트 충전
+        memberMapper.addPoint(payment.getMemberId(), payment.getAmount());
+
+        // 포인트 히스토리 생성
+        PointHistory pointHistory = PointHistory.builder()
+                .memberId(payment.getMemberId())
+                .paymentId(payment.getPaymentId())
+                .type(PointHistoryType.CHARGE)
+                .amount(payment.getAmount())
+                .createdAt(LocalDateTime.now())
+                .build();
+        int pointInsert = pointHistoryMapper.insert(pointHistory);
+
+        if (pointInsert <= 0) {
+            throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
     }
 }
