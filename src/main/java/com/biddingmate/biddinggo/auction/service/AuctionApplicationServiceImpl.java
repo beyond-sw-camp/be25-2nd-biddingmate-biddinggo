@@ -66,7 +66,12 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
         auctionItemService.getAuctionableInspectionItem(request.getItemId(), request.getSellerId());
 
         // 2. 검증이 끝난 기존 itemId로 auction만 생성한다.
-        return auctionService.createAuction(request);
+        Long auctionId = auctionService.createAuction(request);
+
+        // 3. 경매 생성이 완료되면 상품 상태를 경매 진행 중으로 전이한다.
+        auctionItemService.markAsOnAuction(request.getItemId());
+
+        return auctionId;
     }
 
     /**

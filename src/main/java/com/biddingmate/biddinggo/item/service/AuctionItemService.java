@@ -2,6 +2,8 @@ package com.biddingmate.biddinggo.item.service;
 
 import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
+import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
+import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 
 /**
  * auction_item 테이블 저장 책임을 담당하는 서비스.
@@ -28,4 +30,14 @@ public interface AuctionItemService {
      * 검수 완료된 기존 상품이 경매 등록 가능한 상태인지 검증하고 반환한다.
      */
     AuctionItem getAuctionableInspectionItem(Long itemId, Long sellerId);
+
+    /**
+     * 상품 상태를 조건부로 변경한다.
+     */
+    void changeStatus(Long itemId, AuctionItemStatus newStatus, AuctionItemStatus currentStatus, ItemInspectionStatus currentInspectionStatus);
+
+    /**
+     * 검수 완료 상품을 경매 진행 상태로 전이한다.
+     */
+    void markAsOnAuction(Long itemId);
 }

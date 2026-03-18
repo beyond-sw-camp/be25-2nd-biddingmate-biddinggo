@@ -34,6 +34,18 @@
         WHERE id = #{id}
     </select>
 
+    <update id="updateStatus">
+        UPDATE auction_item
+        SET status = #{newStatus}
+        WHERE id = #{itemId}
+        <if test="currentStatus != null">
+          AND status = #{currentStatus}
+        </if>
+        <if test="currentInspectionStatus != null">
+          AND inspection_status = #{currentInspectionStatus}
+        </if>
+    </update>
+
     <insert id="insert" parameterType="AuctionItem" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO auction_item
         <trim prefix="(" suffix=")" suffixOverrides=",">

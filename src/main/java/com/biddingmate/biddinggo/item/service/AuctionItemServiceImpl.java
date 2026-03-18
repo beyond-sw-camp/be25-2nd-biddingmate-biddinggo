@@ -69,6 +69,28 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         return auctionItem;
     }
 
+    @Override
+    /**
+     * 상품 상태를 조건부로 변경한다.
+     * 현재 상품 상태나 검수 상태가 기대값과 다르면 변경되지 않는다.
+     */
+    public void changeStatus(Long itemId, AuctionItemStatus newStatus, AuctionItemStatus currentStatus, ItemInspectionStatus currentInspectionStatus) {
+        int updatedCount = auctionItemMapper.updateStatus(itemId, newStatus, currentStatus, currentInspectionStatus);
+
+        if (updatedCount != 1) {
+            throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+        }
+    }
+
+    @Override
+    /**
+     * 검수 완료 상품을 경매 진행 상태로 전이한다.
+     * 현재 상태가 PENDING이고 검수 상태가 PASSED인 경우에만 성공한다.
+     */
+    public void markAsOnAuction(Long itemId) {
+        changeStatus(itemId, AuctionItemStatus.ON_AUCTION, AuctionItemStatus.PENDING, ItemInspectionStatus.PASSED);
+    }
+
     /**
      * 공통 auction_item 저장 로직.
      *
