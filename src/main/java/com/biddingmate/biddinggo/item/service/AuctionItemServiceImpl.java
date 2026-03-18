@@ -43,6 +43,55 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         return createItem(item, AuctionItemStatus.PENDING, ItemInspectionStatus.PENDING);
     }
 
+    @Override
+    /**
+     * 검수 완료된 기존 상품을 조회하고, 실제 경매 등록 가능한 상태인지 검증한다.
+     */
+    public AuctionItem getAuctionableInspectionItem(Long itemId, Long sellerId) {
+        AuctionItem auctionItem = auctionItemMapper.findById(itemId);
+
+        if (auctionItem == null) {
+            throw new CustomException(ErrorType.AUCTION_ITEM_NOT_FOUND);
+        }
+
+        if (!auctionItem.getSellerId().equals(sellerId)) {
+            throw new CustomException(ErrorType.AUCTION_ITEM_SELLER_MISMATCH);
+        }
+
+        if (auctionItem.getInspectionStatus() != ItemInspectionStatus.PASSED) {
+            throw new CustomException(ErrorType.INSPECTION_NOT_PASSED);
+        }
+
+        if (auctionItem.getStatus() != AuctionItemStatus.PENDING) {
+            throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+        }
+
+        return auctionItem;
+    }
+
+    @Override
+    /**
+     * 상품 상태를 조건부로 변경한다.
+     * 현재 상품 상태나 검수 상태가 기대값과 다르면 변경되지 않는다.
+     * 유스케이스별 의미 있는 상태 전이는 별도 메서드에서 이 공용 메서드를 감싸서 사용한다.
+     */
+    public void changeStatus(Long itemId, AuctionItemStatus newStatus, AuctionItemStatus currentStatus, ItemInspectionStatus currentInspectionStatus) {
+        int updatedCount = auctionItemMapper.updateStatus(itemId, newStatus, currentStatus, currentInspectionStatus);
+
+        if (updatedCount != 1) {
+            throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+        }
+    }
+
+    @Override
+    /**
+     * 검수 완료 상품을 경매 진행 상태로 전이한다.
+     * 현재 상태가 PENDING이고 검수 상태가 PASSED인 경우에만 성공한다.
+     */
+    public void markAsOnAuction(Long itemId) {
+        changeStatus(itemId, AuctionItemStatus.ON_AUCTION, AuctionItemStatus.PENDING, ItemInspectionStatus.PASSED);
+    }
+
     /**
      * 공통 auction_item 저장 로직.
      *

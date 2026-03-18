@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.auction.controller;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionResponse;
 import com.biddingmate.biddinggo.auction.service.AuctionApplicationService;
@@ -49,5 +50,19 @@ public class AuctionController {
                 .build();
 
         return ApiResponse.of(HttpStatus.OK, null, "경매 등록 완료", result);
+    }
+
+    @PostMapping("/inspection-items")
+    @Operation(summary = "검수 완료 상품 경매 등록", description = "검수 완료된 기존 상품을 기준으로 경매를 등록합니다.")
+    public ResponseEntity<ApiResponse<CreateAuctionResponse>> createAuctionFromInspectionItem(
+            @Valid @RequestBody CreateAuctionFromInspectionItemRequest request) {
+
+        Long auctionId = auctionApplicationService.createAuctionFromInspectionItem(request);
+
+        CreateAuctionResponse result = CreateAuctionResponse.builder()
+                .auctionId(auctionId)
+                .build();
+
+        return ApiResponse.of(HttpStatus.OK, null, "검수 완료 상품 경매 등록 완료", result);
     }
 }

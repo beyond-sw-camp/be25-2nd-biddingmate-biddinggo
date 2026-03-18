@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.auction.service;
 
+import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
@@ -52,11 +53,41 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
         }
     }
 
+    @Override
+    @Transactional
+    /**
+     * 검수 완료된 기존 상품 기반 경매 등록 메인 플로우.
+     * 상품/이미지는 새로 생성하지 않고, 기존 auction_item의 상태만 검증한 뒤 auction을 생성한다.
+     */
+    public Long createAuctionFromInspectionItem(CreateAuctionFromInspectionItemRequest request) {
+        validateRequest(request);
+
+        // 1. 기존 상품을 조회하고, 실제 경매 등록 가능한 상태인지 검증한다.
+        auctionItemService.getAuctionableInspectionItem(request.getItemId(), request.getSellerId());
+
+        // 2. 검증이 끝난 기존 itemId로 auction만 생성한다.
+        Long auctionId = auctionService.createAuction(request);
+
+        // 3. 경매 생성이 완료되면 상품 상태를 경매 진행 중으로 전이한다.
+        auctionItemService.markAsOnAuction(request.getItemId());
+
+        return auctionId;
+    }
+
     /**
      * DTO 기본 검증은 컨트롤러에서 처리하고,
      * 여기서는 비즈니스 규칙만 검증한다.
      */
     private void validateRequest(CreateAuctionRequest request) {
+        if (!request.getAuction().getEndDate().isAfter(request.getAuction().getStartDate())) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
+        }
+    }
+
+    /**
+     * 검수 완료 상품 기반 경매 등록 요청의 비즈니스 규칙을 검증한다.
+     */
+    private void validateRequest(CreateAuctionFromInspectionItemRequest request) {
         if (!request.getAuction().getEndDate().isAfter(request.getAuction().getStartDate())) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }

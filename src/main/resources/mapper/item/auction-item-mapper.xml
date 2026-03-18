@@ -3,6 +3,49 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.biddingmate.biddinggo.item.mapper.AuctionItemMapper">
 
+    <resultMap id="auctionItemResultMap" type="AuctionItem">
+        <id property="id" column="id"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="brand" column="brand"/>
+        <result property="name" column="name"/>
+        <result property="quality" column="quality"/>
+        <result property="description" column="description"/>
+        <result property="status" column="status"/>
+        <result property="inspectionStatus" column="inspection_status"/>
+        <result property="returnedAt" column="returned_at"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findById" parameterType="long" resultMap="auctionItemResultMap">
+        SELECT
+            id,
+            seller_id,
+            category_id,
+            brand,
+            name,
+            quality,
+            description,
+            status,
+            inspection_status,
+            returned_at,
+            created_at
+        FROM auction_item
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE auction_item
+        SET status = #{newStatus}
+        WHERE id = #{itemId}
+        <if test="currentStatus != null">
+          AND status = #{currentStatus}
+        </if>
+        <if test="currentInspectionStatus != null">
+          AND inspection_status = #{currentInspectionStatus}
+        </if>
+    </update>
+
     <insert id="insert" parameterType="AuctionItem" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO auction_item
         <trim prefix="(" suffix=")" suffixOverrides=",">
