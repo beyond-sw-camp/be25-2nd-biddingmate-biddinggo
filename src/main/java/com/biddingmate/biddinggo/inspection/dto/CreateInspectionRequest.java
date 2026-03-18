@@ -1,7 +1,5 @@
-package com.biddingmate.biddinggo.auction.dto;
+package com.biddingmate.biddinggo.inspection.dto;
 
-import com.biddingmate.biddinggo.auction.model.AuctionType;
-import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
 import com.biddingmate.biddinggo.item.dto.ItemImageCreateSource;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,7 +7,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -25,24 +21,23 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "경매 등록 요청 DTO")
-public class CreateAuctionRequest {
-    @Schema(description = "경매 상품 정보")
+@Schema(description = "상품 검수 등록 요청 DTO")
+public class CreateInspectionRequest {
+    @Schema(description = "검수 대상 상품 정보")
     @NotNull(message = "상품 정보는 필수입니다.")
     @Valid
     private Item item;
 
-    @Schema(description = "경매 정보")
-    @NotNull(message = "경매 정보는 필수입니다.")
+    @Schema(description = "검수 발송 정보")
     @Valid
-    private Auction auction;
+    private Inspection inspection;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = "경매 상품 요청 DTO")
+    @Schema(description = "검수 대상 상품 요청 DTO")
     public static class Item implements AuctionItemCreateSource {
         @Schema(description = "판매자 ID", example = "1")
         @NotNull(message = "판매자 ID는 필수입니다.")
@@ -95,36 +90,14 @@ public class CreateAuctionRequest {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    @Schema(description = "경매 요청 DTO")
-    public static class Auction {
-        @Schema(description = "경매 타입", example = "NORMAL")
-        private AuctionType type;
+    @Schema(description = "검수 발송 정보")
+    public static class Inspection {
+        @Schema(description = "택배사", example = "CJ대한통운", nullable = true)
+        @Size(max = 20, message = "택배사는 20자 이하여야 합니다.")
+        private String carrier;
 
-        @Schema(description = "검수 여부", example = "NO")
-        private YesNo inspectionYn;
-
-        @Schema(description = "시작가", example = "100000")
-        @PositiveOrZero(message = "시작가는 0 이상이어야 합니다.")
-        private Long startPrice;
-
-        @Schema(description = "입찰 단위", example = "1000")
-        @Positive(message = "입찰 단위는 1 이상이어야 합니다.")
-        private Integer bidUnit;
-
-        @Schema(description = "비크리 가격", example = "150000", nullable = true)
-        @PositiveOrZero(message = "비크리 가격은 0 이상이어야 합니다.")
-        private Long vickreyPrice;
-
-        @Schema(description = "즉시 구매가", example = "180000", nullable = true)
-        @PositiveOrZero(message = "즉시 구매가는 0 이상이어야 합니다.")
-        private Long buyNowPrice;
-
-        @Schema(description = "경매 시작일시", example = "2026-03-15T10:00:00")
-        @NotNull(message = "경매 시작일시는 필수입니다.")
-        private LocalDateTime startDate;
-
-        @Schema(description = "경매 종료일시", example = "2026-03-16T10:00:00")
-        @NotNull(message = "경매 종료일시는 필수입니다.")
-        private LocalDateTime endDate;
+        @Schema(description = "송장 번호", example = "1234567890", nullable = true)
+        @Size(max = 255, message = "송장 번호는 255자 이하여야 합니다.")
+        private String trackingNumber;
     }
 }

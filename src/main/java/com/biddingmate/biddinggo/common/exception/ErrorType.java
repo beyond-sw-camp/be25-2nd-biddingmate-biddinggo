@@ -38,6 +38,10 @@ public enum ErrorType {
     CATEGORY_NOT_FOUND("auction-007", "카테고리를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     INVALID_CATEGORY_LEVEL("auction-008", "최하위 카테고리만 선택할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
+    // 검수
+    INVALID_INSPECTION_CREATE_REQUEST("inspection-001", "검수 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    INSPECTION_SAVE_FAILED("inspection-002", "검수 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // 파일
     INVALID_FILE_UPLOAD_REQUEST("file-001", "파일 업로드 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     R2_PRESIGNED_URL_GENERATION_FAILED("file-002", "R2 업로드 URL 생성에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
