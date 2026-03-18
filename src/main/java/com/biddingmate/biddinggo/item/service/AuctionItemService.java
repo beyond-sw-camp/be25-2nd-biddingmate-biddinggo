@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.item.service;
 
 import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
+import com.biddingmate.biddinggo.item.model.AuctionItem;
 
 /**
  * auction_item 테이블 저장 책임을 담당하는 서비스.
@@ -22,4 +23,9 @@ public interface AuctionItemService {
      * {@code auction_item.inspection_status = PENDING}을 명시 저장한다.</p>
      */
     Long createInspectionItem(AuctionItemCreateSource item);
+
+    /**
+     * 검수 완료된 기존 상품이 경매 등록 가능한 상태인지 검증하고 반환한다.
+     */
+    AuctionItem getAuctionableInspectionItem(Long itemId, Long sellerId);
 }

@@ -43,6 +43,32 @@ public class AuctionItemServiceImpl implements AuctionItemService {
         return createItem(item, AuctionItemStatus.PENDING, ItemInspectionStatus.PENDING);
     }
 
+    @Override
+    /**
+     * 검수 완료된 기존 상품을 조회하고, 실제 경매 등록 가능한 상태인지 검증한다.
+     */
+    public AuctionItem getAuctionableInspectionItem(Long itemId, Long sellerId) {
+        AuctionItem auctionItem = auctionItemMapper.findById(itemId);
+
+        if (auctionItem == null) {
+            throw new CustomException(ErrorType.AUCTION_ITEM_NOT_FOUND);
+        }
+
+        if (!auctionItem.getSellerId().equals(sellerId)) {
+            throw new CustomException(ErrorType.AUCTION_ITEM_SELLER_MISMATCH);
+        }
+
+        if (auctionItem.getInspectionStatus() != ItemInspectionStatus.PASSED) {
+            throw new CustomException(ErrorType.INSPECTION_NOT_PASSED);
+        }
+
+        if (auctionItem.getStatus() != AuctionItemStatus.PENDING) {
+            throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+        }
+
+        return auctionItem;
+    }
+
     /**
      * 공통 auction_item 저장 로직.
      *
