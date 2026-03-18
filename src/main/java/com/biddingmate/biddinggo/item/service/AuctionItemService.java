@@ -33,11 +33,17 @@ public interface AuctionItemService {
 
     /**
      * 상품 상태를 조건부로 변경한다.
+     *
+     * <p>범용 상태 변경 도구이며,
+     * 실제 유스케이스에서는 {@code markAsOnAuction()}처럼 의미가 드러나는 전이 메서드로 감싸서 사용하는 것을 권장한다.</p>
      */
     void changeStatus(Long itemId, AuctionItemStatus newStatus, AuctionItemStatus currentStatus, ItemInspectionStatus currentInspectionStatus);
 
     /**
      * 검수 완료 상품을 경매 진행 상태로 전이한다.
+     *
+     * <p>애플리케이션 서비스가 상태 enum 조합을 직접 알지 않도록,
+     * 경매 등록 유스케이스에서는 이 메서드를 통해 상태 전이를 수행한다.</p>
      */
     void markAsOnAuction(Long itemId);
 }

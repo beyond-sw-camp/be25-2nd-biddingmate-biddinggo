@@ -73,6 +73,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
     /**
      * 상품 상태를 조건부로 변경한다.
      * 현재 상품 상태나 검수 상태가 기대값과 다르면 변경되지 않는다.
+     * 유스케이스별 의미 있는 상태 전이는 별도 메서드에서 이 공용 메서드를 감싸서 사용한다.
      */
     public void changeStatus(Long itemId, AuctionItemStatus newStatus, AuctionItemStatus currentStatus, ItemInspectionStatus currentInspectionStatus) {
         int updatedCount = auctionItemMapper.updateStatus(itemId, newStatus, currentStatus, currentInspectionStatus);
