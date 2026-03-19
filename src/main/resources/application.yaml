@@ -1,5 +1,3 @@
-server:
-  port: 8088
 spring:
   application:
     name: bidding-go
@@ -7,6 +5,3 @@ spring:
     import: optional:file:.env[.properties]
   profiles:
     active: local
-
-server:
-  port: 8088
