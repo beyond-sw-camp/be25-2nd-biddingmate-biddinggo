@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.inspection.mapper;
 
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
+import com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse;
 import com.biddingmate.biddinggo.inspection.model.Inspection;
 import com.biddingmate.biddinggo.inspection.model.InspectionStatus;
 import org.apache.ibatis.annotations.Param;
@@ -14,4 +15,5 @@ public interface InspectionMapper extends IMybatisCRUD<Inspection> {
             @Param("trackingNumber") String trackingNumber,
             @Param("currentStatus") InspectionStatus currentStatus
     );
+    InspectionDetailResponse findDetailById(Long inspectionId);
 }
