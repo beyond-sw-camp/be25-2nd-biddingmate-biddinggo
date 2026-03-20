@@ -28,6 +28,8 @@ public class AdminInquiryController {
     public ResponseEntity<ApiResponse<CreateAdminInquiryResponse>> createAdminInquiry(
             @RequestBody CreateAdminInquiryRequest request
     ) {
+        // 인증 인가 전이므로 writerId를 하드코딩했습니다.
+        // 추후에 리펙터링 대상입니다.
         CreateAdminInquiryResponse result = adminInquiryService.createAdminInquiry(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 성공", result);
@@ -37,7 +39,8 @@ public class AdminInquiryController {
     public ResponseEntity<ApiResponse<PageResponse<AdminInquiryView>>> findAdminInquiry(BasePageRequest request,
                                                                                         @RequestParam boolean isAdmin,
                                                                                         @RequestParam long memberId) {
-        // 인증 인가 완료 후 role 검사 및 memberId 전송
+        // 인증 인가 완료 전이므로 role 검사 및 memberId 전송
+        // 추후에 리펙터링 대상입니다.
         PageResponse<AdminInquiryView> result = adminInquiryService.findAdminInquiry(request, isAdmin, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 목록 조회 성공", result);
