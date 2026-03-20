@@ -3,11 +3,26 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.biddingmate.biddinggo.member.mapper.MemberMapper">
 
+    <select id="getPointByMemberId" resultType="long">
+        SELECT point
+        FROM member
+        WHERE id = #{id}
+    </select>
+
     <update id="addPoint" parameterType="map">
         UPDATE
             member
         SET
             point = point + #{amount}
+        WHERE
+            id = #{id};
+    </update>
+
+    <update id="usePoint" parameterType="map">
+        UPDATE
+            member
+        SET
+            point = point - #{amount}
         WHERE
             id = #{id};
     </update>

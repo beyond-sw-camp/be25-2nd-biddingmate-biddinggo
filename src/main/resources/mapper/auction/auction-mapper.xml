@@ -106,4 +106,33 @@
         WHERE a.id = #{auctionId}
     </select>
 
+    <select id="findById" parameterType="long" resultType="Auction">
+        SELECT id,
+               item_id AS itemId,
+               winner_id AS winnerId,
+               seller_id AS sellerId,
+               type,
+               inspection_yn AS inspectionYn,
+               status,
+               start_price AS startPrice,
+               bid_unit AS bidUnit,
+               vickrey_price AS vickreyPrice,
+               bid_count AS bidCount,
+               buy_now_price AS buyNowPrice,
+               wish_count AS wishCount,
+               start_date AS startDate,
+               end_date AS endDate,
+               cancel_date AS cancelDate,
+               winner_price AS winnerPrice,
+               created_at AS createdAt
+        FROM auction
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateAfterBid" parameterType="map">
+        UPDATE auction
+        SET vickrey_price = #{vickreyPrice},
+            bid_count = bid_count+1
+        WHERE id = #{id}
+    </update>
 </mapper>
