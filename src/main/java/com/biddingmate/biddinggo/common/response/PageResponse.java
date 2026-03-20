@@ -41,7 +41,7 @@ public class PageResponse<T> {
             int size,
             long totalElements
     ) {
-        if (page < 0) throw new IllegalArgumentException("page >= 0");
+        if (page < 0) throw new IllegalArgumentException("page >= 1");
         if (size < 1) throw new IllegalArgumentException("size >= 1");
         if (totalElements < 0) throw new IllegalArgumentException("total >= 0");
 
@@ -52,10 +52,10 @@ public class PageResponse<T> {
 
         int numberOfElements = safeContent.size();
 
-        boolean first = page == 0;
+        boolean first = page == 1;
         boolean last = totalPages == 0 || page >= totalPages - 1;
         boolean hasNext = page + 1 < totalPages;
-        boolean hasPrevious = page > 0;
+        boolean hasPrevious = page > 1;
         boolean empty = safeContent.isEmpty();
 
         return new PageResponse<>(

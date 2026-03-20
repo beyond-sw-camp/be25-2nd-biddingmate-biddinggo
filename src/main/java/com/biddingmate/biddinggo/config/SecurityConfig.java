@@ -26,7 +26,12 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/payments/**", "/api/v1/auctions/**", "/api/v1/files/**", "/api/v1/inspections/**", "/api/v1/bidding/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(
+                                "/api/v1/payments/**", "/api/v1/files/**",
+                                "/api/v1/auctions/**", "/api/v1/inspections/**",
+                                "/api/v1/admin-inquiries/**",
+                                "/api/v1/bidding/**",
+                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated());
 
 

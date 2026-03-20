@@ -1,3 +1,6 @@
+server:
+  port: ${LOCAL_PORT}
+
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
