@@ -15,6 +15,9 @@ public enum ErrorType {
     CONFLICT("conflict", "요청이 현재 상태와 충돌합니다.", HttpStatus.CONFLICT),
     INTERNAL_ERROR("internal_error", "서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    // 페이징 처리
+    INVALID_SORT_ORDER("paging-001", "정렬 방향이 존재하질 않습니다.", HttpStatus.BAD_REQUEST),
+
     // 도메인 별 예시
     // auth
     EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT),
@@ -56,8 +59,10 @@ public enum ErrorType {
     FILE_DELETE_FAILED("file-003", "파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_LOOKUP_FAILED("file-004", "업로드된 파일 조회에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     UPLOADED_FILE_NOT_FOUND("file-005", "업로드된 파일을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
-    INVALID_UPLOADED_FILE_METADATA("file-006", "업로드된 파일 메타데이터가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+    INVALID_UPLOADED_FILE_METADATA("file-006", "업로드된 파일 메타데이터가 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
+    // 1대1 문의
+    ADMIN_INQUIRY_CREATED_FAIL("admin-inquiry-001", "관리자 1대1 문의 생성 실패" , HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String errorCode;
     private final String message;

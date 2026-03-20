@@ -46,7 +46,8 @@ public class BasePageRequest {
     protected String order;
 
     public int getOffset() {
-        return page * size;
+        // page가 1부터 시작한다고 가정할 경우
+        return (page > 0) ? (page - 1) * size : 0;
     }
 
     public int getLimit() {
