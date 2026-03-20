@@ -24,13 +24,6 @@
                  )
     </insert>
 
-<!--    <select id="getTotalAmount" resultType="long">-->
-<!--        SELECT IFNULL(SUM(amount),0)-->
-<!--        FROM bid-->
-<!--        WHERE auction_id = #{auctionId}-->
-<!--          AND bidder_id = #{bidderId}-->
-<!--    </select>-->
-
     <select id="getLastBidAmountByMemberId" resultType="long">
         SELECT amount
         FROM bid

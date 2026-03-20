@@ -106,7 +106,7 @@
         WHERE a.id = #{auctionId}
     </select>
 
-    <select id="findById" parameterType="long" resultType="Auction">
+    <select id="findByIdForUpdate" parameterType="long" resultType="Auction">
         SELECT id,
                item_id AS itemId,
                winner_id AS winnerId,
@@ -127,6 +127,7 @@
                created_at AS createdAt
         FROM auction
         WHERE id = #{id}
+        FOR UPDATE
     </select>
 
     <update id="updateAfterBid" parameterType="map">

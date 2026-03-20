@@ -11,4 +11,6 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
     AuctionDetailResponse findDetailById(Long auctionId);
 
     void updateAfterBid(@Param("id") Long id, @Param("vickreyPrice") Long vickreyPrice);
+
+    Auction findByIdForUpdate(Long auctionId);
 }
