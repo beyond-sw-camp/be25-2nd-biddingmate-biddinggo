@@ -8,7 +8,6 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -19,10 +18,19 @@ public class BidServiceImpl implements BidService {
     @Override
     public Bid createBid(Long memberId, Auction auction, CreateBidRequest request) {
 
-        Bid vickreyBid = bidMapper.getVickreyBid(auction.getId());
-        Long basePrice = (vickreyBid == null) ? auction.getStartPrice() : vickreyBid.getAmount();
+        Long bidCount = bidMapper.getBidCount(auction.getId());
+        Long minBidAmount;
 
-        if(basePrice + auction.getBidUnit() > request.getAmount()){
+        if (bidCount == 0) {
+            minBidAmount = auction.getStartPrice();
+        } else if (bidCount == 1) {
+            minBidAmount = auction.getStartPrice() + auction.getBidUnit();
+        } else {
+            Bid vickreyBid = bidMapper.getVickreyBid(auction.getId());
+            minBidAmount = vickreyBid.getAmount() + auction.getBidUnit();
+        }
+
+        if (minBidAmount > request.getAmount()) {
             throw new CustomException(ErrorType.BID_AMOUNT_TOO_LOW);
         }
 

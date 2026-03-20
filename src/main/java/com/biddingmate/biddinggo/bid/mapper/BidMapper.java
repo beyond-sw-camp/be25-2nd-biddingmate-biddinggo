@@ -12,4 +12,6 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
 
     Long getLastBidAmountByMemberId(@Param("auctionId") Long auctionId,
                               @Param("bidderId") Long bidderId);
+
+    Long getBidCount(@Param("auctionId") Long auctionId);
 }

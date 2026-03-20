@@ -44,7 +44,11 @@ public class BidApplicationServiceImpl implements BidApplicationService {
             throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
         }
 
-        if (auction.getStatus() != AuctionStatus.ON_GOING){
+        LocalDateTime now = LocalDateTime.now();
+
+        if (auction.getStatus() != AuctionStatus.ON_GOING ||
+                now.isBefore(auction.getStartDate()) ||
+                now.isAfter(auction.getEndDate())) {
             throw new CustomException(ErrorType.AUCTION_NOT_BIDDABLE);
         }
 

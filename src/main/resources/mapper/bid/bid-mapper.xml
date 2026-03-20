@@ -45,4 +45,10 @@
         LIMIT 1 OFFSET 1
     </select>
 
+    <select id="getBidCount" resultType="long">
+        SELECT COUNT(*)
+        FROM bid
+        WHERE auction_id = #{auctionId};
+    </select>
+
 </mapper>
