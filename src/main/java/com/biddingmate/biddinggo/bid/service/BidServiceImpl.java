@@ -4,6 +4,8 @@ import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
 import com.biddingmate.biddinggo.bid.model.Bid;
+import com.biddingmate.biddinggo.common.exception.CustomException;
+import com.biddingmate.biddinggo.common.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,25 +16,27 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
-
     @Override
     public Bid createBid(Long memberId, Auction auction, CreateBidRequest request) {
+
         Bid vickreyBid = bidMapper.getVickreyBid(auction.getId());
         Long basePrice = (vickreyBid == null) ? auction.getStartPrice() : vickreyBid.getAmount();
-        if(basePrice + auction.getBidUnit() > request.getAmount()){
-            // 입찰 금액이 현재 차순위 입찰가(없으면 시작가) + 입찰단위 미만인 경우
 
+        if(basePrice + auction.getBidUnit() > request.getAmount()){
+            throw new CustomException(ErrorType.BID_AMOUNT_TOO_LOW);
         }
+
         if((request.getAmount() - auction.getStartPrice()) % auction.getBidUnit() != 0){
-            // 입찰 단위가 아닌 값이 입찰가로 들어온 경우
+            throw new CustomException(ErrorType.INVALID_BID_UNIT);
         }
+
         Long lastBidAmount = bidMapper.getLastBidAmountByMemberId(auction.getId(), memberId);
         if (lastBidAmount == null) {
             lastBidAmount = 0L;
         }
 
         if(lastBidAmount >= request.getAmount()){
-            //이미 입찰한 금액보다 적거나 같은 경우
+            throw new CustomException(ErrorType.BID_AMOUNT_NOT_HIGHER_THAN_PREVIOUS);
         }
 
         // Bid 등록
@@ -46,7 +50,7 @@ public class BidServiceImpl implements BidService {
         int bidInsertCount = bidMapper.insert(bid);
 
         if(bidInsertCount != 1 || bid.getId() == null){
-            //BID_SAVE_FAILED
+            throw new CustomException(ErrorType.BID_SAVE_FAILED);
         }
 
         return bid;

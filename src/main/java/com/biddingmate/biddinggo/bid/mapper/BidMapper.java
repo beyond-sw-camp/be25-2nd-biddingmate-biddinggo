@@ -7,8 +7,6 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface BidMapper extends IMybatisCRUD<Bid> {
-//    Long getTotalAmount(@Param("auctionId") Long auctionId,
-//                        @Param("bidderId") Long bidderId);
 
     Bid getVickreyBid(@Param("auctionId") Long auctionId);
 
