@@ -62,7 +62,15 @@ public enum ErrorType {
     INVALID_UPLOADED_FILE_METADATA("file-006", "업로드된 파일 메타데이터가 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
     // 1대1 문의
-    ADMIN_INQUIRY_CREATED_FAIL("admin-inquiry-001", "관리자 1대1 문의 생성 실패" , HttpStatus.INTERNAL_SERVER_ERROR);
+    ADMIN_INQUIRY_CREATED_FAIL("admin-inquiry-001", "관리자 1대1 문의 생성 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+
+    // 입찰
+    BID_SAVE_FAILED("bid-001", "입찰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    BID_AMOUNT_TOO_LOW("bid-002", "입찰 금액이 최소 입찰 가능 금액보다 낮습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_BID_UNIT("bid-003", "입찰 단위로만 입찰이 가능합니다.", HttpStatus.BAD_REQUEST),
+    BID_AMOUNT_NOT_HIGHER_THAN_PREVIOUS("bid-004", "이전 입찰 기록보다 높게 설정해주세요.", HttpStatus.BAD_REQUEST),
+    AUCTION_NOT_BIDDABLE("bid-005", "진행중인 경매에만 입찰을 등록할 수 있습니다.", HttpStatus.BAD_REQUEST),
+    NOT_ENOUGH_POINT("bid-006", "보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST);
 
     private final String errorCode;
     private final String message;

@@ -9,4 +9,7 @@ import org.apache.ibatis.annotations.Param;
 public interface MemberMapper extends IMybatisCRUD<Member> {
     void addPoint(@Param("id") Long id, @Param("amount") Long amount);
 
+    void usePoint(@Param("id") Long id, @Param("amount") Long amount);
+
+    Long getPointById(@Param("id") Long id);
 }
