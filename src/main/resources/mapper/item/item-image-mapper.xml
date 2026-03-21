@@ -8,6 +8,11 @@
         <result property="displayOrder" column="display_order"/>
     </resultMap>
 
+    <resultMap id="inspectionDetailImageResultMap" type="com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse$Image">
+        <result property="url" column="url"/>
+        <result property="displayOrder" column="display_order"/>
+    </resultMap>
+
     <insert id="insert" parameterType="ItemImage" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO item_image(
             item_id,
@@ -27,6 +32,15 @@
     </insert>
 
     <select id="findDetailImagesByItemId" parameterType="long" resultMap="auctionDetailImageResultMap">
+        SELECT
+            url,
+            display_order
+        FROM item_image
+        WHERE item_id = #{itemId}
+        ORDER BY display_order ASC
+    </select>
+
+    <select id="findInspectionDetailImagesByItemId" parameterType="long" resultMap="inspectionDetailImageResultMap">
         SELECT
             url,
             display_order

@@ -3,8 +3,4 @@ spring:
     name: bidding-go
   config:
     import: optional:file:.env[.properties]
-  profiles:
-    active: local
 
-server:
-  port: 8088

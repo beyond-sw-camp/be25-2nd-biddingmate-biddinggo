@@ -15,6 +15,9 @@ public enum ErrorType {
     CONFLICT("conflict", "요청이 현재 상태와 충돌합니다.", HttpStatus.CONFLICT),
     INTERNAL_ERROR("internal_error", "서버 내부 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    // 페이징 처리
+    INVALID_SORT_ORDER("paging-001", "정렬 방향이 존재하질 않습니다.", HttpStatus.BAD_REQUEST),
+
     // 도메인 별 예시
     // auth
     EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT),
@@ -45,6 +48,10 @@ public enum ErrorType {
     // 검수
     INVALID_INSPECTION_CREATE_REQUEST("inspection-001", "검수 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     INSPECTION_SAVE_FAILED("inspection-002", "검수 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INSPECTION_NOT_FOUND("inspection-003", "검수 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    INVALID_INSPECTION_STATUS("inspection-004", "현재 검수 상태에서는 처리할 수 없습니다.", HttpStatus.CONFLICT),
+    INSPECTION_SHIPPING_INFO_ALREADY_EXISTS("inspection-005", "이미 배송 정보가 등록된 검수입니다.", HttpStatus.CONFLICT),
+    INSPECTION_SHIPPING_UPDATE_FAILED("inspection-006", "검수 배송 정보 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 파일
     INVALID_FILE_UPLOAD_REQUEST("file-001", "파일 업로드 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
@@ -52,8 +59,18 @@ public enum ErrorType {
     FILE_DELETE_FAILED("file-003", "파일 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_LOOKUP_FAILED("file-004", "업로드된 파일 조회에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     UPLOADED_FILE_NOT_FOUND("file-005", "업로드된 파일을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
-    INVALID_UPLOADED_FILE_METADATA("file-006", "업로드된 파일 메타데이터가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+    INVALID_UPLOADED_FILE_METADATA("file-006", "업로드된 파일 메타데이터가 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
+    // 1대1 문의
+    ADMIN_INQUIRY_CREATED_FAIL("admin-inquiry-001", "관리자 1대1 문의 생성 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+
+    // 입찰
+    BID_SAVE_FAILED("bid-001", "입찰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    BID_AMOUNT_TOO_LOW("bid-002", "입찰 금액이 최소 입찰 가능 금액보다 낮습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_BID_UNIT("bid-003", "입찰 단위로만 입찰이 가능합니다.", HttpStatus.BAD_REQUEST),
+    BID_AMOUNT_NOT_HIGHER_THAN_PREVIOUS("bid-004", "이전 입찰 기록보다 높게 설정해주세요.", HttpStatus.BAD_REQUEST),
+    AUCTION_NOT_BIDDABLE("bid-005", "진행중인 경매에만 입찰을 등록할 수 있습니다.", HttpStatus.BAD_REQUEST),
+    NOT_ENOUGH_POINT("bid-006", "보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST);
 
     private final String errorCode;
     private final String message;
