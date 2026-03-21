@@ -35,7 +35,7 @@ public class BidApplicationServiceImpl implements BidApplicationService {
 
     @Override
     @Transactional
-    public CreateBidResponse createBid(Long memberId, Long auctionId, CreateBidRequest request){
+    public CreateBidResponse createBidProcess(Long memberId, Long auctionId, CreateBidRequest request){
 
         // 1. 경매 유효성 검증
         Auction auction = auctionMapper.findByIdForUpdate(auctionId);
@@ -71,8 +71,7 @@ public class BidApplicationServiceImpl implements BidApplicationService {
 
         // 4. Auction 정보 갱신 : 경매 차순위 값 변경 + 입찰 수 증가
         // 추후 AuctionService 구현 이후 변경
-        // auction 정보 갱신 실패 예외 처리
-        Bid vickreyBid = bidMapper.getVickreyBid(auctionId);
+        Bid vickreyBid = bidService.getVickreyBid(auctionId);
         if(vickreyBid != null){
             auctionMapper.updateAfterBid(auctionId, vickreyBid.getAmount());
         }

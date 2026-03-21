@@ -73,4 +73,9 @@ public class BidServiceImpl implements BidService {
 
         return lastBidAmount;
     }
+
+    @Override
+    public Bid getVickreyBid(Long auctionId) {
+        return bidMapper.getVickreyBid(auctionId);
+    }
 }

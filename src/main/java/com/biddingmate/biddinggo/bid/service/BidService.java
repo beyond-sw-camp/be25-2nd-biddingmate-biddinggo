@@ -12,4 +12,6 @@ public interface BidService {
     Bid createBid(Long memberId, Auction auction, @Valid CreateBidRequest request);
 
     Long getLastBidAmount(Long memberId, Long auctionId);
+
+    Bid getVickreyBid(Long auctionId);
 }

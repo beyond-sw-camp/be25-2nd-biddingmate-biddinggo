@@ -37,7 +37,7 @@ public class BidController {
             @Valid @RequestBody CreateBidRequest request
     ) {
 
-        CreateBidResponse result = bidApplicationService.createBid(memberId, auctionId, request);
+        CreateBidResponse result = bidApplicationService.createBidProcess(memberId, auctionId, request);
 
         return ApiResponse.of(HttpStatus.OK, null, "입찰 완료", result);
     }
