@@ -4,14 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
 @Builder
-@ToString
 @Schema(description = "입찰 조회 응답 DTO")
 public class BidResponse {
     @Schema(description = "조회된 입찰")

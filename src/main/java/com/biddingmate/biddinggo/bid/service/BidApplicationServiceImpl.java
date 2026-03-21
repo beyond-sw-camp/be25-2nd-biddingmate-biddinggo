@@ -5,7 +5,6 @@ import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.dto.CreateBidResponse;
-import com.biddingmate.biddinggo.bid.mapper.BidMapper;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
