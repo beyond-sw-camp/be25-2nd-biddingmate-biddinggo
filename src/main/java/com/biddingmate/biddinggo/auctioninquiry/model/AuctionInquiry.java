@@ -1,9 +1,13 @@
 package com.biddingmate.biddinggo.auctioninquiry.model;
 
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AuctionInquiry {
 
     private Long id;

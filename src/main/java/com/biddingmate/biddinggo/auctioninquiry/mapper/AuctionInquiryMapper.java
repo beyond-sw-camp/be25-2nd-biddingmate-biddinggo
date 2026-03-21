@@ -15,5 +15,5 @@ public interface AuctionInquiryMapper {
         (#{auctionId}, #{writerId}, #{content}, 'ACTIVE', NOW())
     """)
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insertInquiry(AuctionInquiry inquiry);
+    int insertInquiry(AuctionInquiry inquiry);
 }
