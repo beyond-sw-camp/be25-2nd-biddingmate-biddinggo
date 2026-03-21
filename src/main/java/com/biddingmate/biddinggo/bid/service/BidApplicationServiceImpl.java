@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class BidApplicationServiceImpl implements BidApplicationService {
-    private final BidMapper bidMapper;
     private final AuctionMapper auctionMapper;
     private final MemberMapper memberMapper;
     private final PointHistoryMapper pointHistoryMapper;

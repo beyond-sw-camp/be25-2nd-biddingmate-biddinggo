@@ -1,8 +1,11 @@
 package com.biddingmate.biddinggo.bid.service;
 
 import com.biddingmate.biddinggo.auction.model.Auction;
+import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.model.Bid;
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import jakarta.validation.Valid;
 
 public interface BidService {
@@ -14,4 +17,6 @@ public interface BidService {
     Long getLastBidAmount(Long memberId, Long auctionId);
 
     Bid getVickreyBid(Long auctionId);
+
+    PageResponse<BidResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId);
 }
