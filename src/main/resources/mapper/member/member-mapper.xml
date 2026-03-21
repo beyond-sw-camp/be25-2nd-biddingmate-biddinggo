@@ -12,4 +12,47 @@
             id = #{id};
     </update>
 
+    <select id="selectMyInfo" parameterType="long" resultType="com.biddingmate.biddinggo.member.dto.MemberMyResponse">
+        SELECT
+            m.point AS point,
+            COALESCE(p.total_purchase_amount, 0) AS totalPurchaseAmount,
+            COALESCE(s.total_sales_amount, 0) AS totalSalesAmount
+        FROM member m
+
+        LEFT JOIN (
+            SELECT
+                winner_id,
+                SUM(winner_price) AS total_purchase_amount
+            FROM winner_deal
+            GROUP BY winner_id
+        ) p ON m.id = p.winner_id
+
+        LEFT JOIN (
+            SELECT
+                seller_id,
+                SUM(winner_price) AS total_sales_amount
+            FROM winner_deal
+            GROUP BY seller_id
+        ) s ON m.id = s.seller_id
+        WHERE m.id = #{memberId}
+    </select>
+
+    <select id="findById" parameterType="long" resultType="com.biddingmate.biddinggo.member.model.Member">
+        SELECT
+            id,
+            name,
+            nickname,
+            email,
+            image_url AS imageUrl,
+            point,
+            bank_code AS bankCode,
+            bank_account AS bankAccount,
+            grade,
+            role,
+            status,
+            last_change_nick AS lastChangeNick,
+            created_at AS createdAt
+        FROM member
+        WHERE id = #{id}
+    </select>
 </mapper>

@@ -30,7 +30,8 @@ public class SecurityConfig {
                                 "/api/v1/payments/**", "/api/v1/files/**",
                                 "/api/v1/auctions/**", "/api/v1/inspections/**",
                                 "/api/v1/admin-inquiries/**",
-                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                "/swagger-ui/**", "/v3/api-docs/**",
+                                "/api/v1/users/my").permitAll()
                         .anyRequest().authenticated());
         return http.build();
     }
