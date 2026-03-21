@@ -1,8 +1,10 @@
 package com.biddingmate.biddinggo.auctioninquiry.controller;
 
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryRequest;
+import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse;
 import com.biddingmate.biddinggo.auctioninquiry.service.AuctionInquiryService;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,24 +18,26 @@ public class AuctionInquiryController {
     private final AuctionInquiryService auctionInquiryService;
 
     @PostMapping("/{auctionId}")
-    public ResponseEntity<ApiResponse<Long>> createInquiry(
+    public ResponseEntity<ApiResponse<CreateAuctionInquiryResponse>> createInquiry(
             @PathVariable Long auctionId,
-            @RequestBody CreateAuctionInquiryRequest request
+            @Valid @RequestBody CreateAuctionInquiryRequest request
     ) {
 
+        // TODO: 추후 인증/인가 적용 시 로그인한 사용자 ID로 변경 필요
         Long writerId = 1L;
 
-        Long id = auctionInquiryService.createInquiry(
-                auctionId,
-                writerId,
-                request.getContent()
-        );
+        CreateAuctionInquiryResponse result =
+                auctionInquiryService.createInquiry(
+                        auctionId,
+                        writerId,
+                        request.getContent()
+                );
 
         return ApiResponse.of(
                 HttpStatus.OK,
                 null,
                 "문의 등록 성공",
-                id
+                result
         );
     }
 }
