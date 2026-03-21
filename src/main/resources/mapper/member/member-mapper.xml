@@ -12,7 +12,7 @@
             id = #{id};
     </update>
 
-    <select id="selectMyInfo" parameterType="long" resultType="com.biddingmate.biddinggo.member.dto.MemberMyResponse">
+    <select id="selectMyInfo" parameterType="long" resultType="MemberMyResponse">
         SELECT
             m.point AS point,
             COALESCE(p.total_purchase_amount, 0) AS totalPurchaseAmount,
@@ -37,7 +37,7 @@
         WHERE m.id = #{memberId}
     </select>
 
-    <select id="findById" parameterType="long" resultType="com.biddingmate.biddinggo.member.model.Member">
+    <select id="findById" parameterType="long" resultType="Member">
         SELECT
             id,
             name,
