@@ -51,7 +51,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        int result = auctionInquiryMapper.insertInquiry(inquiry);
+        int result = auctionInquiryMapper.insert(inquiry);
 
         if (result <= 0) {
             throw new CustomException(ErrorType.AUCTION_INQUIRY_CREATE_FAIL);

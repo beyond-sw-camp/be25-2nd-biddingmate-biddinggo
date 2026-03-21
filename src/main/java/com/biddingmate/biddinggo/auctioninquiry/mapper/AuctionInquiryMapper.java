@@ -1,19 +1,10 @@
 package com.biddingmate.biddinggo.auctioninquiry.mapper;
 
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
-import org.apache.ibatis.annotations.Insert;
+import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
 
 @Mapper
-public interface AuctionInquiryMapper {
+public interface AuctionInquiryMapper extends IMybatisCRUD<AuctionInquiry> {
 
-    @Insert("""
-        INSERT INTO auction_inquiry
-        (auction_id, writer_id, content, status, created_at)
-        VALUES
-        (#{auctionId}, #{writerId}, #{content}, 'ACTIVE', NOW())
-    """)
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insertInquiry(AuctionInquiry inquiry);
 }
