@@ -1,14 +1,14 @@
 package com.biddingmate.biddinggo.auth.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
+//@RestController
 public class MainController {
 
-    @GetMapping("/")
-    @ResponseBody
-    public String mainApi() {
-
-        return "main route";
-    }
+//    @GetMapping("/")
+//    public String mainApi() {
+//
+//        return "메인 페이지";
+//    }
 }
