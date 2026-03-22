@@ -1,6 +1,8 @@
 package com.biddingmate.biddinggo.admininquiry.service;
 
 import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryRequest;
+import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.mapper.AdminInquiryMapper;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -70,5 +73,32 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
         }
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    @Override
+    @Transactional
+    public AnswerAdminInquiryResponse answerAdminInquiry(Long inquiryId, AnswerAdminInquiryRequest request, Long adminId) {
+        AdminInquiry updateDto = AdminInquiry.builder()
+                .id(inquiryId)
+                .adminId(adminId)
+                .answer(request.getAnswer())
+                .answeredAt(LocalDateTime.now())
+                .build();
+
+        int update = adminInquiryMapper.update(updateDto);
+
+        if (update <= 0) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_UPDATED_FAIL);
+        }
+
+        AdminInquiry adminInquiry = Optional.ofNullable(adminInquiryMapper.findById(inquiryId))
+                .orElseThrow(() -> new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND));
+
+        return AnswerAdminInquiryResponse.builder()
+                .id(adminInquiry.getId())
+                .adminId(adminInquiry.getAdminId())
+                .answer(adminInquiry.getAnswer())
+                .answeredAt(adminInquiry.getAnsweredAt())
+                .build();
     }
 }

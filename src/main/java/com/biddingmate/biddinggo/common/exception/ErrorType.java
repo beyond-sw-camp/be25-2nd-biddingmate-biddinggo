@@ -63,6 +63,8 @@ public enum ErrorType {
 
     // 1대1 문의
     ADMIN_INQUIRY_CREATED_FAIL("admin-inquiry-001", "관리자 1대1 문의 생성 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+    ADMIN_INQUIRY_UPDATED_FAIL("admin-inquiry-002", "관리자 1대1 문의 답변 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+    ADMIN_INQUIRY_NOT_FOUND("admin-inquiry-003", "해당 1대1 문의가 존재하질 않습니다.", HttpStatus.NOT_FOUND),
 
     // 입찰
     BID_SAVE_FAILED("bid-001", "입찰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

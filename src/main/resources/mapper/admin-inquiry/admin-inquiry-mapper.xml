@@ -70,4 +70,29 @@
         FROM admin_inquiry
         WHERE writer_id = #{memberId}
     </select>
+
+    <!-- 문의 답변 -->
+    <update id="update" parameterType="AdminInquiry">
+        UPDATE admin_inquiry
+        SET
+            admin_id = #{adminId},
+            answer = #{answer},
+            answered_at = #{answeredAt}
+        WHERE
+            id = #{id}
+            AND answer IS NULL
+    </update>
+
+    <select id="findById" parameterType="long" resultType="AdminInquiry">
+        SELECT id,
+               writer_id AS writerId,
+               admin_id AS adminId,
+               category,
+               content,
+               answer,
+               answered_at AS answeredAt,
+               created_at AS createdAt
+        FROM admin_inquiry
+        WHERE id = #{id}
+    </select>
 </mapper>
