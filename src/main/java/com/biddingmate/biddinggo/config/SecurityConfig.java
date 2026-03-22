@@ -32,7 +32,7 @@ public class SecurityConfig {
                                 "/api/v1/admin-inquiries/**",
                                 "/api/v1/bidding/**",
                                 "/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/v1/users/my"
+                                "/api/v1/users/my", "/api/v1/users/my/profile"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 );
