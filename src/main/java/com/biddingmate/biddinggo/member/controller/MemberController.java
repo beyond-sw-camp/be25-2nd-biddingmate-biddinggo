@@ -2,6 +2,7 @@ package com.biddingmate.biddinggo.member.controller;
 
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.member.dto.MemberMyResponse;
+import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
