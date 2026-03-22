@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
+import com.biddingmate.biddinggo.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,15 +45,12 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
         }
 
         // 3. 사용자 존재 여부 검증 (Member 구현 시 연결 가능)
-        /* [테스트 완료 및 주석 처리]
 
-         */
-    /*
-    Member member = memberMapper.findById(writerId);
-    if (member == null) {
-        throw new CustomException(ErrorType.NOT_FOUND);
-    }
-    */
+        Member member = memberMapper.findById(writerId);
+        if (member == null) {
+            throw new CustomException(ErrorType.NOT_FOUND);
+        }
+
 
         Long sellerId = auction.getSellerId();
 

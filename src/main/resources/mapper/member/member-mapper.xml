@@ -72,9 +72,4 @@
             point >= #{amount};
     </update>
 
-    <select id="findById" resultType="com.biddingmate.biddinggo.member.model.Member">
-        SELECT *
-        FROM member
-        WHERE id = #{id}
-    </select>
 </mapper>
