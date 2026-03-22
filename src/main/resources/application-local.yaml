@@ -20,6 +20,7 @@ spring:
       client:
         registration:
           kakao:
+            client-authentication-method: client_secret_post
             client-name: kakao
             client-id: ${KAKAO_REST_API_KEY}
             client-secret: ${KAKAO_CLIENT_SECRET}

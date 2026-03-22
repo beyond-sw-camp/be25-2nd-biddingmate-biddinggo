@@ -33,6 +33,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .getClientRegistration()
                 .getRegistrationId();
 
+        // 카카오 로그인일 때만 상세 속성 출력
+        if ("kakao".equals(registrationId)) {
+            System.out.println("======= KAKAO LOGIN DEBUG =======");
+            System.out.println("Attributes: " + oAuth2User.getAttributes());
+            System.out.println("=================================");
+        }
+
         OAuth2Response oAuth2Response = null;
 
         if (registrationId.equals("kakao")) {
