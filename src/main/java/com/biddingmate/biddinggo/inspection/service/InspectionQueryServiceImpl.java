@@ -3,6 +3,8 @@ package com.biddingmate.biddinggo.inspection.service;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse;
+import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
+import com.biddingmate.biddinggo.inspection.dto.InspectionListResponse;
 import com.biddingmate.biddinggo.inspection.mapper.InspectionMapper;
 import com.biddingmate.biddinggo.item.mapper.ItemImageMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,16 @@ import java.util.List;
 public class InspectionQueryServiceImpl implements InspectionQueryService {
     private final InspectionMapper inspectionMapper;
     private final ItemImageMapper itemImageMapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<InspectionListResponse> getInspectionList(InspectionListRequest request) {
+        if (request.getMemberId() == null || request.getMemberId() <= 0) {
+            throw new CustomException(ErrorType.INVALID_INSPECTION_LIST_REQUEST);
+        }
+
+        return inspectionMapper.findInspectionList(request.getMemberId(), request.getStatus());
+    }
 
     @Override
     @Transactional(readOnly = true)
