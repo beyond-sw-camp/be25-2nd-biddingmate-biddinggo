@@ -3,6 +3,19 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.biddingmate.biddinggo.inspection.mapper.InspectionMapper">
 
+    <resultMap id="inspectionListResultMap" type="com.biddingmate.biddinggo.inspection.dto.InspectionListResponse">
+        <id property="inspectionId" column="inspection_id"/>
+        <result property="itemId" column="item_id"/>
+        <result property="brand" column="brand"/>
+        <result property="name" column="name"/>
+        <result property="quality" column="quality"/>
+        <result property="inspectionStatus" column="inspection_status"/>
+        <result property="representativeImageUrl" column="representative_image_url"/>
+        <result property="carrier" column="carrier"/>
+        <result property="trackingNumber" column="tracking_number"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
     <resultMap id="inspectionResultMap" type="Inspection">
         <id property="id" column="id"/>
         <result property="itemId" column="item_id"/>
@@ -52,6 +65,33 @@
             created_at
         FROM inspection
         WHERE id = #{id}
+    </select>
+
+    <select id="findInspectionList" parameterType="map" resultMap="inspectionListResultMap">
+        SELECT
+            i.id AS inspection_id,
+            ai.id AS item_id,
+            ai.brand,
+            ai.name,
+            ai.quality,
+            ai.inspection_status,
+            ii.url AS representative_image_url,
+            i.carrier,
+            i.tracking_number,
+            i.created_at
+        FROM inspection i
+        INNER JOIN auction_item ai ON i.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id
+            AND ii.display_order = (
+                SELECT MIN(ii2.display_order)
+                FROM item_image ii2
+                WHERE ii2.item_id = ai.id
+            )
+        WHERE ai.seller_id = #{memberId}
+        <if test="status != null">
+            AND ai.inspection_status = #{status}
+        </if>
+        ORDER BY i.created_at DESC
     </select>
 
     <update id="updateShippingInfo">
