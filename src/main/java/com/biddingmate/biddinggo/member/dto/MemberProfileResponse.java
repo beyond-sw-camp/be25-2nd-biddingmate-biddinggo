@@ -25,6 +25,6 @@ public class MemberProfileResponse {
     private String bankCode;
     private String bankAccount;
 
-    private LocalDateTime lastChangeNick;
+    private Boolean canChangeNickname;
     private Integer remainingDays;
 }
