@@ -10,6 +10,7 @@ import com.biddingmate.biddinggo.admininquiry.service.AdminInquiryService;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class AdminInquiryController {
     // 인증 인가 구현 후 등록 예정
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<AnswerAdminInquiryResponse>> answerAdminInquiry(@PathVariable Long inquiryId,
-                                                                                     @RequestBody AnswerAdminInquiryRequest request,
+                                                                                     @Valid @RequestBody AnswerAdminInquiryRequest request,
                                                                                       @RequestParam Long adminId) {
         AnswerAdminInquiryResponse result = adminInquiryService.answerAdminInquiry(inquiryId, request, adminId);
 
