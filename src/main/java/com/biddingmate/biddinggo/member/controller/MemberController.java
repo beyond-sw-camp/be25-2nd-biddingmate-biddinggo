@@ -23,4 +23,10 @@ public class MemberController {
         MemberMyResponse result = memberService.getMyInfo(memberId);
         return ApiResponse.of(HttpStatus.OK, null, "회원 마이페이지 조회 성공", result);
     }
+
+    @GetMapping("/my/profile")
+    public ResponseEntity<ApiResponse<MemberProfileResponse>> getMyProfile(@RequestParam Long memberId) {
+        MemberProfileResponse result = memberService.getMyProfile(memberId);
+        return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 조회 성공", result);
+    }
 }
