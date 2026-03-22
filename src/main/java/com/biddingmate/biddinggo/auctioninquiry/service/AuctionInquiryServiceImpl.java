@@ -26,14 +26,8 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
     @Override
     @Transactional
     public CreateAuctionInquiryResponse createInquiry(Long auctionId, Long writerId, String content) {
-        System.out.println("검사 시작 - auctionId: " + auctionId + ", writerId: " + writerId);
 
-        // 1. content 검증
-        if (content == null || content.isBlank()) {
-            throw new CustomException(ErrorType.AUCTION_INQUIRY_CONTENT_INVALID);
-        }
-
-        // 2. 경매 존재 여부 검증
+        // 경매 존재 여부 검증
         Auction auction = auctionMapper.findByIdForUpdate(auctionId);
         if (auction == null) {
             throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
@@ -44,13 +38,12 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
             throw new CustomException(ErrorType.CANNOT_INQUIRE_OWN_AUCTION);
         }
 
-        // 3. 사용자 존재 여부 검증 (Member 구현 시 연결 가능)
+        // 사용자 존재 여부 검증
 
         Member member = memberMapper.findById(writerId);
         if (member == null) {
             throw new CustomException(ErrorType.NOT_FOUND);
         }
-
 
         Long sellerId = auction.getSellerId();
 
