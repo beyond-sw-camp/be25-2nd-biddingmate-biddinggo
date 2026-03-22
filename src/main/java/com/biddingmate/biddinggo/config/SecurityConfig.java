@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.config;
 
+import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -20,6 +21,15 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
+
+        this.customOAuth2UserService = customOAuth2UserService;
+    }
+
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -29,7 +39,9 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement((seession) -> seession
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login((oauth2)-> oauth2
+                        .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/payments/**", "/api/v1/files/**",
