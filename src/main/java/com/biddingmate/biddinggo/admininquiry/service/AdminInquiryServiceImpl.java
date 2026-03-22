@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.admininquiry.service;
 
 import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryViewDetail;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.mapper.AdminInquiryMapper;
@@ -70,5 +71,24 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
         }
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AdminInquiryViewDetail findAdminInquiryDetail(Long inquiryId, boolean isAdmin, Long memberId) {
+
+        AdminInquiryViewDetail adminInquiryViewDetail;
+
+        if (isAdmin) {
+            adminInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetail(inquiryId);
+        } else {
+            adminInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetailOfMe(inquiryId, memberId);
+        }
+
+        if (adminInquiryViewDetail == null) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND);
+        }
+
+        return adminInquiryViewDetail;
     }
 }

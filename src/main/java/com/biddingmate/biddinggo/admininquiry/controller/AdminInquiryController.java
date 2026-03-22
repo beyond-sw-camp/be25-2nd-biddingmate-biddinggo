@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.admininquiry.controller;
 
 import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryViewDetail;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.model.AdminInquiry;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,5 +46,14 @@ public class AdminInquiryController {
         PageResponse<AdminInquiryView> result = adminInquiryService.findAdminInquiry(request, isAdmin, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 목록 조회 성공", result);
+    }
+
+    @GetMapping("{inquiryId}")
+    public ResponseEntity<ApiResponse<AdminInquiryViewDetail>> findAdminInquiryDetail(@PathVariable Long inquiryId,
+                                                                                      @RequestParam boolean isAdmin,
+                                                                                      @RequestParam Long memberId) {
+        AdminInquiryViewDetail result = adminInquiryService.findAdminInquiryDetail(inquiryId, isAdmin, memberId);
+
+        return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 상세 조회 성공", result);
     }
 }
