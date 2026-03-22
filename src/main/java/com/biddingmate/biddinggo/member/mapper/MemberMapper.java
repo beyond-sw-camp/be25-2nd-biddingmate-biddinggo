@@ -12,4 +12,6 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     void usePoint(@Param("id") Long id, @Param("amount") Long amount);
 
     Long getPointById(@Param("id") Long id);
+
+    Member findById(Long id);
 }

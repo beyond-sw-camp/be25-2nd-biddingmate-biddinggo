@@ -67,7 +67,7 @@ public enum ErrorType {
     // 경매 문의
     AUCTION_INQUIRY_CONTENT_INVALID("auction-inquiry-001", "문의 내용이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_INQUIRY_CREATE_FAIL("auction-inquiry-002", "경매 문의 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
-
+    CANNOT_INQUIRE_OWN_AUCTION("auction-inquiry-003", "본인이 등록한 경매에는 문의할 수 없습니다.", HttpStatus.BAD_REQUEST),
     // 입찰
     BID_SAVE_FAILED("bid-001", "입찰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     BID_AMOUNT_TOO_LOW("bid-002", "입찰 금액이 최소 입찰 가능 금액보다 낮습니다.", HttpStatus.BAD_REQUEST),
