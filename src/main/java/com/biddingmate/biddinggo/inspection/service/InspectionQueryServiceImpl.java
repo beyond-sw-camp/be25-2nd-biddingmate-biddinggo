@@ -7,6 +7,7 @@ import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListResponse;
 import com.biddingmate.biddinggo.inspection.mapper.InspectionMapper;
 import com.biddingmate.biddinggo.item.mapper.ItemImageMapper;
+import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,21 @@ public class InspectionQueryServiceImpl implements InspectionQueryService {
             throw new CustomException(ErrorType.INVALID_INSPECTION_LIST_REQUEST);
         }
 
-        return inspectionMapper.findInspectionList(request.getMemberId(), request.getStatus());
+        ItemInspectionStatus status = parseInspectionStatus(request.getStatus());
+
+        return inspectionMapper.findInspectionList(request.getMemberId(), status);
+    }
+
+    private ItemInspectionStatus parseInspectionStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+
+        try {
+            return ItemInspectionStatus.valueOf(status.trim().toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            throw new CustomException(ErrorType.INVALID_INSPECTION_LIST_STATUS);
+        }
     }
 
     @Override

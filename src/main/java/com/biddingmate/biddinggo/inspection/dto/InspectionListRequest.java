@@ -1,6 +1,5 @@
 package com.biddingmate.biddinggo.inspection.dto;
 
-import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -23,5 +22,5 @@ public class InspectionListRequest {
     private Long memberId;
 
     @Schema(description = "검수 상태", example = "PENDING", nullable = true)
-    private ItemInspectionStatus status;
+    private String status;
 }
