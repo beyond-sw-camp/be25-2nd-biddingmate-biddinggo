@@ -31,8 +31,11 @@ public class SecurityConfig {
                                 "/api/v1/auctions/**", "/api/v1/inspections/**",
                                 "/api/v1/admin-inquiries/**",
                                 "/api/v1/bidding/**",
-                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated());
+                                "/swagger-ui/**", "/v3/api-docs/**",
+                                "/api/v1/users/my"
+                                ).permitAll()
+                                .anyRequest().authenticated()
+                );
 
 
         return http.build();
