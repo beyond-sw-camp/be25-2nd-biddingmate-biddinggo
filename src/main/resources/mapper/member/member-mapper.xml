@@ -72,4 +72,23 @@
             point >= #{amount};
     </update>
 
+    <select id="selectMyProfile" parameterType="long" resultType="MemberProfileQueryResponse">
+        SELECT
+            m.image_url AS imageUrl,
+            m.name AS name,
+            m.nickname AS nickname,
+            m.email AS email,
+
+            a.zipcode AS zipcode,
+            a.address AS address,
+            a.detail_address AS detailAddress,
+
+            m.bank_code AS bankCode,
+            m.bank_account AS bankAccount,
+            m.last_change_nick AS lastChangeNick
+
+        FROM member m
+                 LEFT JOIN address a ON m.id = a.member_id
+        WHERE m.id = #{memberId}
+    </select>
 </mapper>
