@@ -78,27 +78,35 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
     @Override
     @Transactional
     public AnswerAdminInquiryResponse answerAdminInquiry(Long inquiryId, AnswerAdminInquiryRequest request, Long adminId) {
+        AdminInquiry adminInquiry = adminInquiryMapper.findById(inquiryId);
+
+        if (adminInquiry == null) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND);
+        }
+
+        if (adminInquiry.getAnsweredAt() != null) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_ALREADY_ANSWERED);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
         AdminInquiry updateDto = AdminInquiry.builder()
                 .id(inquiryId)
                 .adminId(adminId)
                 .answer(request.getAnswer())
-                .answeredAt(LocalDateTime.now())
+                .answeredAt(now)
                 .build();
 
-        int update = adminInquiryMapper.update(updateDto);
+        int updatedRows = adminInquiryMapper.update(updateDto);
 
-        if (update <= 0) {
+        if (updatedRows <= 0) {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_UPDATED_FAIL);
         }
 
-        AdminInquiry adminInquiry = Optional.ofNullable(adminInquiryMapper.findById(inquiryId))
-                .orElseThrow(() -> new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND));
-
         return AnswerAdminInquiryResponse.builder()
-                .id(adminInquiry.getId())
-                .adminId(adminInquiry.getAdminId())
-                .answer(adminInquiry.getAnswer())
-                .answeredAt(adminInquiry.getAnsweredAt())
+                .id(inquiryId)
+                .adminId(adminId)
+                .answer(request.getAnswer())
+                .answeredAt(now)
                 .build();
     }
 }
