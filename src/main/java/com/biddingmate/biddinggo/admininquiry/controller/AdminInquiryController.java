@@ -59,6 +59,7 @@ public class AdminInquiryController {
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 상세 조회 성공", result);
     }
+
     @PatchMapping("/{inquiryId}")
     // 인증 인가 구현 후 등록 예정
     // @PreAuthorize("hasRole('ADMIN')")
