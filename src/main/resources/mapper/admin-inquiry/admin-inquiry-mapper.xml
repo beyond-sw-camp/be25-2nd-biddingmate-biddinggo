@@ -102,6 +102,7 @@
         LEFT JOIN member am ON ai.admin_id = am.id
         WHERE ai.id = #{inquiryId}
           AND ai.writer_id = #{memberId}
+    </select>
 
     <!-- 문의 답변 -->
     <update id="update" parameterType="AdminInquiry">

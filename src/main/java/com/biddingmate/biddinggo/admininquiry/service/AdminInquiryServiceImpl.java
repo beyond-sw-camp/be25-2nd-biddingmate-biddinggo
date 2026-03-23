@@ -94,6 +94,7 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
         }
 
         return adminInquiryViewDetail;
+    }
 
     @Transactional
     public AnswerAdminInquiryResponse answerAdminInquiry(Long inquiryId, AnswerAdminInquiryRequest request, Long adminId) {
