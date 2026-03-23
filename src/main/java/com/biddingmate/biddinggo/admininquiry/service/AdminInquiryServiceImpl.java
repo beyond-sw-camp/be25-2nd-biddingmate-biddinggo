@@ -1,6 +1,8 @@
 package com.biddingmate.biddinggo.admininquiry.service;
 
 import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryRequest;
+import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.mapper.AdminInquiryMapper;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -70,5 +73,40 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
         }
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    @Override
+    @Transactional
+    public AnswerAdminInquiryResponse answerAdminInquiry(Long inquiryId, AnswerAdminInquiryRequest request, Long adminId) {
+        AdminInquiry adminInquiry = adminInquiryMapper.findById(inquiryId);
+
+        if (adminInquiry == null) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND);
+        }
+
+        if (adminInquiry.getAnsweredAt() != null) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_ALREADY_ANSWERED);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        AdminInquiry updateDto = AdminInquiry.builder()
+                .id(inquiryId)
+                .adminId(adminId)
+                .answer(request.getAnswer())
+                .answeredAt(now)
+                .build();
+
+        int updatedRows = adminInquiryMapper.update(updateDto);
+
+        if (updatedRows <= 0) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_UPDATED_FAIL);
+        }
+
+        return AnswerAdminInquiryResponse.builder()
+                .id(inquiryId)
+                .adminId(adminId)
+                .answer(request.getAnswer())
+                .answeredAt(now)
+                .build();
     }
 }

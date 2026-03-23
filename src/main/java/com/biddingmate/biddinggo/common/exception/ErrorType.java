@@ -63,6 +63,9 @@ public enum ErrorType {
 
     // 1대1 문의
     ADMIN_INQUIRY_CREATED_FAIL("admin-inquiry-001", "관리자 1대1 문의 생성 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+    ADMIN_INQUIRY_UPDATED_FAIL("admin-inquiry-002", "관리자 1대1 문의 답변 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+    ADMIN_INQUIRY_NOT_FOUND("admin-inquiry-003", "해당 1대1 문의가 존재하질 않습니다.", HttpStatus.NOT_FOUND),
+    ADMIN_INQUIRY_ALREADY_ANSWERED("admin-inquiry-004", "해당 1대1 문의는 이미 답변이 완료된 상태입니다.", HttpStatus.CONFLICT),
 
     // 회원 정보
     MEMBER_NOT_FOUND("member-001", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
