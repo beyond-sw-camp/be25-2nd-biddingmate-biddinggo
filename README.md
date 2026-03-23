@@ -86,7 +86,7 @@
 
 # 3.  ERD
 ![](img/erd.png)<br/>
-🔗[ ERD ](https://www.erdcloud.com/d/dDdGFuogL2iKmdRJm)
+🔗[ ERD ](https://www.erdcloud.com/d/dWKrWvBcWyqzdomS4)
 
 ---
 
