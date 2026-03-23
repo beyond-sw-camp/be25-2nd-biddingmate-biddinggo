@@ -51,4 +51,21 @@
         WHERE auction_id = #{auctionId};
     </select>
 
+    <select id="getBidsByAuctionId" parameterType="map" resultType="Bid">
+        SELECT id,
+               auction_id AS auctionId,
+               bidder_id AS bidderId,
+               amount,
+               created_at AS createdAt
+        FROM bid
+        WHERE auction_id = #{auctionId}
+        ORDER BY created_at ${order}
+    </select>
+
+    <select id="getBidsByAuctionIdCount" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM bid
+        WHERE auction_id = #{auctionId}
+    </select>
+
 </mapper>

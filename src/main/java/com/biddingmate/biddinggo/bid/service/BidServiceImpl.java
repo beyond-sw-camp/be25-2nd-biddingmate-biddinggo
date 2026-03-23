@@ -1,20 +1,26 @@
 package com.biddingmate.biddinggo.bid.service;
 
 import com.biddingmate.biddinggo.auction.model.Auction;
+import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
+
     @Override
     public Bid createBid(Long memberId, Auction auction, CreateBidRequest request) {
 
@@ -77,5 +83,21 @@ public class BidServiceImpl implements BidService {
     @Override
     public Bid getVickreyBid(Long auctionId) {
         return bidMapper.getVickreyBid(auctionId);
+    }
+
+    @Override
+    public PageResponse<BidResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId) {
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        String order = request.getOrder();
+
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
+        String sortOrder = order.toUpperCase();
+
+        List<BidResponse> bids = bidMapper.getBidsByAuctionId(rowBounds, auctionId, sortOrder);
+        int count = bidMapper.getBidsByAuctionIdCount(auctionId);
+
+        return PageResponse.of(bids, request.getPage(), request.getSize(), count);
     }
 }
