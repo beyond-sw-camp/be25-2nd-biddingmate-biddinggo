@@ -16,4 +16,5 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     Long getPointById(@Param("id") Long id);
 
+    Member findById(Long id);
 }
