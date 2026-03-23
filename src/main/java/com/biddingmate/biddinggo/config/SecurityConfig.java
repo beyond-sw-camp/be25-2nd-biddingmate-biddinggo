@@ -32,10 +32,16 @@ public class SecurityConfig {
                                 "/api/v1/admin-inquiries/**",
                                 "/api/v1/bidding/**",
                                 "/swagger-ui/**", "/v3/api-docs/**",
+<<<<<<< feat/user-profile
                                 "/api/v1/users/my", "/api/v1/users/my/profile"
+=======
+                                "/api/v1/users/my",
+                                "/api/v1/auction/**"
+>>>>>>> dev
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 );
+
 
 
         return http.build();

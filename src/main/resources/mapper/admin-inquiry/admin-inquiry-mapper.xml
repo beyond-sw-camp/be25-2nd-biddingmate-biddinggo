@@ -70,4 +70,63 @@
         FROM admin_inquiry
         WHERE writer_id = #{memberId}
     </select>
+
+    <!-- 관리자 문의글 상세 조회 -->
+    <select id="findAdminInquiryDetail" parameterType="map" resultType="AdminInquiryViewDetail">
+        SELECT ai.id,
+               m.nickname AS writerNickname,
+               ai.category,
+               ai.content,
+               ai.answer,
+               am.nickname AS adminNickname,
+               ai.answered_at AS answeredAt,
+               ai.created_at AS createdAt
+        FROM admin_inquiry ai
+        JOIN member m ON ai.writer_id = m.id
+        LEFT JOIN member am ON ai.admin_id = am.id
+        WHERE ai.id = #{inquiryId}
+    </select>
+
+    <!-- 사용자 문의글 상세 조회 -->
+    <select id="findAdminInquiryDetailOfMe" parameterType="map" resultType="AdminInquiryViewDetail">
+        SELECT ai.id,
+               m.nickname AS writerNickname,
+               ai.category,
+               ai.content,
+               ai.answer,
+               am.nickname AS adminNickname,
+               ai.answered_at AS answeredAt,
+               ai.created_at AS createdAt
+        FROM admin_inquiry ai
+        JOIN member m ON ai.writer_id = m.id
+        LEFT JOIN member am ON ai.admin_id = am.id
+        WHERE ai.id = #{inquiryId}
+          AND ai.writer_id = #{memberId}
+    </select>
+
+    <!-- 문의 답변 -->
+    <update id="update" parameterType="AdminInquiry">
+        UPDATE admin_inquiry
+        SET
+            admin_id = #{adminId},
+            answer = #{answer},
+            answered_at = #{answeredAt}
+        WHERE
+            id = #{id}
+            AND answer IS NULL
+    </update>
+
+    <select id="findById" parameterType="long" resultType="AdminInquiry">
+        SELECT id,
+               writer_id AS writerId,
+               admin_id AS adminId,
+               category,
+               content,
+               answer,
+               answered_at AS answeredAt,
+               created_at AS createdAt
+        FROM admin_inquiry
+        WHERE id = #{id}
+
+    </select>
 </mapper>
