@@ -1,8 +1,8 @@
 package com.biddingmate.biddinggo.member.mapper;
 
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
-import com.biddingmate.biddinggo.member.dto.MemberMyResponse;
-import com.biddingmate.biddinggo.member.dto.MemberProfileQueryResponse;
+import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
+import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -11,12 +11,12 @@ import org.apache.ibatis.annotations.Param;
 public interface MemberMapper extends IMybatisCRUD<Member> {
     void addPoint(@Param("id") Long id, @Param("amount") Long amount);
 
-    MemberMyResponse selectMyInfo(@Param("memberId") Long memberId);
+    MemberDashboardResponse findDashboardById(@Param("id") Long id);
 
     void usePoint(@Param("id") Long id, @Param("amount") Long amount);
 
     Long getPointById(@Param("id") Long id);
 
-    MemberProfileQueryResponse selectMyProfile(@Param("memberId") Long memberId);
+    MemberProfileResponse findProfileById(@Param("id") Long id);
 
 }

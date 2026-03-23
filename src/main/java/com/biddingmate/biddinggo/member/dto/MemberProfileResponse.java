@@ -1,18 +1,14 @@
 package com.biddingmate.biddinggo.member.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Setter
 public class MemberProfileResponse {
+
     private String imageUrl;
     private String name;
     private String nickname;
@@ -25,6 +21,4 @@ public class MemberProfileResponse {
     private String bankCode;
     private String bankAccount;
 
-    private Boolean canChangeNickname;
-    private Integer remainingDays;
 }

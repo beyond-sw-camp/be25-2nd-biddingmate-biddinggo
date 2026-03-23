@@ -18,7 +18,7 @@
             id = #{id};
     </update>
 
-    <select id="selectMyInfo" parameterType="long" resultType="MemberMyResponse">
+    <select id="findDashboardById" parameterType="long" resultType="MemberDashboardResponse">
         SELECT
             m.point AS point,
             COALESCE(p.total_purchase_amount, 0) AS totalPurchaseAmount,
@@ -72,7 +72,7 @@
             point >= #{amount};
     </update>
 
-    <select id="selectMyProfile" parameterType="long" resultType="MemberProfileQueryResponse">
+    <select id="findProfileById" parameterType="long" resultType="MemberProfileResponse">
         SELECT
             m.image_url AS imageUrl,
             m.name AS name,
@@ -84,8 +84,7 @@
             a.detail_address AS detailAddress,
 
             m.bank_code AS bankCode,
-            m.bank_account AS bankAccount,
-            m.last_change_nick AS lastChangeNick
+            m.bank_account AS bankAccount
 
         FROM member m
                  LEFT JOIN address a ON m.id = a.member_id
