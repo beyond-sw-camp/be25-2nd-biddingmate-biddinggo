@@ -31,10 +31,6 @@ public class UpdateAuctionRequest {
     @Positive(message = "입찰 단위는 1 이상이어야 합니다.")
     private Integer bidUnit;
 
-    @Schema(description = "비크리 가격", example = "150000", nullable = true)
-    @PositiveOrZero(message = "비크리 가격은 0 이상이어야 합니다.")
-    private Long vickreyPrice;
-
     @Schema(description = "즉시 구매가", example = "180000", nullable = true)
     @PositiveOrZero(message = "즉시 구매가는 0 이상이어야 합니다.")
     private Long buyNowPrice;

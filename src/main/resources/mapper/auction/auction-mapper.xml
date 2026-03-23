@@ -136,4 +136,21 @@
             bid_count = bid_count+1
         WHERE id = #{id}
     </update>
+
+    <update id="updateAuction" parameterType="Auction">
+        UPDATE auction
+        SET start_price = #{startPrice},
+            bid_unit = #{bidUnit},
+            buy_now_price = #{buyNowPrice},
+            start_date = #{startDate},
+            end_date = #{endDate}
+        WHERE id = #{id}
+    </update>
+
+    <update id="cancelAuction" parameterType="map">
+        UPDATE auction
+        SET status = #{newStatus},
+            cancel_date = #{cancelDate}
+        WHERE id = #{auctionId}
+    </update>
 </mapper>
