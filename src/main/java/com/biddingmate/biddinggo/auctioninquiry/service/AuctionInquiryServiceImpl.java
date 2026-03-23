@@ -28,7 +28,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
     public CreateAuctionInquiryResponse createInquiry(Long auctionId, Long writerId, String content) {
 
         // 경매 존재 여부 검증
-        Auction auction = auctionMapper.findByIdForUpdate(auctionId);
+        Auction auction = auctionMapper.findById(auctionId);
         if (auction == null) {
             throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
         }

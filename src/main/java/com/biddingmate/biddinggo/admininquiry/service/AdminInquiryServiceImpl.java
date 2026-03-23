@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +93,7 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
         }
 
         return adminInquiryViewDetail;
-
+    }
     @Transactional
     public AnswerAdminInquiryResponse answerAdminInquiry(Long inquiryId, AnswerAdminInquiryRequest request, Long adminId) {
         AdminInquiry adminInquiry = adminInquiryMapper.findById(inquiryId);

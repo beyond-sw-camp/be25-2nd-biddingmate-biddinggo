@@ -6,7 +6,6 @@ import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryResponse;
-import com.biddingmate.biddinggo.admininquiry.model.AdminInquiry;
 import com.biddingmate.biddinggo.admininquiry.service.AdminInquiryService;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
@@ -15,7 +14,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,7 +58,7 @@ public class AdminInquiryController {
         AdminInquiryViewDetail result = adminInquiryService.findAdminInquiryDetail(inquiryId, isAdmin, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 상세 조회 성공", result);
-      
+    }
     @PatchMapping("/{inquiryId}")
     // 인증 인가 구현 후 등록 예정
     // @PreAuthorize("hasRole('ADMIN')")
