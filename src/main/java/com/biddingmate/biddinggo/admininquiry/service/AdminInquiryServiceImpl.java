@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.admininquiry.service;
 
 import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryViewDetail;
 import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
@@ -68,6 +69,7 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
             list = adminInquiryMapper.findAdminInquiry(rowBounds, sortOrder);
             count = adminInquiryMapper.getAdminInquiryTotal();
         } else {
+          
             list = adminInquiryMapper.findAdminInquiryOfMe(rowBounds, memberId, sortOrder);
             count = adminInquiryMapper.getAdminInquiryTotalOfMe(memberId);
         }
@@ -76,6 +78,23 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public AdminInquiryViewDetail findAdminInquiryDetail(Long inquiryId, boolean isAdmin, Long memberId) {
+
+        AdminInquiryViewDetail adminInquiryViewDetail;
+
+        if (isAdmin) {
+            adminInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetail(inquiryId);
+        } else {
+            adminInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetailOfMe(inquiryId, memberId);
+        }
+
+        if (adminInquiryViewDetail == null) {
+            throw new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND);
+        }
+
+        return adminInquiryViewDetail;
+
     @Transactional
     public AnswerAdminInquiryResponse answerAdminInquiry(Long inquiryId, AnswerAdminInquiryRequest request, Long adminId) {
         AdminInquiry adminInquiry = adminInquiryMapper.findById(inquiryId);

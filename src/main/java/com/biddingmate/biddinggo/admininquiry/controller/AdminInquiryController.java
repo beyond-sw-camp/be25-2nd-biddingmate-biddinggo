@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.admininquiry.controller;
 
 import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryViewDetail;
 import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryRequest;
 import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryResponse;
 import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
@@ -52,6 +53,14 @@ public class AdminInquiryController {
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 목록 조회 성공", result);
     }
 
+    @GetMapping("{inquiryId}")
+    public ResponseEntity<ApiResponse<AdminInquiryViewDetail>> findAdminInquiryDetail(@PathVariable Long inquiryId,
+                                                                                      @RequestParam boolean isAdmin,
+                                                                                      @RequestParam Long memberId) {
+        AdminInquiryViewDetail result = adminInquiryService.findAdminInquiryDetail(inquiryId, isAdmin, memberId);
+
+        return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 상세 조회 성공", result);
+      
     @PatchMapping("/{inquiryId}")
     // 인증 인가 구현 후 등록 예정
     // @PreAuthorize("hasRole('ADMIN')")
