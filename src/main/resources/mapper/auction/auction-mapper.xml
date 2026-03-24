@@ -155,7 +155,8 @@
 
     <update id="updateAfterBid" parameterType="map">
         UPDATE auction
-        SET vickrey_price = #{vickreyPrice},
+        SET
+            <if test="vickreyPrice != null"> vickrey_price = #{vickreyPrice},</if>
             bid_count = bid_count+1
         WHERE id = #{id}
     </update>

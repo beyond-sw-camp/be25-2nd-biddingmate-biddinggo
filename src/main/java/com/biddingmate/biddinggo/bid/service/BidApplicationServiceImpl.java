@@ -70,10 +70,10 @@ public class BidApplicationServiceImpl implements BidApplicationService {
         // 4. Auction 정보 갱신 : 경매 차순위 값 변경 + 입찰 수 증가
         // 추후 AuctionService 구현 이후 변경
         Bid vickreyBid = bidService.getVickreyBid(auctionId);
-        if(vickreyBid != null){
-            auctionMapper.updateAfterBid(auctionId, vickreyBid.getAmount());
-        }
-
+        auctionMapper.updateAfterBid(
+                auctionId,
+                vickreyBid != null ? vickreyBid.getAmount() : null
+        );
 
         // 5. Point History 저장
         // 추후 PointHistoryService 구현 이후 변경
