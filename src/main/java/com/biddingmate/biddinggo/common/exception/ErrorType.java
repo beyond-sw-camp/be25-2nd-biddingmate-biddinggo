@@ -21,6 +21,9 @@ public enum ErrorType {
     // 도메인 별 예시
     // auth
     EXPIRED_ACCESS_TOKEN("auth-001", "만료된 Access Token 입니다.", HttpStatus.CONFLICT),
+    INVALID_TOKEN("auth-002", "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
+    EXPIRED_TOKEN("auth-003", "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
+    TOKEN_NOT_FOUND("auth-004", "토큰이 존재하지 않습니다.", HttpStatus.UNAUTHORIZED),
 
     // 결제
     VIRTUAL_ACCOUNT_ALREADY_EXISTS("payment-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT),
