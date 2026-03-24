@@ -94,6 +94,16 @@
         ORDER BY i.created_at DESC
     </select>
 
+    <select id="countInspectionList" parameterType="map" resultType="_int">
+        SELECT COUNT(*)
+        FROM inspection i
+        INNER JOIN auction_item ai ON i.item_id = ai.id
+        WHERE ai.seller_id = #{memberId}
+        <if test="status != null">
+            AND ai.inspection_status = #{status}
+        </if>
+    </select>
+
     <update id="updateShippingInfo">
         UPDATE inspection
         SET carrier = #{carrier},
