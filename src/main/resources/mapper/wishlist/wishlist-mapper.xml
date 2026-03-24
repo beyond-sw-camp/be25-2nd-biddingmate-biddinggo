@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biddingmate.biddinggo.wishlist.mapper.WishlistMapper">
+
+    <insert id="insert" parameterType="Wishlist" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO wishlist(
+            member_id,
+            auction_id,
+            created_at
+        ) VALUES (
+            #{memberId},
+            #{auctionId},
+            #{createdAt}
+         )
+    </insert>
+
+    <select id="findByMemberIdAndAuctionId" parameterType="map" resultType="long">
+        SELECT id
+        FROM wishlist
+        WHERE member_id = #{memberId}
+          AND auction_id = #{auctionId}
+    </select>
+
+</mapper>
