@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.inspection.model.InspectionStatus;
 import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 
@@ -20,8 +21,12 @@ public interface InspectionMapper extends IMybatisCRUD<Inspection> {
             @Param("currentStatus") InspectionStatus currentStatus
     );
 
-    List<InspectionListResponse> findInspectionList(@Param("memberId") Long memberId,
+    List<InspectionListResponse> findInspectionList(RowBounds rowBounds,
+                                                    @Param("memberId") Long memberId,
                                                     @Param("status") ItemInspectionStatus status);
+
+    int countInspectionList(@Param("memberId") Long memberId,
+                            @Param("status") ItemInspectionStatus status);
 
     InspectionDetailResponse findDetailById(Long inspectionId);
 }
