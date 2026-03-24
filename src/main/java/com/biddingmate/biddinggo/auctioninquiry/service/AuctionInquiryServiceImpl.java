@@ -10,8 +10,6 @@ import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiryStatus;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
-import com.biddingmate.biddinggo.member.mapper.MemberMapper;
-import com.biddingmate.biddinggo.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,6 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
     private final AuctionInquiryMapper auctionInquiryMapper;
     private final AuctionMapper auctionMapper;
-    private final MemberMapper memberMapper;
 
     @Override
     @Transactional
@@ -41,19 +38,10 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
             throw new CustomException(ErrorType.CANNOT_INQUIRE_OWN_AUCTION);
         }
 
-        // 사용자 존재 여부 검증
-
-        Member member = memberMapper.findById(writerId);
-        if (member == null) {
-            throw new CustomException(ErrorType.MEMBER_NOT_FOUND);
-        }
-
-        Long sellerId = auction.getSellerId();
-
         AuctionInquiry inquiry = AuctionInquiry.builder()
                 .auctionId(auctionId)
                 .writerId(writerId)
-                .answererId(sellerId)
+                .answererId(auction.getSellerId())
                 .content(content)
                 .status(AuctionInquiryStatus.PENDING)
                 .createdAt(LocalDateTime.now())
@@ -73,9 +61,11 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                 .createdAt(inquiry.getCreatedAt())
                 .build();
     }
+
     @Override
     @Transactional
     public AnswerAuctionInquiryResponse registerAnswer(Long inquiryId, Long sellerId, AnswerAuctionInquiryRequest request) {
+
         // 문의글 존재 여부 확인
         AuctionInquiry inquiry = auctionInquiryMapper.findInquiryById(inquiryId)
                 .orElseThrow(() -> new CustomException(ErrorType.AUCTION_INQUIRY_NOT_FOUND));
