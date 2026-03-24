@@ -2,9 +2,12 @@ package com.biddingmate.biddinggo.auctioninquiry.service;
 
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
+import com.biddingmate.biddinggo.auctioninquiry.dto.AnswerAuctionInquiryRequest;
+import com.biddingmate.biddinggo.auctioninquiry.dto.AnswerAuctionInquiryResponse;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse;
 import com.biddingmate.biddinggo.auctioninquiry.mapper.AuctionInquiryMapper;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
+import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiryStatus;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
@@ -42,7 +45,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
         Member member = memberMapper.findById(writerId);
         if (member == null) {
-            throw new CustomException(ErrorType.NOT_FOUND);
+            throw new CustomException(ErrorType.MEMBER_NOT_FOUND);
         }
 
         Long sellerId = auction.getSellerId();
@@ -52,6 +55,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                 .writerId(writerId)
                 .answererId(sellerId)
                 .content(content)
+                .status(AuctionInquiryStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -67,6 +71,40 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                 .writerId(inquiry.getWriterId())
                 .content(inquiry.getContent())
                 .createdAt(inquiry.getCreatedAt())
+                .build();
+    }
+    @Override
+    @Transactional
+    public AnswerAuctionInquiryResponse registerAnswer(Long inquiryId, Long sellerId, AnswerAuctionInquiryRequest request) {
+        // 문의글 존재 여부 확인
+        AuctionInquiry inquiry = auctionInquiryMapper.findInquiryById(inquiryId)
+                .orElseThrow(() -> new CustomException(ErrorType.AUCTION_INQUIRY_NOT_FOUND));
+
+        // 이미 답변이 달렸는지 확인
+        if (inquiry.getStatus() == AuctionInquiryStatus.ANSWERED) {
+            throw new CustomException(ErrorType.AUCTION_INQUIRY_ALREADY_ANSWERED);
+        }
+
+        // 답변 권한 확인
+        if (inquiry.getAnswererId() == null || !inquiry.getAnswererId().equals(sellerId)) {
+            throw new CustomException(ErrorType.FORBIDDEN);
+        }
+
+        // 답변 데이터 설정
+        LocalDateTime now = LocalDateTime.now();
+        inquiry.setAnswer(request.getAnswer());
+        inquiry.setAnsweredAt(now);
+        inquiry.setStatus(AuctionInquiryStatus.ANSWERED);
+
+        int result = auctionInquiryMapper.updateAnswer(inquiry);
+        if (result <= 0) {
+            throw new CustomException(ErrorType.AUCTION_INQUIRY_UPDATE_FAIL);
+        }
+
+        return AnswerAuctionInquiryResponse.builder()
+                .id(inquiry.getId())
+                .answer(inquiry.getAnswer())
+                .answeredAt(now)
                 .build();
     }
 }
