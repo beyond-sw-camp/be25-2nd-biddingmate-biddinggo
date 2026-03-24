@@ -27,7 +27,7 @@ spring:
             redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             scope:
-              - name
+              - profile_nickname
               - account_email
           google:
             client-id: ${GOOGLE_CLIENT_ID}
