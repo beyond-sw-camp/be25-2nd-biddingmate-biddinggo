@@ -63,6 +63,14 @@ public enum ErrorType {
 
     // 1대1 문의
     ADMIN_INQUIRY_CREATED_FAIL("admin-inquiry-001", "관리자 1대1 문의 생성 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+    ADMIN_INQUIRY_UPDATED_FAIL("admin-inquiry-002", "관리자 1대1 문의 답변 실패" , HttpStatus.INTERNAL_SERVER_ERROR),
+    ADMIN_INQUIRY_NOT_FOUND("admin-inquiry-003", "해당 1대1 문의가 존재하질 않습니다.", HttpStatus.NOT_FOUND),
+    ADMIN_INQUIRY_ALREADY_ANSWERED("admin-inquiry-004", "해당 1대1 문의는 이미 답변이 완료된 상태입니다.", HttpStatus.CONFLICT),
+
+    // 경매 문의
+    AUCTION_INQUIRY_CONTENT_INVALID("auction-inquiry-001", "문의 내용이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    AUCTION_INQUIRY_CREATE_FAIL("auction-inquiry-002", "경매 문의 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
+    CANNOT_INQUIRE_OWN_AUCTION("auction-inquiry-003", "본인이 등록한 경매에는 문의할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     // 회원 정보
     MEMBER_NOT_FOUND("member-001", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
