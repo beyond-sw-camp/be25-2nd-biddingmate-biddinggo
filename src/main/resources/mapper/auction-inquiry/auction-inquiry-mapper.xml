@@ -21,4 +21,26 @@
                  )
     </insert>
 
+    <select id="findInquiryById" parameterType="long" resultType="com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry">
+        SELECT
+            id,
+            auction_id AS auctionId,
+            writer_id AS writerId,
+            answerer_id AS answererId,
+            content,
+            answer,
+            status,
+            answered_at AS answeredAt,
+            created_at AS createdAt
+        FROM auction_inquiry
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateAnswer" parameterType="com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry">
+        UPDATE auction_inquiry
+        SET answer      = #{answer},
+            answered_at = #{answeredAt},
+            status      = #{status}
+        WHERE id = #{id}
+          AND answer IS NULL </update>
 </mapper>
