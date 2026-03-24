@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.dto;
+package com.biddingmate.biddinggo.auth.oauth2.dto;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.dto;
+package com.biddingmate.biddinggo.auth.oauth2.dto;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;

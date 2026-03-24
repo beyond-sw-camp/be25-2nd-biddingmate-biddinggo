@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.jwt;
+package com.biddingmate.biddinggo.auth.oauth2.jwt;
 
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;

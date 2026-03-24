@@ -1,9 +1,9 @@
 package com.biddingmate.biddinggo.config;
 
-import com.biddingmate.biddinggo.auth.jwt.JWTFilter;
-import com.biddingmate.biddinggo.auth.jwt.JWTUtil;
-import com.biddingmate.biddinggo.auth.oauth2.CustomSuccessHandler;
-import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
+import com.biddingmate.biddinggo.auth.oauth2.jwt.JWTFilter;
+import com.biddingmate.biddinggo.auth.oauth2.jwt.JWTUtil;
+import com.biddingmate.biddinggo.auth.oauth2.handler.CustomSuccessHandler;
+import com.biddingmate.biddinggo.auth.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,7 +74,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/users/my",
                                 "/api/v1/auction/**",
-                                "/api/v1/wishlists/**"
+                                "/api/v1/wishlists/**",
                                 "/api/v1/users/me", "/api/v1/users/me/profile"
                                 ).permitAll()
                                 .anyRequest().authenticated()

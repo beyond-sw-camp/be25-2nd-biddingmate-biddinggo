@@ -1,7 +1,7 @@
-package com.biddingmate.biddinggo.auth.oauth2;
+package com.biddingmate.biddinggo.auth.oauth2.handler;
 
-import com.biddingmate.biddinggo.auth.dto.CustomOAuth2Member;
-import com.biddingmate.biddinggo.auth.jwt.JWTUtil;
+import com.biddingmate.biddinggo.auth.oauth2.dto.CustomOAuth2Member;
+import com.biddingmate.biddinggo.auth.oauth2.jwt.JWTUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
