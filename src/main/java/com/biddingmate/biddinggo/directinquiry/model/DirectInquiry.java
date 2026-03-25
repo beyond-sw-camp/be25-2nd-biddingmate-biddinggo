@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminInquiry {
+public class DirectInquiry {
     private Long id;
     private Long writerId;
     private Long adminId;
