@@ -47,6 +47,10 @@ public enum ErrorType {
     AUCTION_ITEM_SELLER_MISMATCH("auction-010", "상품 판매자와 요청 판매자가 일치하지 않습니다.", HttpStatus.FORBIDDEN),
     INSPECTION_NOT_PASSED("auction-011", "검수 완료된 상품만 경매 등록할 수 있습니다.", HttpStatus.CONFLICT),
     ITEM_NOT_AUCTIONABLE("auction-012", "현재 상태에서는 경매 등록할 수 없습니다.", HttpStatus.CONFLICT),
+    INVALID_AUCTION_UPDATE_REQUEST("auction-013", "경매 수정 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_AUCTION_CANCEL_REQUEST("auction-014", "경매 취소 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    AUCTION_UPDATE_NOT_ALLOWED("auction-015", "현재 상태에서는 경매를 수정할 수 없습니다.", HttpStatus.CONFLICT),
+    AUCTION_CANCEL_NOT_ALLOWED("auction-016", "현재 상태에서는 경매를 취소할 수 없습니다.", HttpStatus.CONFLICT),
 
     // 검수
     INVALID_INSPECTION_CREATE_REQUEST("inspection-001", "검수 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
