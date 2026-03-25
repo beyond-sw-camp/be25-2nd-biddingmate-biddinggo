@@ -1,11 +1,14 @@
 package com.biddingmate.biddinggo.auction.controller;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.CancelAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionResponse;
+import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
 import com.biddingmate.biddinggo.auction.service.AuctionApplicationService;
 import com.biddingmate.biddinggo.auction.service.AuctionQueryService;
+import com.biddingmate.biddinggo.auction.service.AuctionService;
 import io.swagger.v3.oas.annotations.Operation;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuctionController {
     private final AuctionApplicationService auctionApplicationService;
     private final AuctionQueryService auctionQueryService;
+    private final AuctionService auctionService;
 
     @GetMapping("/{auctionId}")
     @Operation(summary = "경매 상세 조회", description = "경매 기본 정보, 상품 정보, 카테고리, 이미지 목록을 조회합니다.")
@@ -64,5 +69,35 @@ public class AuctionController {
                 .build();
 
         return ApiResponse.of(HttpStatus.OK, null, "검수 완료 상품 경매 등록 완료", result);
+    }
+
+    @PatchMapping("/{auctionId}")
+    @Operation(summary = "경매 정보 수정", description = "경매 정보를 수정합니다.")
+    public ResponseEntity<ApiResponse<CreateAuctionResponse>> updateAuction(
+            @PathVariable Long auctionId,
+            @Valid @RequestBody UpdateAuctionRequest request) {
+
+        auctionService.updateAuction(auctionId, request);
+
+        CreateAuctionResponse result = CreateAuctionResponse.builder()
+                .auctionId(auctionId)
+                .build();
+
+        return ApiResponse.of(HttpStatus.OK, null, "경매 정보 수정 완료", result);
+    }
+
+    @PatchMapping("/{auctionId}/cancel")
+    @Operation(summary = "경매 취소", description = "경매를 취소 처리합니다.")
+    public ResponseEntity<ApiResponse<CreateAuctionResponse>> cancelAuction(
+            @PathVariable Long auctionId,
+            @Valid @RequestBody CancelAuctionRequest request) {
+
+        auctionService.cancelAuction(auctionId, request.getSellerId());
+
+        CreateAuctionResponse result = CreateAuctionResponse.builder()
+                .auctionId(auctionId)
+                .build();
+
+        return ApiResponse.of(HttpStatus.OK, null, "경매 취소 완료", result);
     }
 }

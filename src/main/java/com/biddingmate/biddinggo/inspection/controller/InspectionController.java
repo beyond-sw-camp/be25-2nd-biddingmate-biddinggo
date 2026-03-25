@@ -1,8 +1,11 @@
 package com.biddingmate.biddinggo.inspection.controller;
 
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionRequest;
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionResponse;
+import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
+import com.biddingmate.biddinggo.inspection.dto.InspectionListResponse;
 import com.biddingmate.biddinggo.inspection.dto.UpdateInspectionShippingRequest;
 import com.biddingmate.biddinggo.inspection.service.InspectionApplicationService;
 import com.biddingmate.biddinggo.inspection.service.InspectionService;
@@ -30,6 +33,16 @@ public class InspectionController {
     private final InspectionApplicationService inspectionApplicationService;
     private final InspectionService inspectionService;
     private final InspectionQueryService inspectionQueryService;
+
+    @GetMapping("")
+    @Operation(summary = "검수물품 목록 조회", description = "회원별 검수물품 목록을 조회하고, 선택한 검수 상태로 필터링합니다.")
+    public ResponseEntity<ApiResponse<PageResponse<InspectionListResponse>>> getInspectionList(
+            @Valid InspectionListRequest request) {
+
+        PageResponse<InspectionListResponse> result = inspectionQueryService.getInspectionList(request);
+
+        return ApiResponse.of(HttpStatus.OK, null, "검수물품 목록 조회 완료", result);
+    }
 
     @GetMapping("/{inspectionId}")
     @Operation(summary = "검수 아이템 상세 조회", description = "검수 정보, 상품 정보, 카테고리, 이미지 목록을 조회합니다.")

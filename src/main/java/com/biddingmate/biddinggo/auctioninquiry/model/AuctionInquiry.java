@@ -20,6 +20,6 @@ public class AuctionInquiry {
 
     private LocalDateTime answeredAt;
 
-    private String status;
+    private AuctionInquiryStatus status;
     private LocalDateTime createdAt;
 }

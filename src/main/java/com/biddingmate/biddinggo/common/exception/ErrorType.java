@@ -47,6 +47,10 @@ public enum ErrorType {
     AUCTION_ITEM_SELLER_MISMATCH("auction-010", "상품 판매자와 요청 판매자가 일치하지 않습니다.", HttpStatus.FORBIDDEN),
     INSPECTION_NOT_PASSED("auction-011", "검수 완료된 상품만 경매 등록할 수 있습니다.", HttpStatus.CONFLICT),
     ITEM_NOT_AUCTIONABLE("auction-012", "현재 상태에서는 경매 등록할 수 없습니다.", HttpStatus.CONFLICT),
+    INVALID_AUCTION_UPDATE_REQUEST("auction-013", "경매 수정 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_AUCTION_CANCEL_REQUEST("auction-014", "경매 취소 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    AUCTION_UPDATE_NOT_ALLOWED("auction-015", "현재 상태에서는 경매를 수정할 수 없습니다.", HttpStatus.CONFLICT),
+    AUCTION_CANCEL_NOT_ALLOWED("auction-016", "현재 상태에서는 경매를 취소할 수 없습니다.", HttpStatus.CONFLICT),
 
     // 검수
     INVALID_INSPECTION_CREATE_REQUEST("inspection-001", "검수 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
@@ -55,6 +59,8 @@ public enum ErrorType {
     INVALID_INSPECTION_STATUS("inspection-004", "현재 검수 상태에서는 처리할 수 없습니다.", HttpStatus.CONFLICT),
     INSPECTION_SHIPPING_INFO_ALREADY_EXISTS("inspection-005", "이미 배송 정보가 등록된 검수입니다.", HttpStatus.CONFLICT),
     INSPECTION_SHIPPING_UPDATE_FAILED("inspection-006", "검수 배송 정보 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_INSPECTION_LIST_REQUEST("inspection-007", "검수물품 목록 조회 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_INSPECTION_LIST_STATUS("inspection-008", "검수물품 상태값이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
     // 파일
     INVALID_FILE_UPLOAD_REQUEST("file-001", "파일 업로드 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
@@ -74,7 +80,9 @@ public enum ErrorType {
     AUCTION_INQUIRY_CONTENT_INVALID("auction-inquiry-001", "문의 내용이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_INQUIRY_CREATE_FAIL("auction-inquiry-002", "경매 문의 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
     CANNOT_INQUIRE_OWN_AUCTION("auction-inquiry-003", "본인이 등록한 경매에는 문의할 수 없습니다.", HttpStatus.BAD_REQUEST),
-
+    AUCTION_INQUIRY_NOT_FOUND("auction-inquiry-004", "해당 경매 문의가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    AUCTION_INQUIRY_ALREADY_ANSWERED("auction-inquiry-005", "이미 답변이 등록된 문의입니다.", HttpStatus.CONFLICT),
+    AUCTION_INQUIRY_UPDATE_FAIL("auction-inquiry-006", "경매 문의 답변 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
     // 회원 정보
     MEMBER_NOT_FOUND("member-001", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
 
@@ -88,7 +96,9 @@ public enum ErrorType {
 
     // 관심 경매
     WISHLIST_SAVE_FAIL("wishlist-001", "관심 경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    WISHLIST_ALREADY_EXISTS("wishlist-002", "해당 관심 경매가 이미 존재합니다.", HttpStatus.BAD_REQUEST);
+    WISHLIST_ALREADY_EXISTS("wishlist-002", "해당 관심 경매가 이미 존재합니다.", HttpStatus.BAD_REQUEST),
+    WISHLIST_NOT_FOUND("wishlist-003", "해당 관심 경매가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    WISHLIST_DELETE_FAIL("wishlist-004", "관심 경매 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String errorCode;
     private final String message;

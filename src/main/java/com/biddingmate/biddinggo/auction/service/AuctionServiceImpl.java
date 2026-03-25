@@ -2,13 +2,16 @@ package com.biddingmate.biddinggo.auction.service;
 
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
+import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
+import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +23,68 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionMapper auctionMapper;
+
+    @Override
+    @Transactional
+    /**
+     * 경매 수정 메인 로직.
+     * 판매자 본인 여부와 수정 가능 상태를 확인한 뒤 auction 테이블의 수정 가능 필드만 반영한다.
+     */
+    public void updateAuction(Long auctionId, UpdateAuctionRequest request) {
+        validateUpdateRequest(auctionId, request);
+
+        // 동시 수정 충돌을 줄이기 위해 수정 대상 경매를 lock 조회한다.
+        Auction auction = getAuctionForModification(auctionId);
+        validateSeller(auction, request.getSellerId());
+
+        // 정책상 PENDING 또는 ON_GOING + bidCount == 0 인 경우에만 수정 가능하다.
+        if (!isAuctionUpdatableOrCancelable(auction)) {
+            throw new CustomException(ErrorType.AUCTION_UPDATE_NOT_ALLOWED);
+        }
+
+        // 현재 정책상 경매 메타 정보(가격/일정)만 수정 대상으로 둔다.
+        Auction updateTarget = Auction.builder()
+                .id(auctionId)
+                .startPrice(request.getStartPrice())
+                .bidUnit(request.getBidUnit())
+                .buyNowPrice(request.getBuyNowPrice())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .build();
+
+        int updatedCount = auctionMapper.updateAuction(updateTarget);
+
+        if (updatedCount != 1) {
+            throw new CustomException(ErrorType.AUCTION_UPDATE_NOT_ALLOWED);
+        }
+    }
+
+    @Override
+    @Transactional
+    /**
+     * 경매 취소 메인 로직.
+     * 판매자 본인 여부와 취소 가능 상태를 확인한 뒤 status와 cancel_date를 함께 갱신한다.
+     */
+    public void cancelAuction(Long auctionId, Long sellerId) {
+        if (auctionId == null || auctionId <= 0 || sellerId == null || sellerId <= 0) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_CANCEL_REQUEST);
+        }
+
+        // 취소 직전 상태를 정확히 확인하기 위해 lock 조회한다.
+        Auction auction = getAuctionForModification(auctionId);
+        validateSeller(auction, sellerId);
+
+        // 수정과 동일한 정책으로 취소 가능 여부를 판단한다.
+        if (!isAuctionUpdatableOrCancelable(auction)) {
+            throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
+        }
+
+        int updatedCount = auctionMapper.cancelAuction(auctionId, LocalDateTime.now(), AuctionStatus.CANCELLED);
+
+        if (updatedCount != 1) {
+            throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
+        }
+    }
 
     @Override
     public Long createAuction(CreateAuctionRequest request, Long itemId) {
@@ -80,5 +145,60 @@ public class AuctionServiceImpl implements AuctionService {
         }
 
         return auction.getId();
+    }
+
+    /**
+     * 수정 요청 기본값을 검증한다.
+     * 경매 ID, 판매자 ID, 수정 필수 필드가 비어 있으면 요청 오류로 처리한다.
+     */
+    private void validateUpdateRequest(Long auctionId, UpdateAuctionRequest request) {
+        if (auctionId == null || auctionId <= 0 || request == null) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_UPDATE_REQUEST);
+        }
+
+        if (request.getSellerId() == null || request.getSellerId() <= 0) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_UPDATE_REQUEST);
+        }
+
+        if (request.getStartPrice() == null || request.getBidUnit() == null
+                || request.getStartDate() == null || request.getEndDate() == null) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_UPDATE_REQUEST);
+        }
+    }
+
+    /**
+     * 수정/취소 대상 경매를 배타적으로 조회한다.
+     */
+    private Auction getAuctionForModification(Long auctionId) {
+        Auction auction = auctionMapper.findByIdForUpdate(auctionId);
+
+        if (auction == null) {
+            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
+        }
+
+        return auction;
+    }
+
+    /**
+     * 요청 판매자와 실제 경매 판매자가 같은지 검증한다.
+     */
+    private void validateSeller(Auction auction, Long sellerId) {
+        if (!auction.getSellerId().equals(sellerId)) {
+            throw new CustomException(ErrorType.FORBIDDEN);
+        }
+    }
+
+    /**
+     * 경매 수정/취소 가능 여부를 판단한다.
+     * PENDING 은 항상 허용하고, ON_GOING 은 입찰 수가 0일 때만 허용한다.
+     */
+    private boolean isAuctionUpdatableOrCancelable(Auction auction) {
+        if (auction.getStatus() == AuctionStatus.PENDING) {
+            return true;
+        }
+
+        return auction.getStatus() == AuctionStatus.ON_GOING
+                && auction.getBidCount() != null
+                && auction.getBidCount() == 0;
     }
 }

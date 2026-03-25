@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.admininquiry.dto;
+package com.biddingmate.biddinggo.directinquiry.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminInquiryView {
+public class DirectInquiryView {
     private Long id;
     private String nickname;
     private String category;

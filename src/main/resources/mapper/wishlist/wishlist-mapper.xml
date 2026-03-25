@@ -2,6 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.biddingmate.biddinggo.wishlist.mapper.WishlistMapper">
+    <resultMap id="auctionDetailResultMap" type="com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse">
+        <id property="auctionId" column="auction_id"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="status" column="status"/>
+        <result property="type" column="type"/>
+        <result property="inspectionYn" column="inspection_yn"/>
+        <result property="startPrice" column="start_price"/>
+        <result property="bidUnit" column="bid_unit"/>
+        <result property="vickreyPrice" column="vickrey_price"/>
+        <result property="buyNowPrice" column="buy_now_price"/>
+        <result property="bidCount" column="bid_count"/>
+        <result property="wishCount" column="wish_count"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="cancelDate" column="cancel_date"/>
+        <result property="createdAt" column="created_at"/>
+        <association property="item" javaType="com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse$Item">
+            <id property="itemId" column="item_id"/>
+            <result property="brand" column="brand"/>
+            <result property="name" column="name"/>
+            <result property="quality" column="quality"/>
+            <result property="description" column="description"/>
+            <association property="category" javaType="com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse$Category">
+                <id property="id" column="category_id"/>
+                <result property="name" column="category_name"/>
+                <result property="level" column="category_level"/>
+            </association>
+        </association>
+    </resultMap>
 
     <insert id="insert" parameterType="Wishlist" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO wishlist(
@@ -22,4 +51,47 @@
           AND auction_id = #{auctionId}
     </select>
 
+    <select id="getCountByAuctionId" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM wishlist
+        WHERE auction_id = #{auctionId}
+    </select>
+
+    <select id="getCountByMemberId" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM wishlist
+        WHERE member_id = #{memberId}
+    </select>
+
+    <select id="findWishlistAuctionsByMemberId" parameterType="map" resultType="Auction">
+        SELECT
+            a.id AS id,
+            a.item_id AS itemId,
+            a.winner_id AS winnerId,
+            a.seller_id AS sellerId,
+            a.type AS type,
+            a.inspection_yn AS inspectionYn,
+            a.status AS status,
+            a.start_price AS startPrice,
+            a.bid_unit AS bidUnit,
+            a.vickrey_price AS vickreyPrice,
+            a.bid_count AS bidCount,
+            a.buy_now_price AS buyNowPrice,
+            a.wish_count AS wishCount,
+            a.start_date AS startDate,
+            a.end_date AS endDate,
+            a.cancel_date AS cancelDate,
+            a.winner_price AS winnerPrice,
+            a.created_at AS createdAt
+        FROM auction a
+        INNER JOIN wishlist w
+            ON a.id = w.auction_id AND w.member_id = #{memberId};
+    </select>
+
+    <delete id="delete" parameterType="map">
+        DELETE
+        FROM wishlist
+        WHERE auction_id = #{auctionId}
+          AND member_id = #{memberId}
+    </delete>
 </mapper>

@@ -12,5 +12,5 @@ public interface BidApplicationService {
     /*
         입찰, 경매 정보 수정, 사용자 정보 수정을 하나의 흐름으로 처리한다.
      */
-    CreateBidResponse createBidProcess(Long memberId, Long auctionId, @Valid CreateBidRequest request);
+    CreateBidResponse createBidProcess(Long memberId, @Valid CreateBidRequest request);
 }
