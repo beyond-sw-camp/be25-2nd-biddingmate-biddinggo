@@ -22,6 +22,8 @@ public class CreateAuctionInquiryResponse {
     @Schema(description = "작성자 ID", example = "1")
     private Long writerId;
 
+    private String title;
+
     @Schema(description = "문의 내용", example = "상품 상태가 어떤가요?")
     private String content;
 

@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auctioninquiry.dto.AnswerAuctionInquiryRequest;
 import com.biddingmate.biddinggo.auctioninquiry.dto.AnswerAuctionInquiryResponse;
+import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryRequest;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse;
 import com.biddingmate.biddinggo.auctioninquiry.mapper.AuctionInquiryMapper;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
@@ -25,7 +26,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
     @Override
     @Transactional
-    public CreateAuctionInquiryResponse createInquiry(Long auctionId, Long writerId, String content) {
+    public CreateAuctionInquiryResponse createInquiry(Long auctionId, Long writerId, CreateAuctionInquiryRequest request) {
 
         // 경매 존재 여부 검증
         Auction auction = auctionMapper.findById(auctionId);
@@ -42,7 +43,8 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                 .auctionId(auctionId)
                 .writerId(writerId)
                 .answererId(auction.getSellerId())
-                .content(content)
+                .title(request.getTitle())
+                .content(request.getContent())
                 .status(AuctionInquiryStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -57,6 +59,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                 .id(inquiry.getId())
                 .auctionId(inquiry.getAuctionId())
                 .writerId(inquiry.getWriterId())
+                .title(inquiry.getTitle())
                 .content(inquiry.getContent())
                 .createdAt(inquiry.getCreatedAt())
                 .build();

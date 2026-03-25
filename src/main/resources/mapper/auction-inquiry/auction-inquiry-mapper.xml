@@ -10,12 +10,14 @@
             auction_id,
             writer_id,
             answerer_id,
+            title,
             content,
             created_at
         ) VALUES (
                      #{auctionId},
                      #{writerId},
                      #{answererId},
+                     #{title},
                      #{content},
                      #{createdAt}
                  )
@@ -27,6 +29,7 @@
             auction_id AS auctionId,
             writer_id AS writerId,
             answerer_id AS answererId,
+            title,
             content,
             answer,
             status,
