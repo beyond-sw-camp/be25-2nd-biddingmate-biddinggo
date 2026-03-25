@@ -177,4 +177,10 @@
             cancel_date = #{cancelDate}
         WHERE id = #{auctionId}
     </update>
+
+    <update id="updateWishCount" parameterType="map">
+        UPDATE auction
+        SET wish_count = wish_count + #{wishCount}
+        WHERE id = #{id}
+    </update>
 </mapper>

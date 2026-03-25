@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +29,7 @@ import software.amazon.awssdk.annotations.NotNull;
 public class WishlistController {
     private final WishlistService wishlistService;
 
-    @PostMapping("/")
+    @PostMapping("")
     @Operation(summary = "관심 경매 등록", description = "관심 경매를 등록합니다.")
     public ResponseEntity<ApiResponse<CreateWishlistResponse>> createWishlist(
             @RequestBody CreateWishlistRequest request,
@@ -54,7 +55,7 @@ public class WishlistController {
         return ApiResponse.of(HttpStatus.OK, null, "경매 관심 수 조회 성공", result);
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "내 관심 경매 조회", description = "사용자의 관심 경매를 조회합니다.")
     public ResponseEntity<ApiResponse<PageResponse<AuctionDetailResponse>>> getWishlist(
             BasePageRequest request,
@@ -67,5 +68,21 @@ public class WishlistController {
         PageResponse<AuctionDetailResponse> result = wishlistService.findWishlistAuctionsByMemberId(request, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 조회 성공", result);
+    }
+
+    @DeleteMapping("")
+    @Operation(summary = "관심 경매 삭제", description = "관심 경매를 삭제합니다.")
+    public ResponseEntity<ApiResponse<Integer>> deleteWishlist(
+            @RequestBody CreateWishlistRequest request,
+            /*
+              <<to-do>>
+              이후 인증 구현 완료 후, 로그인 정보 받아와서 memberId에 주입
+             */
+            @NotNull @RequestParam Long memberId
+    ) {
+
+        int result = wishlistService.deleteWishlist(request, memberId);
+
+        return ApiResponse.of(HttpStatus.OK, null, "관심 경매 삭제 성공", result);
     }
 }

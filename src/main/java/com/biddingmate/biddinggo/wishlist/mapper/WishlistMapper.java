@@ -20,4 +20,6 @@ public interface WishlistMapper extends IMybatisCRUD<Wishlist> {
                                                                 @Param("order") String sortOrder);
 
     int getCountByMemberId(@Param("memberId") Long memberId);
+
+    int delete(@Param("auctionId") Long auctionId, @Param("memberId")Long memberId);
 }

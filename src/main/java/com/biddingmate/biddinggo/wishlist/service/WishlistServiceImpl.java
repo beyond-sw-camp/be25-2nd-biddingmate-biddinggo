@@ -46,10 +46,11 @@ public class WishlistServiceImpl implements WishlistService {
                 .build();
 
         int insert = wishlistMapper.insert(wishlist);
-
         if (insert <= 0) {
             throw new CustomException(ErrorType.WISHLIST_SAVE_FAIL);
         }
+
+        auctionMapper.updateWishCount(auctionId, 1);
 
         return CreateWishlistResponse.builder()
                 .id(wishlist.getId())
@@ -87,5 +88,27 @@ public class WishlistServiceImpl implements WishlistService {
         int count = wishlistMapper.getCountByMemberId(memberId);
 
         return PageResponse.of(auctions, request.getPage(), request.getSize(), count);
+    }
+
+    @Override
+    @Transactional
+    public int deleteWishlist(CreateWishlistRequest request, Long memberId) {
+        Long auctionId = request.getAuctionId();
+        if(auctionMapper.findById(auctionId) == null){
+            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
+        }
+
+        if(wishlistMapper.findByMemberIdAndAuctionId(memberId, auctionId) == null){
+            throw new CustomException(ErrorType.WISHLIST_NOT_FOUND);
+        }
+
+        int delete = wishlistMapper.delete(auctionId, memberId);
+        if (delete <= 0) {
+            throw new CustomException(ErrorType.WISHLIST_DELETE_FAIL);
+        }
+
+        auctionMapper.updateWishCount(auctionId, -1);
+
+        return delete;
     }
 }

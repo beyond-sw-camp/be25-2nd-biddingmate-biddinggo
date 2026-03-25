@@ -87,4 +87,11 @@
         INNER JOIN wishlist w
             ON a.id = w.auction_id AND w.member_id = #{memberId};
     </select>
+
+    <delete id="delete" parameterType="map">
+        DELETE
+        FROM wishlist
+        WHERE auction_id = #{auctionId}
+          AND member_id = #{memberId}
+    </delete>
 </mapper>
