@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.bid.service;
 
+import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
@@ -19,4 +20,6 @@ public interface BidService {
     Bid getVickreyBid(Long auctionId);
 
     PageResponse<BidResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId);
+
+    PageResponse<AuctionDetailResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId);
 }

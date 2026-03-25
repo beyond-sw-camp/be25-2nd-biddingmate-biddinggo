@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.bid.controller;
 
+import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.dto.CreateBidResponse;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
@@ -56,6 +57,21 @@ public class BidController {
     ) {
         PageResponse<BidResponse> result = bidService.getBidsByAuctionId(request, auctionId);
 
-        return ApiResponse.of(HttpStatus.OK, null, "입찰 기록 조회 완료", result);
+        return ApiResponse.of(HttpStatus.OK, null, "입찰 기록 조회 성공", result);
+    }
+
+    @GetMapping("/users/me/bids")
+    @Operation(summary = "입찰 중인 경매 조회", description = "입찰 중인 경매를 조회합니다.")
+    public ResponseEntity<ApiResponse<PageResponse<AuctionDetailResponse>>> getBidAuctionsForUser(
+        BasePageRequest request,
+            /*
+              <<to-do>>
+              이후 인증 구현 완료 후, 로그인 정보 받아와서 memberId에 주입
+             */
+        @NotNull @RequestParam Long memberId
+    ) {
+        PageResponse<AuctionDetailResponse> result = bidService.getBidAuctionsByMemberId(request, memberId);
+
+        return ApiResponse.of(HttpStatus.OK, null, "입찰 중인 경매 조회 성공", result);
     }
 }

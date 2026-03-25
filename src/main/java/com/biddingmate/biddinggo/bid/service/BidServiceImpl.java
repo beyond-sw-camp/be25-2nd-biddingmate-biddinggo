@@ -1,5 +1,7 @@
 package com.biddingmate.biddinggo.bid.service;
 
+import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
@@ -14,17 +16,21 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
+    private final AuctionMapper auctionMapper;
 
     @Override
     public Bid createBid(Long memberId, Auction auction, CreateBidRequest request) {
 
-        Long bidCount = bidMapper.getBidCount(auction.getId());
+
+        int bidCount = bidMapper.getBidCount(Map.of("auctionId", auction.getId()));
         Long minBidAmount;
 
         if (bidCount == 0) {
@@ -96,8 +102,24 @@ public class BidServiceImpl implements BidService {
         String sortOrder = order.toUpperCase();
 
         List<BidResponse> bids = bidMapper.getBidsByAuctionId(rowBounds, auctionId, sortOrder);
-        int count = bidMapper.getBidsByAuctionIdCount(auctionId);
+        int bidCount = bidMapper.getBidCount(Map.of("auctionId", auctionId));
 
-        return PageResponse.of(bids, request.getPage(), request.getSize(), count);
+        return PageResponse.of(bids, request.getPage(), request.getSize(), bidCount);
+    }
+
+    @Override
+    public PageResponse<AuctionDetailResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId) {
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        String order = request.getOrder();
+
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
+        String sortOrder = order.toUpperCase();
+
+        List<AuctionDetailResponse> auctions = bidMapper.findBidAuctionsByMemberId(rowBounds, memberId, sortOrder);
+        int bidCount = bidMapper.getBidCount(Map.of("bidderId", memberId));
+
+        return PageResponse.of(auctions, request.getPage(), request.getSize(), bidCount);
     }
 }
