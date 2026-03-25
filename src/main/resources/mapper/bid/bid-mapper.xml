@@ -45,10 +45,18 @@
         LIMIT 1 OFFSET 1
     </select>
 
-    <select id="getBidCount" resultType="long">
-        SELECT COUNT(*)
-        FROM bid
-        WHERE auction_id = #{auctionId};
+    <select id="getBidCount" parameterType="map" resultType="int">
+        <choose>
+            <when test="auctionId != null">
+                SELECT COUNT(*) FROM bid WHERE auction_id = #{auctionId}
+            </when>
+            <when test="bidderId != null">
+                SELECT COUNT(DISTINCT auction_id) FROM bid WHERE bidder_id = #{bidderId}
+            </when>
+            <otherwise>
+                SELECT 0
+            </otherwise>
+        </choose>
     </select>
 
     <select id="getBidsByAuctionId" parameterType="map" resultType="Bid">
@@ -62,10 +70,30 @@
         ORDER BY created_at ${order}
     </select>
 
-    <select id="getBidsByAuctionIdCount" parameterType="long" resultType="int">
-        SELECT COUNT(*)
-        FROM bid
-        WHERE auction_id = #{auctionId}
+    <select id="findBidAuctionsByMemberId" parameterType="map" resultType="Auction">
+        SELECT DISTINCT
+            a.id AS id,
+            a.item_id AS itemId,
+            a.winner_id AS winnerId,
+            a.seller_id AS sellerId,
+            a.type AS type,
+            a.inspection_yn AS inspectionYn,
+            a.status AS status,
+            a.start_price AS startPrice,
+            a.bid_unit AS bidUnit,
+            a.vickrey_price AS vickreyPrice,
+            a.bid_count AS bidCount,
+            a.buy_now_price AS buyNowPrice,
+            a.wish_count AS wishCount,
+            a.start_date AS startDate,
+            a.end_date AS endDate,
+            a.cancel_date AS cancelDate,
+            a.winner_price AS winnerPrice,
+            a.created_at AS createdAt
+        FROM auction a
+                 INNER JOIN bid b
+                            ON a.id = b.auction_id
+        WHERE b.bidder_id = #{memberId};
     </select>
 
 </mapper>

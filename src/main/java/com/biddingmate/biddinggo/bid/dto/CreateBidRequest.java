@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Schema(description = "입찰 등록 요청 DTO")
 public class CreateBidRequest {
+    @NotNull(message = "입찰할 경매 ID는 필수입니다.")
+    private Long auctionId;
+
     @NotNull(message = "입찰 금액은 필수입니다.")
     private Long amount;
 }
