@@ -2,6 +2,7 @@ package com.biddingmate.biddinggo.inspection.service;
 
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListResponse;
@@ -9,6 +10,7 @@ import com.biddingmate.biddinggo.inspection.mapper.InspectionMapper;
 import com.biddingmate.biddinggo.item.mapper.ItemImageMapper;
 import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +28,23 @@ public class InspectionQueryServiceImpl implements InspectionQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InspectionListResponse> getInspectionList(InspectionListRequest request) {
+    public PageResponse<InspectionListResponse> getInspectionList(InspectionListRequest request) {
         if (request.getMemberId() == null || request.getMemberId() <= 0) {
             throw new CustomException(ErrorType.INVALID_INSPECTION_LIST_REQUEST);
         }
 
-        ItemInspectionStatus status = parseInspectionStatus(request.getStatus());
+        String order = request.getOrder();
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
 
-        return inspectionMapper.findInspectionList(request.getMemberId(), status);
+        ItemInspectionStatus status = parseInspectionStatus(request.getStatus());
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+
+        List<InspectionListResponse> list = inspectionMapper.findInspectionList(rowBounds, request.getMemberId(), status);
+        int count = inspectionMapper.countInspectionList(request.getMemberId(), status);
+
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
     }
 
     private ItemInspectionStatus parseInspectionStatus(String status) {
