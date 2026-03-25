@@ -34,29 +34,29 @@
 
     <!-- 관리자 전체 조회 -->
     <select id="findDirectInquiry" resultMap="DirectInquiryViewMap">
-        SELECT ai.id,
+        SELECT di.id,
                m.nickname,
-               ai.category,
-               ai.answer,
-               ai.answered_at,
-               ai.created_at
-        FROM direct_inquiry ai
-        LEFT JOIN member m ON ai.writer_id = m.id
-        ORDER BY ai.created_at ${order}
+               di.category,
+               di.answer,
+               di.answered_at,
+               di.created_at
+        FROM direct_inquiry di
+        LEFT JOIN member m ON di.writer_id = m.id
+        ORDER BY di.created_at ${order}
     </select>
 
     <!-- 사용자 본인 조회 -->
     <select id="findDirectInquiryOfMe" parameterType="map" resultMap="DirectInquiryViewMap">
-        SELECT ai.id,
+        SELECT di.id,
                m.nickname,
-               ai.category,
-               ai.answer,
-               ai.answered_at,
-               ai.created_at
-        FROM direct_inquiry ai
-        LEFT JOIN member m ON ai.writer_id = m.id
-        WHERE ai.writer_id = #{memberId}
-        ORDER BY ai.created_at ${order}
+               di.category,
+               di.answer,
+               di.answered_at,
+               di.created_at
+        FROM direct_inquiry di
+        LEFT JOIN member m ON di.writer_id = m.id
+        WHERE di.writer_id = #{memberId}
+        ORDER BY di.created_at ${order}
     </select>
 
     <!-- 관리자 전체 count -->
@@ -72,36 +72,36 @@
     </select>
 
     <!-- 관리자 문의글 상세 조회 -->
-    <select id="findDirectInquiryDetail" parameterType="map" resultType="DirectInquiryViewDetail">
-        SELECT ai.id,
+    <select id="findDirectInquiryDetdil" parameterType="map" resultType="DirectInquiryViewDetail">
+        SELECT di.id,
                m.nickname AS writerNickname,
-               ai.category,
-               ai.content,
-               ai.answer,
+               di.category,
+               di.content,
+               di.answer,
                am.nickname AS adminNickname,
-               ai.answered_at AS answeredAt,
-               ai.created_at AS createdAt
-        FROM direct_inquiry ai
-        JOIN member m ON ai.writer_id = m.id
-        LEFT JOIN member am ON ai.admin_id = am.id
-        WHERE ai.id = #{inquiryId}
+               di.answered_at AS answeredAt,
+               di.created_at AS createdAt
+        FROM direct_inquiry di
+        JOIN member m ON di.writer_id = m.id
+        LEFT JOIN member am ON di.admin_id = am.id
+        WHERE di.id = #{inquiryId}
     </select>
 
     <!-- 사용자 문의글 상세 조회 -->
     <select id="findDirectInquiryDetailOfMe" parameterType="map" resultType="DirectInquiryViewDetail">
-        SELECT ai.id,
+        SELECT di.id,
                m.nickname AS writerNickname,
-               ai.category,
-               ai.content,
-               ai.answer,
+               di.category,
+               di.content,
+               di.answer,
                am.nickname AS adminNickname,
-               ai.answered_at AS answeredAt,
-               ai.created_at AS createdAt
-        FROM direct_inquiry ai
-        JOIN member m ON ai.writer_id = m.id
-        LEFT JOIN member am ON ai.admin_id = am.id
-        WHERE ai.id = #{inquiryId}
-          AND ai.writer_id = #{memberId}
+               di.answered_at AS answeredAt,
+               di.created_at AS createdAt
+        FROM direct_inquiry di
+        JOIN member m ON di.writer_id = m.id
+        LEFT JOIN member am ON di.admin_id = am.id
+        WHERE di.id = #{inquiryId}
+          AND di.writer_id = #{memberId}
     </select>
 
     <!-- 문의 답변 -->
