@@ -1,7 +1,6 @@
 package com.biddingmate.biddinggo.directinquiry.service;
 
 import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryView;
-import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryViewDetail;
 import com.biddingmate.biddinggo.directinquiry.dto.AnswerDirectInquiryRequest;
 import com.biddingmate.biddinggo.directinquiry.dto.AnswerDirectInquiryResponse;
 import com.biddingmate.biddinggo.directinquiry.dto.CreateDirectInquiryRequest;
@@ -51,8 +50,8 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
     }
 
     @Override
-    @Transactional
-    public PageResponse<DirectInquiryView> findDirectInquiry(BasePageRequest request, boolean isAdmin, Long memberId) {
+    @Transactional(readOnly = true)
+    public PageResponse<DirectInquiryView> findAllDirectInquiry(BasePageRequest request) {
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
 
@@ -64,34 +63,30 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
         List<DirectInquiryView> list;
         int count;
 
-        if (isAdmin) {
-            list = directInquiryMapper.findDirectInquiry(rowBounds, sortOrder);
-            count = directInquiryMapper.getDirectInquiryTotal();
-        } else {
-          
-            list = directInquiryMapper.findDirectInquiryOfMe(rowBounds, memberId, sortOrder);
-            count = directInquiryMapper.getDirectInquiryTotalOfMe(memberId);
-        }
+        list = directInquiryMapper.findAllDirectInquiry(rowBounds, sortOrder);
+        count = directInquiryMapper.getDirectInquiryTotal();
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public DirectInquiryViewDetail findDirectInquiryDetail(Long inquiryId, boolean isAdmin, Long memberId) {
-        DirectInquiryViewDetail directInquiryViewDetail;
+    public PageResponse<DirectInquiryView> findDirectInquiry(BasePageRequest request, Long memberId) {
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        String order = request.getOrder();
 
-        if (isAdmin) {
-            directInquiryViewDetail = directInquiryMapper.findDirectInquiryDetail(inquiryId);
-        } else {
-            directInquiryViewDetail = directInquiryMapper.findDirectInquiryDetailOfMe(inquiryId, memberId);
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
         }
+        String sortOrder = order.toUpperCase();
 
-        if (directInquiryViewDetail == null) {
-            throw new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND);
-        }
-
-        return directInquiryViewDetail;
+        List<DirectInquiryView> list;
+        int count;
+      
+        list = directInquiryMapper.findDirectInquiryOfMe(rowBounds, memberId, sortOrder);
+        count = directInquiryMapper.getDirectInquiryTotalOfMe(memberId);
+        
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
     }
 
     @Transactional
