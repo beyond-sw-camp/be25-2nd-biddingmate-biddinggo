@@ -88,4 +88,24 @@ public class WishlistServiceImpl implements WishlistService {
 
         return PageResponse.of(auctions, request.getPage(), request.getSize(), count);
     }
+
+    @Override
+    public int deleteWishlist(CreateWishlistRequest request, Long memberId) {
+        Long auctionId = request.getAuctionId();
+        if(auctionMapper.findById(auctionId) == null){
+            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
+        }
+
+        if(wishlistMapper.findByMemberIdAndAuctionId(memberId, auctionId) == null){
+            throw new CustomException(ErrorType.WISHLIST_NOT_FOUND);
+        }
+
+        int delete = wishlistMapper.delete(auctionId, memberId);
+
+        if (delete <= 0) {
+            throw new CustomException(ErrorType.WISHLIST_DELETE_FAIL);
+        }
+
+        return delete;
+    }
 }

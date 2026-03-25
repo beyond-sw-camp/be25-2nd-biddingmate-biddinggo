@@ -13,4 +13,6 @@ public interface WishlistService {
     WishlistCountResponse getWishlistCount(Long auctionId);
 
     PageResponse<AuctionDetailResponse> findWishlistAuctionsByMemberId(BasePageRequest request, Long memberId);
+
+    int deleteWishlist(CreateWishlistRequest request, Long memberId);
 }

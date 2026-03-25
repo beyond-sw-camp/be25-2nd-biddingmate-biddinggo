@@ -85,7 +85,9 @@ public enum ErrorType {
 
     // 관심 경매
     WISHLIST_SAVE_FAIL("wishlist-001", "관심 경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    WISHLIST_ALREADY_EXISTS("wishlist-002", "해당 관심 경매가 이미 존재합니다.", HttpStatus.BAD_REQUEST);
+    WISHLIST_ALREADY_EXISTS("wishlist-002", "해당 관심 경매가 이미 존재합니다.", HttpStatus.BAD_REQUEST),
+    WISHLIST_NOT_FOUND("wishlist-003", "해당 관심 경매가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    WISHLIST_DELETE_FAIL("wishlist-004", "관심 경매 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String errorCode;
     private final String message;
