@@ -46,10 +46,11 @@ public class WishlistServiceImpl implements WishlistService {
                 .build();
 
         int insert = wishlistMapper.insert(wishlist);
-
         if (insert <= 0) {
             throw new CustomException(ErrorType.WISHLIST_SAVE_FAIL);
         }
+
+        auctionMapper.updateWishCount(auctionId, 1);
 
         return CreateWishlistResponse.builder()
                 .id(wishlist.getId())
@@ -90,6 +91,7 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
+    @Transactional
     public int deleteWishlist(CreateWishlistRequest request, Long memberId) {
         Long auctionId = request.getAuctionId();
         if(auctionMapper.findById(auctionId) == null){
@@ -101,10 +103,11 @@ public class WishlistServiceImpl implements WishlistService {
         }
 
         int delete = wishlistMapper.delete(auctionId, memberId);
-
         if (delete <= 0) {
             throw new CustomException(ErrorType.WISHLIST_DELETE_FAIL);
         }
+
+        auctionMapper.updateWishCount(auctionId, -1);
 
         return delete;
     }

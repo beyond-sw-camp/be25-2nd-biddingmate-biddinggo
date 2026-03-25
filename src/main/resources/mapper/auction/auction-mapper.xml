@@ -159,4 +159,10 @@
             bid_count = bid_count+1
         WHERE id = #{id}
     </update>
+
+    <update id="updateWishCount" parameterType="map">
+        UPDATE auction
+        SET wish_count = wish_count + #{wishCount}
+        WHERE id = #{id}
+    </update>
 </mapper>
