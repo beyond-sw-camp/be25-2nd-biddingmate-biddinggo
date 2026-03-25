@@ -1,11 +1,16 @@
 package com.biddingmate.biddinggo.auction.service;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
+import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
+import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.item.mapper.ItemImageMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +25,43 @@ import java.util.List;
 public class AuctionQueryServiceImpl implements AuctionQueryService {
     private final AuctionMapper auctionMapper;
     private final ItemImageMapper itemImageMapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<AuctionListResponse> getAuctionList(AuctionListRequest request) {
+        String order = request.getOrder();
+
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
+
+        AuctionStatus status = parseAuctionStatus(request.getStatus());
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        String sortOrder = order.toUpperCase();
+
+        List<AuctionListResponse> list = auctionMapper.findAuctionList(
+                rowBounds,
+                status,
+                request.getSellerId(),
+                request.getCategoryId(),
+                sortOrder
+        );
+        int count = auctionMapper.countAuctionList(status, request.getSellerId(), request.getCategoryId());
+
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    private AuctionStatus parseAuctionStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+
+        try {
+            return AuctionStatus.valueOf(status.trim().toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            throw new CustomException(ErrorType.BAD_REQUEST);
+        }
+    }
 
     @Override
     @Transactional(readOnly = true)
