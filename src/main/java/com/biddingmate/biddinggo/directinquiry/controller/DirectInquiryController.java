@@ -35,7 +35,7 @@ public class DirectInquiryController {
     ) {
         // 인증 인가 전이므로 writerId를 하드코딩했습니다.
         // 추후에 리펙터링 대상입니다.
-        CreateDirectInquiryResponse result = directInquiryService.createAdminInquiry(request);
+        CreateDirectInquiryResponse result = directInquiryService.createDirectInquiry(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 성공", result);
     }
@@ -46,7 +46,7 @@ public class DirectInquiryController {
                                                                                          @RequestParam long memberId) {
         // 인증 인가 완료 전이므로 role 검사 및 memberId 전송
         // 추후에 리펙터링 대상입니다.
-        PageResponse<DirectInquiryView> result = directInquiryService.findAdminInquiry(request, isAdmin, memberId);
+        PageResponse<DirectInquiryView> result = directInquiryService.findDirectInquiry(request, isAdmin, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 목록 조회 성공", result);
     }
@@ -55,7 +55,7 @@ public class DirectInquiryController {
     public ResponseEntity<ApiResponse<DirectInquiryViewDetail>> findAdminInquiryDetail(@PathVariable Long inquiryId,
                                                                                        @RequestParam boolean isAdmin,
                                                                                        @RequestParam Long memberId) {
-        DirectInquiryViewDetail result = directInquiryService.findAdminInquiryDetail(inquiryId, isAdmin, memberId);
+        DirectInquiryViewDetail result = directInquiryService.findDirectInquiryDetail(inquiryId, isAdmin, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 상세 조회 성공", result);
     }
@@ -66,7 +66,7 @@ public class DirectInquiryController {
     public ResponseEntity<ApiResponse<AnswerDirectInquiryResponse>> answerAdminInquiry(@PathVariable Long inquiryId,
                                                                                        @Valid @RequestBody AnswerDirectInquiryRequest request,
                                                                                        @RequestParam Long adminId) {
-        AnswerDirectInquiryResponse result = directInquiryService.answerAdminInquiry(inquiryId, request, adminId);
+        AnswerDirectInquiryResponse result = directInquiryService.answerDirectInquiry(inquiryId, request, adminId);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 답변 등록 성공", result);
     }

@@ -27,7 +27,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Override
     @Transactional
-    public CreateDirectInquiryResponse createAdminInquiry(CreateDirectInquiryRequest request) {
+    public CreateDirectInquiryResponse createDirectInquiry(CreateDirectInquiryRequest request) {
         DirectInquiry directInquiry = DirectInquiry.builder()
                 .writerId(1L)
                 .category(request.getCategory())
@@ -52,7 +52,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Override
     @Transactional
-    public PageResponse<DirectInquiryView> findAdminInquiry(BasePageRequest request, boolean isAdmin, Long memberId) {
+    public PageResponse<DirectInquiryView> findDirectInquiry(BasePageRequest request, boolean isAdmin, Long memberId) {
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
 
@@ -65,12 +65,12 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
         int count;
 
         if (isAdmin) {
-            list = directInquiryMapper.findAdminInquiry(rowBounds, sortOrder);
-            count = directInquiryMapper.getAdminInquiryTotal();
+            list = directInquiryMapper.findDirectInquiry(rowBounds, sortOrder);
+            count = directInquiryMapper.getDirectInquiryTotal();
         } else {
           
-            list = directInquiryMapper.findAdminInquiryOfMe(rowBounds, memberId, sortOrder);
-            count = directInquiryMapper.getAdminInquiryTotalOfMe(memberId);
+            list = directInquiryMapper.findDirectInquiryOfMe(rowBounds, memberId, sortOrder);
+            count = directInquiryMapper.getDirectInquiryTotalOfMe(memberId);
         }
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
@@ -78,14 +78,13 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Override
     @Transactional(readOnly = true)
-    public DirectInquiryViewDetail findAdminInquiryDetail(Long inquiryId, boolean isAdmin, Long memberId) {
-
+    public DirectInquiryViewDetail findDirectInquiryDetail(Long inquiryId, boolean isAdmin, Long memberId) {
         DirectInquiryViewDetail directInquiryViewDetail;
 
         if (isAdmin) {
-            directInquiryViewDetail = directInquiryMapper.findAdminInquiryDetail(inquiryId);
+            directInquiryViewDetail = directInquiryMapper.findDirectInquiryDetail(inquiryId);
         } else {
-            directInquiryViewDetail = directInquiryMapper.findAdminInquiryDetailOfMe(inquiryId, memberId);
+            directInquiryViewDetail = directInquiryMapper.findDirectInquiryDetailOfMe(inquiryId, memberId);
         }
 
         if (directInquiryViewDetail == null) {
@@ -96,7 +95,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
     }
 
     @Transactional
-    public AnswerDirectInquiryResponse answerAdminInquiry(Long inquiryId, AnswerDirectInquiryRequest request, Long adminId) {
+    public AnswerDirectInquiryResponse answerDirectInquiry(Long inquiryId, AnswerDirectInquiryRequest request, Long adminId) {
         DirectInquiry directInquiry = directInquiryMapper.findById(inquiryId);
 
         if (directInquiry == null) {

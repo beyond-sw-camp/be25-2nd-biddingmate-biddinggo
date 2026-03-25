@@ -12,14 +12,14 @@ import java.util.List;
 
 @Mapper
 public interface DirectInquiryMapper extends IMybatisCRUD<DirectInquiry> {
-    List<DirectInquiryView> findAdminInquiry(RowBounds rowBounds,
+    List<DirectInquiryView> findDirectInquiry(RowBounds rowBounds,
                                              @Param("order") String sortOrder);
-    List<DirectInquiryView> findAdminInquiryOfMe(RowBounds rowBounds,
+    List<DirectInquiryView> findDirectInquiryOfMe(RowBounds rowBounds,
                                                  @Param("memberId") long memberId,
                                                  @Param("order") String sortOrder);
-    int getAdminInquiryTotal();
-    int getAdminInquiryTotalOfMe(@Param("memberId") long memberId);
+    int getDirectInquiryTotal();
+    int getDirectInquiryTotalOfMe(@Param("memberId") long memberId);
 
-    DirectInquiryViewDetail findAdminInquiryDetail(Long inquiryId);
-    DirectInquiryViewDetail findAdminInquiryDetailOfMe(Long inquiryId, Long memberId);
+    DirectInquiryViewDetail findDirectInquiryDetail(Long inquiryId);
+    DirectInquiryViewDetail findDirectInquiryDetailOfMe(Long inquiryId, Long memberId);
 }
