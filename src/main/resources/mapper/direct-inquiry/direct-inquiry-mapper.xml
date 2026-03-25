@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biddingmate.biddinggo.directinquiry.mapper.DirectInquiryMapper">
+    <insert id="insert" parameterType="DirectInquiry" keyProperty="id" useGeneratedKeys="true" >
+        INSERT INTO direct_inquiry (
+            writer_id,
+            admin_id,
+            category,
+            content,
+            answer,
+            answered_at,
+            created_at
+        ) VALUES (
+                     #{writerId},
+                     #{adminId},
+                     #{category},
+                     #{content},
+                     #{answer},
+                     #{answeredAt},
+                     #{createdAt}
+                 )
+    </insert>
+
+    <!-- resultMap 정의 -->
+    <resultMap id="DirectInquiryViewMap" type="DirectInquiryView">
+        <id property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="category" column="category"/>
+        <result property="answer" column="answer"/>
+        <result property="answeredAt" column="answered_at"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- 관리자 전체 조회 -->
+    <select id="findDirectInquiry" resultMap="DirectInquiryViewMap">
+        SELECT di.id,
+               m.nickname,
+               di.category,
+               di.answer,
+               di.answered_at,
+               di.created_at
+        FROM direct_inquiry di
+        LEFT JOIN member m ON di.writer_id = m.id
+        ORDER BY di.created_at ${order}
+    </select>
+
+    <!-- 사용자 본인 조회 -->
+    <select id="findDirectInquiryOfMe" parameterType="map" resultMap="DirectInquiryViewMap">
+        SELECT di.id,
+               m.nickname,
+               di.category,
+               di.answer,
+               di.answered_at,
+               di.created_at
+        FROM direct_inquiry di
+        LEFT JOIN member m ON di.writer_id = m.id
+        WHERE di.writer_id = #{memberId}
+        ORDER BY di.created_at ${order}
+    </select>
+
+    <!-- 관리자 전체 count -->
+    <select id="getDirectInquiryTotal" resultType="_int">
+        SELECT COUNT(*) FROM direct_inquiry
+    </select>
+
+    <!-- 사용자 본인 count -->
+    <select id="getDirectInquiryTotalOfMe" parameterType="long" resultType="_int">
+        SELECT COUNT(*)
+        FROM direct_inquiry
+        WHERE writer_id = #{memberId}
+    </select>
+
+    <!-- 관리자 문의글 상세 조회 -->
+    <select id="findDirectInquiryDetdil" parameterType="map" resultType="DirectInquiryViewDetail">
+        SELECT di.id,
+               m.nickname AS writerNickname,
+               di.category,
+               di.content,
+               di.answer,
+               am.nickname AS adminNickname,
+               di.answered_at AS answeredAt,
+               di.created_at AS createdAt
+        FROM direct_inquiry di
+        JOIN member m ON di.writer_id = m.id
+        LEFT JOIN member am ON di.admin_id = am.id
+        WHERE di.id = #{inquiryId}
+    </select>
+
+    <!-- 사용자 문의글 상세 조회 -->
+    <select id="findDirectInquiryDetailOfMe" parameterType="map" resultType="DirectInquiryViewDetail">
+        SELECT di.id,
+               m.nickname AS writerNickname,
+               di.category,
+               di.content,
+               di.answer,
+               am.nickname AS adminNickname,
+               di.answered_at AS answeredAt,
+               di.created_at AS createdAt
+        FROM direct_inquiry di
+        JOIN member m ON di.writer_id = m.id
+        LEFT JOIN member am ON di.admin_id = am.id
+        WHERE di.id = #{inquiryId}
+          AND di.writer_id = #{memberId}
+    </select>
+
+    <!-- 문의 답변 -->
+    <update id="update" parameterType="DirectInquiry">
+        UPDATE direct_inquiry
+        SET
+            admin_id = #{adminId},
+            answer = #{answer},
+            answered_at = #{answeredAt}
+        WHERE
+            id = #{id}
+            AND answer IS NULL
+    </update>
+
+    <select id="findById" parameterType="long" resultType="DirectInquiry">
+        SELECT id,
+               writer_id AS writerId,
+               admin_id AS adminId,
+               category,
+               content,
+               answer,
+               answered_at AS answeredAt,
+               created_at AS createdAt
+        FROM direct_inquiry
+        WHERE id = #{id}
+
+    </select>
+</mapper>
