@@ -1,7 +1,8 @@
 package com.biddingmate.biddinggo.member.controller;
 
 import com.biddingmate.biddinggo.common.response.ApiResponse;
-import com.biddingmate.biddinggo.member.dto.MemberMyResponse;
+import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
+import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,15 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/my")
-    public ResponseEntity<ApiResponse<MemberMyResponse>> getMyInfo(@RequestParam Long memberId) {
-        MemberMyResponse result = memberService.getMyInfo(memberId);
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<MemberDashboardResponse>> getDashboard(@RequestParam Long memberId) {
+        MemberDashboardResponse result = memberService.getMyDashboard(memberId);
         return ApiResponse.of(HttpStatus.OK, null, "회원 마이페이지 조회 성공", result);
+    }
+
+    @GetMapping("/me/profile")
+    public ResponseEntity<ApiResponse<MemberProfileResponse>> getProfile(@RequestParam Long memberId) {
+        MemberProfileResponse result = memberService.getMyProfile(memberId);
+        return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 조회 성공", result);
     }
 }

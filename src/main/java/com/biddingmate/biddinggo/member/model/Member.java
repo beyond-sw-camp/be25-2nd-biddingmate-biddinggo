@@ -27,4 +27,11 @@ public class Member {
     private String status;
     private String lastChangeNick;
     private LocalDateTime createdAt;
+
+    public void update(String name, String email) {
+
+        this.name = name;
+        this.email = email;
+
+    }
 }

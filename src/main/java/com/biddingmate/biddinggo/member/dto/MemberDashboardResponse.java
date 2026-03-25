@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MemberMyResponse {
+public class MemberDashboardResponse {
     private Long totalPurchaseAmount;
 
     private Long totalSalesAmount;

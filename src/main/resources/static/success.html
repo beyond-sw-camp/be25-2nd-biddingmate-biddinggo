@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 성공!</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #e8f5e9; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        h1 { color: #2e7d32; }
+        p { color: #666; }
+        .btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #2e7d32; color: white; text-decoration: none; border-radius: 5px; }
+        #user-info { margin-top: 15px; font-weight: bold; color: #1b5e20; border-top: 1px dashed #ccc; padding-top: 15px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>🎉 로그인 성공!</h1>
+
+    <div id="user-info">데이터를 불러오는 중...</div>
+
+    <a href="/" class="btn">메인으로 돌아가기</a>
+</div>
+
+<script>
+    window.onload = function() {
+        // 새로 만든 테스트용 API를 호출합니다.
+        fetch('/api/v1/auth/check', {
+            credentials: 'include' // 쿠키 전송 필수!
+        })
+            .then(response => {
+                if (response.ok) return response.json();
+                throw new Error('인증 실패 (Status: ' + response.status + ')');
+            })
+            .then(data => {
+                console.log("인증 데이터:", data);
+                // AuthTestController 응답 구조에 맞춰 표시
+                const username = data.result.username;
+                document.getElementById('user-info').innerHTML =
+                    `✅ 서버 인증 완료: <strong>${username}</strong>님 접속 중 (Role: ${data.result.role[0].authority})`;
+            })
+            .catch(error => {
+                console.error(error);
+                document.getElementById('user-info').innerHTML =
+                    `<span style="color:red;">❌ 인증 실패: ${error.message}</span>`;
+            });
+    };
+</script>
+</body>
+</html>
