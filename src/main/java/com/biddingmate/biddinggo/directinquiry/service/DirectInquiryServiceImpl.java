@@ -1,11 +1,11 @@
 package com.biddingmate.biddinggo.directinquiry.service;
 
-import com.biddingmate.biddinggo.directinquiry.dto.AdminInquiryView;
-import com.biddingmate.biddinggo.directinquiry.dto.AdminInquiryViewDetail;
-import com.biddingmate.biddinggo.directinquiry.dto.AnswerAdminInquiryRequest;
-import com.biddingmate.biddinggo.directinquiry.dto.AnswerAdminInquiryResponse;
-import com.biddingmate.biddinggo.directinquiry.dto.CreateAdminInquiryRequest;
-import com.biddingmate.biddinggo.directinquiry.dto.CreateAdminInquiryResponse;
+import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryView;
+import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryViewDetail;
+import com.biddingmate.biddinggo.directinquiry.dto.AnswerDirectInquiryRequest;
+import com.biddingmate.biddinggo.directinquiry.dto.AnswerDirectInquiryResponse;
+import com.biddingmate.biddinggo.directinquiry.dto.CreateDirectInquiryRequest;
+import com.biddingmate.biddinggo.directinquiry.dto.CreateDirectInquiryResponse;
 import com.biddingmate.biddinggo.directinquiry.mapper.AdminInquiryMapper;
 import com.biddingmate.biddinggo.directinquiry.model.AdminInquiry;
 import com.biddingmate.biddinggo.common.exception.CustomException;
@@ -27,7 +27,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Override
     @Transactional
-    public CreateAdminInquiryResponse createAdminInquiry(CreateAdminInquiryRequest request) {
+    public CreateDirectInquiryResponse createAdminInquiry(CreateDirectInquiryRequest request) {
         AdminInquiry adminInquiry = AdminInquiry.builder()
                 .writerId(1L)
                 .category(request.getCategory())
@@ -41,7 +41,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_CREATED_FAIL);
         }
 
-        return CreateAdminInquiryResponse.builder()
+        return CreateDirectInquiryResponse.builder()
                 .id(adminInquiry.getId())
                 .writerId(adminInquiry.getWriterId())
                 .category(adminInquiry.getCategory())
@@ -52,7 +52,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Override
     @Transactional
-    public PageResponse<AdminInquiryView> findAdminInquiry(BasePageRequest request, boolean isAdmin, Long memberId) {
+    public PageResponse<DirectInquiryView> findAdminInquiry(BasePageRequest request, boolean isAdmin, Long memberId) {
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
 
@@ -61,7 +61,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
         }
         String sortOrder = order.toUpperCase();
 
-        List<AdminInquiryView> list;
+        List<DirectInquiryView> list;
         int count;
 
         if (isAdmin) {
@@ -78,25 +78,25 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Override
     @Transactional(readOnly = true)
-    public AdminInquiryViewDetail findAdminInquiryDetail(Long inquiryId, boolean isAdmin, Long memberId) {
+    public DirectInquiryViewDetail findAdminInquiryDetail(Long inquiryId, boolean isAdmin, Long memberId) {
 
-        AdminInquiryViewDetail adminInquiryViewDetail;
+        DirectInquiryViewDetail directInquiryViewDetail;
 
         if (isAdmin) {
-            adminInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetail(inquiryId);
+            directInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetail(inquiryId);
         } else {
-            adminInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetailOfMe(inquiryId, memberId);
+            directInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetailOfMe(inquiryId, memberId);
         }
 
-        if (adminInquiryViewDetail == null) {
+        if (directInquiryViewDetail == null) {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND);
         }
 
-        return adminInquiryViewDetail;
+        return directInquiryViewDetail;
     }
 
     @Transactional
-    public AnswerAdminInquiryResponse answerAdminInquiry(Long inquiryId, AnswerAdminInquiryRequest request, Long adminId) {
+    public AnswerDirectInquiryResponse answerAdminInquiry(Long inquiryId, AnswerDirectInquiryRequest request, Long adminId) {
         AdminInquiry adminInquiry = adminInquiryMapper.findById(inquiryId);
 
         if (adminInquiry == null) {
@@ -121,7 +121,7 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_UPDATED_FAIL);
         }
 
-        return AnswerAdminInquiryResponse.builder()
+        return AnswerDirectInquiryResponse.builder()
                 .id(inquiryId)
                 .adminId(adminId)
                 .answer(request.getAnswer())

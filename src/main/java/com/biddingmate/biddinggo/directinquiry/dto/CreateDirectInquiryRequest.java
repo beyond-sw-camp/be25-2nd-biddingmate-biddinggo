@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class CreateAdminInquiryRequest {
+public class CreateDirectInquiryRequest {
     private String category;
     private String content;
 }

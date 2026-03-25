@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class AnswerAdminInquiryRequest {
+public class AnswerDirectInquiryRequest {
     @NotBlank(message = "답변 내용은 필수입니다.")
     private String answer;
 }

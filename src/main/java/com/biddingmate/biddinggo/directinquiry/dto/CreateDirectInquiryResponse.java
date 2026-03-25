@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @Builder
-public class CreateAdminInquiryResponse {
+public class CreateDirectInquiryResponse {
     private Long id;
     private Long writerId;
     private String category;
