@@ -6,8 +6,8 @@ import com.biddingmate.biddinggo.directinquiry.dto.AnswerDirectInquiryRequest;
 import com.biddingmate.biddinggo.directinquiry.dto.AnswerDirectInquiryResponse;
 import com.biddingmate.biddinggo.directinquiry.dto.CreateDirectInquiryRequest;
 import com.biddingmate.biddinggo.directinquiry.dto.CreateDirectInquiryResponse;
-import com.biddingmate.biddinggo.directinquiry.mapper.AdminInquiryMapper;
-import com.biddingmate.biddinggo.directinquiry.model.AdminInquiry;
+import com.biddingmate.biddinggo.directinquiry.mapper.DirectInquiryMapper;
+import com.biddingmate.biddinggo.directinquiry.model.DirectInquiry;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
@@ -23,30 +23,30 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DirectInquiryServiceImpl implements DirectInquiryService {
-    private final AdminInquiryMapper adminInquiryMapper;
+    private final DirectInquiryMapper directInquiryMapper;
 
     @Override
     @Transactional
     public CreateDirectInquiryResponse createAdminInquiry(CreateDirectInquiryRequest request) {
-        AdminInquiry adminInquiry = AdminInquiry.builder()
+        DirectInquiry directInquiry = DirectInquiry.builder()
                 .writerId(1L)
                 .category(request.getCategory())
                 .content(request.getContent())
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        int insert = adminInquiryMapper.insert(adminInquiry);
+        int insert = directInquiryMapper.insert(directInquiry);
 
         if (insert <= 0) {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_CREATED_FAIL);
         }
 
         return CreateDirectInquiryResponse.builder()
-                .id(adminInquiry.getId())
-                .writerId(adminInquiry.getWriterId())
-                .category(adminInquiry.getCategory())
-                .content(adminInquiry.getContent())
-                .createdAt(adminInquiry.getCreatedAt())
+                .id(directInquiry.getId())
+                .writerId(directInquiry.getWriterId())
+                .category(directInquiry.getCategory())
+                .content(directInquiry.getContent())
+                .createdAt(directInquiry.getCreatedAt())
                 .build();
     }
 
@@ -65,12 +65,12 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
         int count;
 
         if (isAdmin) {
-            list = adminInquiryMapper.findAdminInquiry(rowBounds, sortOrder);
-            count = adminInquiryMapper.getAdminInquiryTotal();
+            list = directInquiryMapper.findAdminInquiry(rowBounds, sortOrder);
+            count = directInquiryMapper.getAdminInquiryTotal();
         } else {
           
-            list = adminInquiryMapper.findAdminInquiryOfMe(rowBounds, memberId, sortOrder);
-            count = adminInquiryMapper.getAdminInquiryTotalOfMe(memberId);
+            list = directInquiryMapper.findAdminInquiryOfMe(rowBounds, memberId, sortOrder);
+            count = directInquiryMapper.getAdminInquiryTotalOfMe(memberId);
         }
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
@@ -83,9 +83,9 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
         DirectInquiryViewDetail directInquiryViewDetail;
 
         if (isAdmin) {
-            directInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetail(inquiryId);
+            directInquiryViewDetail = directInquiryMapper.findAdminInquiryDetail(inquiryId);
         } else {
-            directInquiryViewDetail = adminInquiryMapper.findAdminInquiryDetailOfMe(inquiryId, memberId);
+            directInquiryViewDetail = directInquiryMapper.findAdminInquiryDetailOfMe(inquiryId, memberId);
         }
 
         if (directInquiryViewDetail == null) {
@@ -97,25 +97,25 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Transactional
     public AnswerDirectInquiryResponse answerAdminInquiry(Long inquiryId, AnswerDirectInquiryRequest request, Long adminId) {
-        AdminInquiry adminInquiry = adminInquiryMapper.findById(inquiryId);
+        DirectInquiry directInquiry = directInquiryMapper.findById(inquiryId);
 
-        if (adminInquiry == null) {
+        if (directInquiry == null) {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_NOT_FOUND);
         }
 
-        if (adminInquiry.getAnsweredAt() != null) {
+        if (directInquiry.getAnsweredAt() != null) {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_ALREADY_ANSWERED);
         }
 
         LocalDateTime now = LocalDateTime.now();
-        AdminInquiry updateDto = AdminInquiry.builder()
+        DirectInquiry updateDto = DirectInquiry.builder()
                 .id(inquiryId)
                 .adminId(adminId)
                 .answer(request.getAnswer())
                 .answeredAt(now)
                 .build();
 
-        int updatedRows = adminInquiryMapper.update(updateDto);
+        int updatedRows = directInquiryMapper.update(updateDto);
 
         if (updatedRows <= 0) {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_UPDATED_FAIL);

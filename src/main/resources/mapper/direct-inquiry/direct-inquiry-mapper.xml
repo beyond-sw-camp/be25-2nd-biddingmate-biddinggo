@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.biddingmate.biddinggo.directinquiry.mapper.AdminInquiryMapper">
-    <insert id="insert" parameterType="AdminInquiry" keyProperty="id" useGeneratedKeys="true" >
-        INSERT INTO admin_inquiry (
+<mapper namespace="com.biddingmate.biddinggo.directinquiry.mapper.DirectInquiryMapper">
+    <insert id="insert" parameterType="DirectInquiry" keyProperty="id" useGeneratedKeys="true" >
+        INSERT INTO direct_inquiry (
             writer_id,
             admin_id,
             category,
@@ -23,7 +23,7 @@
     </insert>
 
     <!-- resultMap 정의 -->
-    <resultMap id="AdminInquiryViewMap" type="AdminInquiryView">
+    <resultMap id="DirectInquiryViewMap" type="DirectInquiryView">
         <id property="id" column="id"/>
         <result property="nickname" column="nickname"/>
         <result property="category" column="category"/>
@@ -33,46 +33,46 @@
     </resultMap>
 
     <!-- 관리자 전체 조회 -->
-    <select id="findAdminInquiry" resultMap="AdminInquiryViewMap">
+    <select id="findDirectInquiry" resultMap="DirectInquiryViewMap">
         SELECT ai.id,
                m.nickname,
                ai.category,
                ai.answer,
                ai.answered_at,
                ai.created_at
-        FROM admin_inquiry ai
+        FROM direct_inquiry ai
         LEFT JOIN member m ON ai.writer_id = m.id
         ORDER BY ai.created_at ${order}
     </select>
 
     <!-- 사용자 본인 조회 -->
-    <select id="findAdminInquiryOfMe" parameterType="map" resultMap="AdminInquiryViewMap">
+    <select id="findDirectInquiryOfMe" parameterType="map" resultMap="DirectInquiryViewMap">
         SELECT ai.id,
                m.nickname,
                ai.category,
                ai.answer,
                ai.answered_at,
                ai.created_at
-        FROM admin_inquiry ai
+        FROM direct_inquiry ai
         LEFT JOIN member m ON ai.writer_id = m.id
         WHERE ai.writer_id = #{memberId}
         ORDER BY ai.created_at ${order}
     </select>
 
     <!-- 관리자 전체 count -->
-    <select id="getAdminInquiryTotal" resultType="_int">
-        SELECT COUNT(*) FROM admin_inquiry
+    <select id="getDirectInquiryTotal" resultType="_int">
+        SELECT COUNT(*) FROM direct_inquiry
     </select>
 
     <!-- 사용자 본인 count -->
-    <select id="getAdminInquiryTotalOfMe" parameterType="long" resultType="_int">
+    <select id="getDirectInquiryTotalOfMe" parameterType="long" resultType="_int">
         SELECT COUNT(*)
-        FROM admin_inquiry
+        FROM direct_inquiry
         WHERE writer_id = #{memberId}
     </select>
 
     <!-- 관리자 문의글 상세 조회 -->
-    <select id="findAdminInquiryDetail" parameterType="map" resultType="AdminInquiryViewDetail">
+    <select id="findDirectInquiryDetail" parameterType="map" resultType="DirectInquiryViewDetail">
         SELECT ai.id,
                m.nickname AS writerNickname,
                ai.category,
@@ -81,14 +81,14 @@
                am.nickname AS adminNickname,
                ai.answered_at AS answeredAt,
                ai.created_at AS createdAt
-        FROM admin_inquiry ai
+        FROM direct_inquiry ai
         JOIN member m ON ai.writer_id = m.id
         LEFT JOIN member am ON ai.admin_id = am.id
         WHERE ai.id = #{inquiryId}
     </select>
 
     <!-- 사용자 문의글 상세 조회 -->
-    <select id="findAdminInquiryDetailOfMe" parameterType="map" resultType="AdminInquiryViewDetail">
+    <select id="findDirectInquiryDetailOfMe" parameterType="map" resultType="DirectInquiryViewDetail">
         SELECT ai.id,
                m.nickname AS writerNickname,
                ai.category,
@@ -97,7 +97,7 @@
                am.nickname AS adminNickname,
                ai.answered_at AS answeredAt,
                ai.created_at AS createdAt
-        FROM admin_inquiry ai
+        FROM direct_inquiry ai
         JOIN member m ON ai.writer_id = m.id
         LEFT JOIN member am ON ai.admin_id = am.id
         WHERE ai.id = #{inquiryId}
@@ -105,8 +105,8 @@
     </select>
 
     <!-- 문의 답변 -->
-    <update id="update" parameterType="AdminInquiry">
-        UPDATE admin_inquiry
+    <update id="update" parameterType="DirectInquiry">
+        UPDATE direct_inquiry
         SET
             admin_id = #{adminId},
             answer = #{answer},
@@ -116,7 +116,7 @@
             AND answer IS NULL
     </update>
 
-    <select id="findById" parameterType="long" resultType="AdminInquiry">
+    <select id="findById" parameterType="long" resultType="DirectInquiry">
         SELECT id,
                writer_id AS writerId,
                admin_id AS adminId,
@@ -125,7 +125,7 @@
                answer,
                answered_at AS answeredAt,
                created_at AS createdAt
-        FROM admin_inquiry
+        FROM direct_inquiry
         WHERE id = #{id}
 
     </select>
