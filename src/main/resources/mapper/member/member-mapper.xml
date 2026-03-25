@@ -18,29 +18,68 @@
             id = #{id};
     </update>
 
-    <select id="findDashboardById" parameterType="long" resultType="MemberDashboardResponse">
-        SELECT
-            m.point AS point,
-            COALESCE(p.total_purchase_amount, 0) AS totalPurchaseAmount,
-            COALESCE(s.total_sales_amount, 0) AS totalSalesAmount
+    <select id="findDashboardInfoById" parameterType="long" resultType="MemberDashboardResponse">
+        SELECT  m.nickname AS nickname,
+                m.grade AS grade,
+                m.point AS POINT
         FROM member m
-
-        LEFT JOIN (
-            SELECT
-                winner_id,
-                SUM(winner_price) AS total_purchase_amount
-            FROM winner_deal
-            GROUP BY winner_id
-        ) p ON m.id = p.winner_id
-
-        LEFT JOIN (
-            SELECT
-                seller_id,
-                SUM(winner_price) AS total_sales_amount
-            FROM winner_deal
-            GROUP BY seller_id
-        ) s ON m.id = s.seller_id
         WHERE m.id = #{memberId}
+    </select>
+
+    <select id="findWonItemsById" parameterType="long" resultType="MemberWonItemResponse">
+        SELECT  ii.url AS imageUrl,                     -- 상품 대표 이미지 URL
+                ai.name AS itemName,                    -- 상품 이름
+                wd.delivery_status AS deliveryStatus    -- 배송 상태
+        FROM winner_deal wd
+
+        -- 낙찰된 경매 정보 연결
+        INNER JOIN auction a
+        ON wd.auction_id = a.id
+
+        -- 경매에 연결된 상품 정보
+        INNER JOIN auction_item ai
+        ON a.item_id = ai.id
+
+        -- 상품 이미지
+        LEFT JOIN item_image ii
+        ON ii.item_id = ai.id
+        AND ii.`display_order` = 1              -- 대표 이미지 1장만
+
+        WHERE wd.winner_id = #{memberId}
+        AND wd.status IN ('PAID', 'CONFIRMED')  -- 배송 취소 상태 제외
+        ORDER BY wd.created_at DESC             -- 최신순
+        LIMIT 2
+    </select>
+
+    <select id="findBiddingItemsById" parameterType="long" resultType="MemberBiddingItemResponse">
+        SELECT
+            ii.url AS imageUrl,                 -- 상품 대표 이미지 URL
+            ai.name AS itemName,                -- 상품 이름
+            a.vickrey_price AS currentPrice,    -- 차순위 가격
+            mb.myBidPrice AS myBidPrice,        -- 내가 해당 경매에서 입찰한 최고 금액
+            a.end_date AS endDate               -- 경매 종료일
+        FROM (                                  -- 한 경매에 여러 번 입찰 가능, MAX()로 "내 최고 입찰가" 뽑기
+                 SELECT
+                     b.auction_id,
+                     MAX(b.amount) AS myBidPrice
+                 FROM bid b
+                 WHERE b.bidder_id = #{memberId}       -- 경매에 참여한 사용자 id
+                 GROUP BY b.auction_id
+             ) mb
+
+                 INNER JOIN auction a
+                            ON a.id = mb.auction_id
+
+                 INNER JOIN auction_item ai
+                            ON a.item_id = ai.id
+
+                 LEFT JOIN item_image ii
+                           ON ii.item_id = ai.id
+                               AND ii.`display_order` = 1
+
+        WHERE a.status = 'ON_GOING'
+        ORDER BY a.end_date ASC
+        LIMIT 3
     </select>
 
     <select id="findById" parameterType="long" resultType="Member">
