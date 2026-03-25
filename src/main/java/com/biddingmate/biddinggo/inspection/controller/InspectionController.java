@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.inspection.controller;
 
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionRequest;
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/inspections")
 @RequiredArgsConstructor
@@ -37,10 +36,10 @@ public class InspectionController {
 
     @GetMapping("")
     @Operation(summary = "검수물품 목록 조회", description = "회원별 검수물품 목록을 조회하고, 선택한 검수 상태로 필터링합니다.")
-    public ResponseEntity<ApiResponse<List<InspectionListResponse>>> getInspectionList(
+    public ResponseEntity<ApiResponse<PageResponse<InspectionListResponse>>> getInspectionList(
             @Valid InspectionListRequest request) {
 
-        List<InspectionListResponse> result = inspectionQueryService.getInspectionList(request);
+        PageResponse<InspectionListResponse> result = inspectionQueryService.getInspectionList(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "검수물품 목록 조회 완료", result);
     }
