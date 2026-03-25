@@ -70,7 +70,7 @@ public class WishlistController {
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 조회 성공", result);
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("")
     @Operation(summary = "관심 경매 삭제", description = "관심 경매를 삭제합니다.")
     public ResponseEntity<ApiResponse<Integer>> deleteWishlist(
             @RequestBody CreateWishlistRequest request,
