@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.oauth2.mapper;
+package com.biddingmate.biddinggo.auth.mapper;
 
 import com.biddingmate.biddinggo.member.model.Member;
 import org.apache.ibatis.annotations.Mapper;

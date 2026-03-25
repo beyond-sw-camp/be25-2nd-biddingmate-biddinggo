@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.oauth2.dto;
+package com.biddingmate.biddinggo.auth.dto;
 
 public interface OAuth2Response {
 

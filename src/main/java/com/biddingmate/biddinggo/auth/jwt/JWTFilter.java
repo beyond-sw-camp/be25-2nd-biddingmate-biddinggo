@@ -1,7 +1,7 @@
-package com.biddingmate.biddinggo.auth.oauth2.jwt;
+package com.biddingmate.biddinggo.auth.jwt;
 
-import com.biddingmate.biddinggo.auth.oauth2.dto.CustomOAuth2Member;
-import com.biddingmate.biddinggo.auth.oauth2.dto.MemberDto;
+import com.biddingmate.biddinggo.auth.dto.CustomOAuth2Member;
+import com.biddingmate.biddinggo.auth.dto.MemberDto;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import io.jsonwebtoken.ExpiredJwtException;

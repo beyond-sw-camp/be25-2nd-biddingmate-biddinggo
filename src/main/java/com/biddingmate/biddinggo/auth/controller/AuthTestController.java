@@ -1,6 +1,6 @@
-package com.biddingmate.biddinggo.auth.oauth2.controller;
+package com.biddingmate.biddinggo.auth.controller;
 
-import com.biddingmate.biddinggo.auth.oauth2.dto.CustomOAuth2Member;
+import com.biddingmate.biddinggo.auth.dto.CustomOAuth2Member;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

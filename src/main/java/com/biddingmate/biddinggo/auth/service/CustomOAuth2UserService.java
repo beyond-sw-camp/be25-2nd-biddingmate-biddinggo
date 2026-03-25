@@ -1,11 +1,11 @@
-package com.biddingmate.biddinggo.auth.oauth2.service;
+package com.biddingmate.biddinggo.auth.service;
 
-import com.biddingmate.biddinggo.auth.oauth2.dto.CustomOAuth2Member;
-import com.biddingmate.biddinggo.auth.oauth2.dto.GoogleResponse;
-import com.biddingmate.biddinggo.auth.oauth2.dto.KakaoResponse;
-import com.biddingmate.biddinggo.auth.oauth2.dto.MemberDto;
-import com.biddingmate.biddinggo.auth.oauth2.dto.OAuth2Response;
-import com.biddingmate.biddinggo.auth.oauth2.mapper.AuthMemberMapper;
+import com.biddingmate.biddinggo.auth.dto.CustomOAuth2Member;
+import com.biddingmate.biddinggo.auth.dto.GoogleResponse;
+import com.biddingmate.biddinggo.auth.dto.KakaoResponse;
+import com.biddingmate.biddinggo.auth.dto.MemberDto;
+import com.biddingmate.biddinggo.auth.dto.OAuth2Response;
+import com.biddingmate.biddinggo.auth.mapper.AuthMemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
