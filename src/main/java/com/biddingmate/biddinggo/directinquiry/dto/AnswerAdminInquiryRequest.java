@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.admininquiry.dto;
+package com.biddingmate.biddinggo.directinquiry.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.admininquiry.dto;
+package com.biddingmate.biddinggo.directinquiry.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

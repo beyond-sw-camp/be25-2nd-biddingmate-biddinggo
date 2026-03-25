@@ -1,13 +1,13 @@
-package com.biddingmate.biddinggo.admininquiry.service;
+package com.biddingmate.biddinggo.directinquiry.service;
 
-import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
-import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryViewDetail;
-import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryRequest;
-import com.biddingmate.biddinggo.admininquiry.dto.AnswerAdminInquiryResponse;
-import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryRequest;
-import com.biddingmate.biddinggo.admininquiry.dto.CreateAdminInquiryResponse;
-import com.biddingmate.biddinggo.admininquiry.mapper.AdminInquiryMapper;
-import com.biddingmate.biddinggo.admininquiry.model.AdminInquiry;
+import com.biddingmate.biddinggo.directinquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.directinquiry.dto.AdminInquiryViewDetail;
+import com.biddingmate.biddinggo.directinquiry.dto.AnswerAdminInquiryRequest;
+import com.biddingmate.biddinggo.directinquiry.dto.AnswerAdminInquiryResponse;
+import com.biddingmate.biddinggo.directinquiry.dto.CreateAdminInquiryRequest;
+import com.biddingmate.biddinggo.directinquiry.dto.CreateAdminInquiryResponse;
+import com.biddingmate.biddinggo.directinquiry.mapper.AdminInquiryMapper;
+import com.biddingmate.biddinggo.directinquiry.model.AdminInquiry;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AdminInquiryServiceImpl implements AdminInquiryService {
+public class DirectInquiryServiceImpl implements DirectInquiryService {
     private final AdminInquiryMapper adminInquiryMapper;
 
     @Override

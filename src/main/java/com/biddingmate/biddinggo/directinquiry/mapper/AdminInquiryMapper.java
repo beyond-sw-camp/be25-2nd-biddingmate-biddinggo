@@ -1,8 +1,8 @@
-package com.biddingmate.biddinggo.admininquiry.mapper;
+package com.biddingmate.biddinggo.directinquiry.mapper;
 
-import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryView;
-import com.biddingmate.biddinggo.admininquiry.dto.AdminInquiryViewDetail;
-import com.biddingmate.biddinggo.admininquiry.model.AdminInquiry;
+import com.biddingmate.biddinggo.directinquiry.dto.AdminInquiryView;
+import com.biddingmate.biddinggo.directinquiry.dto.AdminInquiryViewDetail;
+import com.biddingmate.biddinggo.directinquiry.model.AdminInquiry;
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.admininquiry.dto;
+package com.biddingmate.biddinggo.directinquiry.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
