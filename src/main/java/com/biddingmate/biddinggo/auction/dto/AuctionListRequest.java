@@ -23,7 +23,7 @@ public class AuctionListRequest extends BasePageRequest {
     @Positive(message = "판매자 ID는 1 이상이어야 합니다.")
     private Long sellerId;
 
-    @Schema(description = "카테고리 ID", example = "10", nullable = true)
+    @Schema(description = "카테고리 ID", example = "100", nullable = true)
     @Positive(message = "카테고리 ID는 1 이상이어야 합니다.")
     private Long categoryId;
 }

@@ -36,9 +36,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         }
 
         AuctionStatus status = parseAuctionStatus(request.getStatus());
-        int page = Math.max(1, request.getPage());
-        int offset = (page - 1) * request.getSize();
-        RowBounds rowBounds = new RowBounds(offset, request.getSize());
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String sortOrder = order.toUpperCase();
 
         List<AuctionListResponse> list = auctionMapper.findAuctionList(
@@ -50,7 +48,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         );
         int count = auctionMapper.countAuctionList(status, request.getSellerId(), request.getCategoryId());
 
-        return PageResponse.of(list, page, request.getSize(), count);
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
     }
 
     private AuctionStatus parseAuctionStatus(String status) {
