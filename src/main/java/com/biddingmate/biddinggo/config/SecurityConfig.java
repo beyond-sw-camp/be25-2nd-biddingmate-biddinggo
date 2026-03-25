@@ -78,6 +78,7 @@ public class SecurityConfig {
                                 "/api/v1/wishlists/**",
                                 "/api/v1/users/me",
                                 "/api/v1/users/**",
+                                "/api/v1/bids/**",
                                 "/api/v1/users/me/profile"
                                 ).permitAll()
                                 .anyRequest().authenticated()

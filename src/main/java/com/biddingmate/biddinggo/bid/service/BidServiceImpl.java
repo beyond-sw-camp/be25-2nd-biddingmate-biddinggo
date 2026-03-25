@@ -16,7 +16,6 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
-    private final AuctionMapper auctionMapper;
 
     @Override
     public Bid createBid(Long memberId, Auction auction, CreateBidRequest request) {

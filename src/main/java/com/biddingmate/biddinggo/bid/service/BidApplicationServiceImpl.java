@@ -33,7 +33,8 @@ public class BidApplicationServiceImpl implements BidApplicationService {
 
     @Override
     @Transactional
-    public CreateBidResponse createBidProcess(Long memberId, Long auctionId, CreateBidRequest request){
+    public CreateBidResponse createBidProcess(Long memberId, CreateBidRequest request){
+        Long auctionId = request.getAuctionId();
 
         // 1. 경매 유효성 검증
         Auction auction = auctionMapper.findByIdForUpdate(auctionId);
