@@ -30,7 +30,7 @@ public class DirectInquiryController {
     private final DirectInquiryService directInquiryService;
 
     @PostMapping("")
-    public ResponseEntity<ApiResponse<CreateDirectInquiryResponse>> createAdminInquiry(
+    public ResponseEntity<ApiResponse<CreateDirectInquiryResponse>> createDirectInquiry(
             @RequestBody CreateDirectInquiryRequest request
     ) {
         // 인증 인가 전이므로 writerId를 하드코딩했습니다.
@@ -41,33 +41,12 @@ public class DirectInquiryController {
     }
 
     @GetMapping("")
-    public ResponseEntity<ApiResponse<PageResponse<DirectInquiryView>>> findAdminInquiry(BasePageRequest request,
-                                                                                         @RequestParam boolean isAdmin,
+    public ResponseEntity<ApiResponse<PageResponse<DirectInquiryView>>> findDirectInquiry(BasePageRequest request,
                                                                                          @RequestParam long memberId) {
         // 인증 인가 완료 전이므로 role 검사 및 memberId 전송
         // 추후에 리펙터링 대상입니다.
-        PageResponse<DirectInquiryView> result = directInquiryService.findDirectInquiry(request, isAdmin, memberId);
+        PageResponse<DirectInquiryView> result = directInquiryService.findDirectInquiry(request, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 목록 조회 성공", result);
-    }
-
-    @GetMapping("{inquiryId}")
-    public ResponseEntity<ApiResponse<DirectInquiryViewDetail>> findAdminInquiryDetail(@PathVariable Long inquiryId,
-                                                                                       @RequestParam boolean isAdmin,
-                                                                                       @RequestParam Long memberId) {
-        DirectInquiryViewDetail result = directInquiryService.findDirectInquiryDetail(inquiryId, isAdmin, memberId);
-
-        return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 상세 조회 성공", result);
-    }
-
-    @PatchMapping("/{inquiryId}")
-    // 인증 인가 구현 후 등록 예정
-    // @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<AnswerDirectInquiryResponse>> answerAdminInquiry(@PathVariable Long inquiryId,
-                                                                                       @Valid @RequestBody AnswerDirectInquiryRequest request,
-                                                                                       @RequestParam Long adminId) {
-        AnswerDirectInquiryResponse result = directInquiryService.answerDirectInquiry(inquiryId, request, adminId);
-
-        return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 답변 등록 성공", result);
     }
 }
