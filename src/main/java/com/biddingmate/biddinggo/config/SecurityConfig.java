@@ -69,7 +69,7 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/api/v1/payments/**", "/api/v1/files/**",
                                 "/api/v1/auctions/**", "/api/v1/inspections/**",
-                                "/api/v1/direct-inquiries/**",
+                                "/api/v1/direct-inquiries/**", "/api/v1/admins/direct-inquiries/**",
                                 "/api/v1/bidding/**",
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/users/my",

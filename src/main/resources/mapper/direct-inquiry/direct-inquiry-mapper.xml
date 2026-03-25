@@ -22,38 +22,30 @@
                  )
     </insert>
 
-    <!-- resultMap 정의 -->
-    <resultMap id="DirectInquiryViewMap" type="com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryView">
-        <id property="id" column="id"/>
-        <result property="nickname" column="nickname"/>
-        <result property="category" column="category"/>
-        <result property="content" column="content"/>
-        <result property="adminNickname" column="admin_nickname"/>
-        <result property="answer" column="answer"/>
-        <result property="answeredAt" column="answered_at"/>
-        <result property="createdAt" column="created_at"/>
-    </resultMap>
-
-    <select id="findDirectInquiry" resultMap="DirectInquiryViewMap">
+    <select id="findAllDirectInquiry" resultType="DirectInquiryView">
         SELECT di.id,
-               m_writer.nickname AS nickname,
+               m_writer.nickname,
                di.category,
-               di.content,         di.answer,
-               m_admin.nickname AS admin_nickname, di.answered_at,
-               di.created_at
+               di.content,
+               m_admin.nickname AS adminNickname,
+               di.answer,
+               di.answered_at AS answeredAt,
+               di.created_at AS createdAt
         FROM direct_inquiry di
         LEFT JOIN member m_writer ON di.writer_id = m_writer.id
-        LEFT JOIN member m_admin ON di.admin_id = m_admin.id ORDER BY di.created_at ${order}
+        LEFT JOIN member m_admin ON di.admin_id = m_admin.id
+        ORDER BY di.created_at ${order}
     </select>
 
-    <select id="findDirectInquiryOfMe" parameterType="map" resultMap="DirectInquiryViewMap">
+    <select id="findDirectInquiryOfMe" parameterType="map" resultType="DirectInquiryView">
         SELECT di.id,
-               m_writer.nickname AS nickname,
+               m_writer.nickname,
                di.category,
-               di.content,         di.answer,
-               m_admin.nickname AS admin_nickname,
-               di.answered_at,
-               di.created_at
+               di.content,
+               m_admin.nickname AS adminNickname,
+               di.answer,
+               di.answered_at AS answeredAt,
+               di.created_at AS createdAt
         FROM direct_inquiry di
         LEFT JOIN member m_writer ON di.writer_id = m_writer.id
         LEFT JOIN member m_admin ON di.admin_id = m_admin.id
