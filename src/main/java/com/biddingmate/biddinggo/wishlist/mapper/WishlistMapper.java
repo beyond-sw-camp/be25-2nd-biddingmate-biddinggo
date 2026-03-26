@@ -13,8 +13,6 @@ import java.util.List;
 public interface WishlistMapper extends IMybatisCRUD<Wishlist> {
     Long findByMemberIdAndAuctionId(@Param("memberId") Long memberId, @Param("auctionId") Long auctionId);
 
-    int getCountByAuctionId(@Param("auctionId") Long auctionId);
-
     List<AuctionDetailResponse> findWishlistAuctionsByMemberId (RowBounds rowBounds,
                                                                 @Param("memberId") Long memberId,
                                                                 @Param("order") String sortOrder);
