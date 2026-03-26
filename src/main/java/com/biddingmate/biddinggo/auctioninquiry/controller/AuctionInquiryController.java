@@ -39,7 +39,7 @@ public class AuctionInquiryController {
                 auctionInquiryService.createInquiry(
                         request.getAuctionId(),
                         writerId,
-                        request.getContent()
+                        request
                 );
 
         return ApiResponse.of(
