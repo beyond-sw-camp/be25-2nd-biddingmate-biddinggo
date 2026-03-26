@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biddingmate.biddinggo.address.mapper.AddressMapper">
+    <select id="countByMemberId" parameterType="long" resultType="_int">
+        SELECT COUNT(addr.id)
+        FROM address addr
+        WHERE addr.member_id = #{memberId};
+    </select>
+
+    <insert id="insert" parameterType="Address" keyProperty="id" useGeneratedKeys="true" >
+        INSERT INTO address (
+            member_id,
+            zipcode,
+            address,
+            detail_address,
+            created_at,
+            default_yn
+        ) VALUES (
+                     #{memberId},
+                     #{zipcode},
+                     #{address},
+                     #{detailAddress},
+                     #{createdAt},
+                     #{defaultYn}
+                 )
+    </insert>
+
+</mapper>
