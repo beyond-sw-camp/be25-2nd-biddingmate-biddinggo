@@ -51,12 +51,6 @@
           AND auction_id = #{auctionId}
     </select>
 
-    <select id="getCountByAuctionId" parameterType="long" resultType="int">
-        SELECT COUNT(*)
-        FROM wishlist
-        WHERE auction_id = #{auctionId}
-    </select>
-
     <select id="getCountByMemberId" parameterType="long" resultType="int">
         SELECT COUNT(*)
         FROM wishlist
