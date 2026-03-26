@@ -83,8 +83,11 @@ public enum ErrorType {
     AUCTION_INQUIRY_NOT_FOUND("auction-inquiry-004", "해당 경매 문의가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     AUCTION_INQUIRY_ALREADY_ANSWERED("auction-inquiry-005", "이미 답변이 등록된 문의입니다.", HttpStatus.CONFLICT),
     AUCTION_INQUIRY_UPDATE_FAIL("auction-inquiry-006", "경매 문의 답변 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // 회원 정보
     MEMBER_NOT_FOUND("member-001", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
+    INVALID_NICKNAME_CHANGE_PERIOD("member-002", "닉네임은 30일 이후에 변경할 수 있습니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATED_NICKNAME("member-003", "이미 사용 중인 닉네임입니다.", HttpStatus.BAD_REQUEST),
 
     // 입찰
     BID_SAVE_FAILED("bid-001", "입찰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
