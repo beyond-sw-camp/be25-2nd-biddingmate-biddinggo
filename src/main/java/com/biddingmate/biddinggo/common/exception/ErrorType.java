@@ -77,6 +77,10 @@ public enum ErrorType {
     ADMIN_INQUIRY_NOT_FOUND("admin-inquiry-003", "해당 1대1 문의가 존재하질 않습니다.", HttpStatus.NOT_FOUND),
     ADMIN_INQUIRY_ALREADY_ANSWERED("admin-inquiry-004", "해당 1대1 문의는 이미 답변이 완료된 상태입니다.", HttpStatus.CONFLICT),
 
+    // 배송지 관리
+    ADDRESS_CREATED_FAIL("address-001", "배송지 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
+    ADDRESS_MAX_COUNT_EXCEEDED("address-002", "배송지는 최대 3개까지 등록 가능합니다.", HttpStatus.CONFLICT),
+
     // 경매 문의
     AUCTION_INQUIRY_CONTENT_INVALID("auction-inquiry-001", "문의 내용이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_INQUIRY_CREATE_FAIL("auction-inquiry-002", "경매 문의 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
