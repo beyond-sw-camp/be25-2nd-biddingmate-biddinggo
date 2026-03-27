@@ -59,4 +59,8 @@
         WHERE member_id = #{memberId};
     </update>
 
+    <delete id="delete" parameterType="long">
+        DELETE FROM address
+        WHERE id = #{addressId}
+    </delete>
 </mapper>

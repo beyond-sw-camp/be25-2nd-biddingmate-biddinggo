@@ -14,4 +14,5 @@ public interface AddressMapper extends IMybatisCRUD<Address> {
     List<AddressListResponse> findAll(@Param("memberId") Long memberId);
     int updateDefault(@Param("addressId") Long addressId,
                        @Param("memberId") Long memberId);
+    int delete(@Param("addressId") Long addressId);
 }

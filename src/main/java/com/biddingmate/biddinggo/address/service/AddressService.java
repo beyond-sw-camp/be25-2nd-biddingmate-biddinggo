@@ -10,4 +10,5 @@ public interface AddressService {
     CreateAddressResponse createAddress(CreateAddressRequest request, Long memberId);
     List<AddressListResponse> findAllAddress(Long memberId);
     void updateDefaultAddress(Long addressId);
+    void deleteAddress(Long addressId);
 }

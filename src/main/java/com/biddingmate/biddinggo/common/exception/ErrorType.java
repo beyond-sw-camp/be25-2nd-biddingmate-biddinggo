@@ -82,6 +82,7 @@ public enum ErrorType {
     ADDRESS_MAX_COUNT_EXCEEDED("address-002", "배송지는 최대 3개까지 등록 가능합니다.", HttpStatus.CONFLICT),
     ADDRESS_NOT_FOUND("address-003", "해당 배송지는 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     ADDRESS_UPDATE_DEFAULT_FAIL("address-004", "기본 배송지 변경에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ADDRESS_DELETE_DEFAULT_FAIL("address-005", "배송지 삭제를 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 경매 문의
     AUCTION_INQUIRY_CONTENT_INVALID("auction-inquiry-001", "문의 내용이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),

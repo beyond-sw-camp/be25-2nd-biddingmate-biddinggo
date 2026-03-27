@@ -63,11 +63,28 @@ public class AddressServiceImpl implements AddressService {
             throw new CustomException(ErrorType.ADDRESS_NOT_FOUND);
         }
 
+
         // 기존의 기본 배송지를 해제하며 선택한 배송지 기본 설정
         int update = addressMapper.updateDefault(addressId, address.getMemberId());
 
         if (update <= 0) {
             throw new CustomException(ErrorType.ADDRESS_UPDATE_DEFAULT_FAIL);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteAddress(Long addressId) {
+        Address address = addressMapper.findById(addressId);
+
+        if (address == null) {
+            throw new CustomException(ErrorType.ADDRESS_NOT_FOUND);
+        }
+
+        int delete = addressMapper.delete(address.getId());
+
+        if (delete <= 0) {
+            throw new CustomException(ErrorType.ADDRESS_DELETE_DEFAULT_FAIL);
         }
     }
 }

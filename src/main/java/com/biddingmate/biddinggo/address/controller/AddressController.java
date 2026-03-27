@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,5 +46,12 @@ public class AddressController {
         addressService.updateDefaultAddress(addressId);
 
         return ApiResponse.of(HttpStatus.OK, null, "기본 배송지 변경에 성공했습니다.", null);
+    }
+
+    @DeleteMapping("/{addressId}")
+    public ResponseEntity<ApiResponse<Void>> deleteAddress(@PathVariable Long addressId) {
+        addressService.deleteAddress(addressId);
+
+        return ApiResponse.of(HttpStatus.OK, null, "배송지 삭제를 성공했습니다.", null);
     }
 }
