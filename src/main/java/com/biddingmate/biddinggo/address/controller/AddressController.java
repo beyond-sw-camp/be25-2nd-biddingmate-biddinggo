@@ -5,6 +5,7 @@ import com.biddingmate.biddinggo.address.dto.CreateAddressRequest;
 import com.biddingmate.biddinggo.address.dto.CreateAddressResponse;
 import com.biddingmate.biddinggo.address.service.AddressService;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AddressController {
     private final AddressService addressService;
 
     @PostMapping("")
-    public ResponseEntity<ApiResponse<CreateAddressResponse>> createAddress(@RequestBody CreateAddressRequest request,
+    public ResponseEntity<ApiResponse<CreateAddressResponse>> createAddress(@Valid @RequestBody CreateAddressRequest request,
                                                                             @RequestParam Long memberId) {
         CreateAddressResponse result = addressService.createAddress(request, memberId);
 
