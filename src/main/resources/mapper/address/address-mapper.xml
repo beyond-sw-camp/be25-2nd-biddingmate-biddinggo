@@ -26,4 +26,16 @@
                  )
     </insert>
 
+    <select id="findAll" parameterType="long" resultType="AddressListResponse">
+        SELECT id,
+               zipcode,
+               address,
+               detail_address AS detailAddress,
+               default_yn AS defaultYn,
+               created_at AS createdAt
+        FROM address
+        WHERE member_id = #{memberId}
+        ORDER BY default_yn DESC, created_at DESC
+    </select>
+
 </mapper>
