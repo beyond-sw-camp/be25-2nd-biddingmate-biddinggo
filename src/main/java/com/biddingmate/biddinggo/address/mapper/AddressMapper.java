@@ -12,4 +12,6 @@ import java.util.List;
 public interface AddressMapper extends IMybatisCRUD<Address> {
     int countByMemberId(@Param("memberId") Long memberId);
     List<AddressListResponse> findAll(@Param("memberId") Long memberId);
+    int updateDefault(@Param("addressId") Long addressId,
+                       @Param("memberId") Long memberId);
 }

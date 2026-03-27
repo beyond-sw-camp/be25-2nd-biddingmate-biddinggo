@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,12 @@ public class AddressController {
         List<AddressListResponse> result = addressService.findAllAddress(memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "배송지 조회 성공", result);
+    }
+
+    @PatchMapping("/{addressId}")
+    public ResponseEntity<ApiResponse<Void>> updateDefault(@PathVariable Long addressId) {
+        addressService.updateDefaultAddress(addressId);
+
+        return ApiResponse.of(HttpStatus.OK, null, "기본 배송지 변경에 성공했습니다.", null);
     }
 }

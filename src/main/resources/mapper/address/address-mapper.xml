@@ -38,4 +38,25 @@
         ORDER BY default_yn DESC, created_at DESC
     </select>
 
+    <select id="findById" parameterType="Address" resultType="Address">
+        SELECT id,
+               member_id AS memberId,
+               zipcode,
+               address,
+               detail_address AS detailAddress,
+               default_yn AS defaultYn,
+               created_at AS createdAt
+        FROM address
+        WHERE id = #{addressId}
+    </select>
+
+    <update id="updateDefault" parameterType="map">
+        UPDATE address
+        SET default_yn = CASE
+            WHEN id = #{addressId} THEN true
+            ELSE false
+        END
+        WHERE member_id = #{memberId};
+    </update>
+
 </mapper>
