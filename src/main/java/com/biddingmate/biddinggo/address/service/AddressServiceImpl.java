@@ -56,7 +56,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public void updateDefaultAddress(Long addressId) {
+    public void updateDefaultAddress(Long addressId, Long memberId) {
         Address address = addressMapper.findById(addressId);
 
         if (address == null) {
@@ -65,7 +65,7 @@ public class AddressServiceImpl implements AddressService {
 
 
         // 기존의 기본 배송지를 해제하며 선택한 배송지 기본 설정
-        int update = addressMapper.updateDefault(addressId, address.getMemberId());
+        int update = addressMapper.updateDefault(addressId, memberId);
 
         if (update <= 0) {
             throw new CustomException(ErrorType.ADDRESS_UPDATE_DEFAULT_FAIL);
@@ -74,14 +74,14 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public void deleteAddress(Long addressId) {
+    public void deleteAddress(Long addressId, Long memberId) {
         Address address = addressMapper.findById(addressId);
 
         if (address == null) {
             throw new CustomException(ErrorType.ADDRESS_NOT_FOUND);
         }
 
-        int delete = addressMapper.delete(address.getId());
+        int delete = addressMapper.delete(address.getId(), memberId);
 
         if (delete <= 0) {
             throw new CustomException(ErrorType.ADDRESS_DELETE_DEFAULT_FAIL);

@@ -42,15 +42,17 @@ public class AddressController {
     }
 
     @PatchMapping("/{addressId}")
-    public ResponseEntity<ApiResponse<Void>> updateDefault(@PathVariable Long addressId) {
-        addressService.updateDefaultAddress(addressId);
+    public ResponseEntity<ApiResponse<Void>> updateDefault(@PathVariable Long addressId,
+                                                           @RequestParam Long memberId) {
+        addressService.updateDefaultAddress(addressId, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "기본 배송지 변경에 성공했습니다.", null);
     }
 
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<ApiResponse<Void>> deleteAddress(@PathVariable Long addressId) {
-        addressService.deleteAddress(addressId);
+    public ResponseEntity<ApiResponse<Void>> deleteAddress(@PathVariable Long addressId,
+                                                           @RequestParam Long memberId) {
+        addressService.deleteAddress(addressId, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "배송지 삭제를 성공했습니다.", null);
     }
