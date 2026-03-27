@@ -17,6 +17,7 @@ public enum ErrorType {
 
     // 페이징 처리
     INVALID_SORT_ORDER("paging-001", "정렬 방향이 존재하질 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_SORT_BY("paging-002", "정렬 기준이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
     // 도메인 별 예시
     // auth

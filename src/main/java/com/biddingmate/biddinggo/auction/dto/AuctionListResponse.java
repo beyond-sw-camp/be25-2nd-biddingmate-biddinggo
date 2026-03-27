@@ -41,6 +41,9 @@ public class AuctionListResponse {
     @Schema(description = "입찰 수", example = "0")
     private Integer bidCount;
 
+    @Schema(description = "관심 수", example = "0")
+    private Integer wishCount;
+
     @Schema(description = "경매 종료일시")
     private LocalDateTime endDate;
 

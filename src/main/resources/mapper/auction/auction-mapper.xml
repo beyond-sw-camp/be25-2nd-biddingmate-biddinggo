@@ -12,6 +12,7 @@
         <result property="startPrice" column="start_price"/>
         <result property="buyNowPrice" column="buy_now_price"/>
         <result property="bidCount" column="bid_count"/>
+        <result property="wishCount" column="wish_count"/>
         <result property="endDate" column="end_date"/>
         <result property="representativeImageUrl" column="representative_image_url"/>
         <result property="createdAt" column="created_at"/>
@@ -130,6 +131,7 @@
             a.start_price,
             a.buy_now_price,
             a.bid_count,
+            a.wish_count,
             a.end_date,
             ii.url AS representative_image_url,
             a.created_at
@@ -151,7 +153,11 @@
         <if test="categoryId != null">
             AND ai.category_id = #{categoryId}
         </if>
-        ORDER BY a.created_at ${order}
+        ORDER BY
+        <choose>
+            <when test='sortBy == "WISH_COUNT"'>a.wish_count ${order}, a.created_at DESC</when>
+            <otherwise>a.created_at ${order}</otherwise>
+        </choose>
     </select>
 
     <select id="countAuctionList" parameterType="map" resultType="_int">

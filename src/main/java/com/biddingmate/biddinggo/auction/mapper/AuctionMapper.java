@@ -20,6 +20,7 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
                                               @Param("status") AuctionStatus status,
                                               @Param("sellerId") Long sellerId,
                                               @Param("categoryId") Long categoryId,
+                                              @Param("sortBy") String sortBy,
                                               @Param("order") String order);
 
     int countAuctionList(@Param("status") AuctionStatus status,

@@ -23,6 +23,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AuctionQueryServiceImpl implements AuctionQueryService {
+    private static final String DEFAULT_SORT_BY = "CREATED_AT";
+    private static final String SORT_BY_WISH_COUNT = "WISH_COUNT";
+
     private final AuctionMapper auctionMapper;
     private final ItemImageMapper itemImageMapper;
 
@@ -36,6 +39,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         }
 
         AuctionStatus status = parseAuctionStatus(request.getStatus());
+        String sortBy = parseSortBy(request.getSortBy());
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String sortOrder = order.toUpperCase();
 
@@ -44,6 +48,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
                 status,
                 request.getSellerId(),
                 request.getCategoryId(),
+                sortBy,
                 sortOrder
         );
         int count = auctionMapper.countAuctionList(status, request.getSellerId(), request.getCategoryId());
@@ -61,6 +66,20 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         } catch (IllegalArgumentException exception) {
             throw new CustomException(ErrorType.BAD_REQUEST);
         }
+    }
+
+    private String parseSortBy(String sortBy) {
+        if (sortBy == null || sortBy.isBlank()) {
+            return DEFAULT_SORT_BY;
+        }
+
+        String normalizedSortBy = sortBy.trim().toUpperCase();
+
+        if (!DEFAULT_SORT_BY.equals(normalizedSortBy) && !SORT_BY_WISH_COUNT.equals(normalizedSortBy)) {
+            throw new CustomException(ErrorType.INVALID_SORT_BY);
+        }
+
+        return normalizedSortBy;
     }
 
     @Override
