@@ -1,6 +1,8 @@
 package com.biddingmate.biddinggo.auction.controller;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
+import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.auction.dto.CancelAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
@@ -11,6 +13,7 @@ import com.biddingmate.biddinggo.auction.service.AuctionQueryService;
 import com.biddingmate.biddinggo.auction.service.AuctionService;
 import io.swagger.v3.oas.annotations.Operation;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,16 @@ public class AuctionController {
     private final AuctionApplicationService auctionApplicationService;
     private final AuctionQueryService auctionQueryService;
     private final AuctionService auctionService;
+
+    @GetMapping("")
+    @Operation(summary = "경매 목록 조회", description = "조건에 맞는 경매 목록을 페이징 조회합니다.")
+    public ResponseEntity<ApiResponse<PageResponse<AuctionListResponse>>> getAuctionList(
+            @Valid AuctionListRequest request) {
+
+        PageResponse<AuctionListResponse> result = auctionQueryService.getAuctionList(request);
+
+        return ApiResponse.of(HttpStatus.OK, null, "경매 목록 조회 완료", result);
+    }
 
     @GetMapping("/{auctionId}")
     @Operation(summary = "경매 상세 조회", description = "경매 기본 정보, 상품 정보, 카테고리, 이미지 목록을 조회합니다.")
