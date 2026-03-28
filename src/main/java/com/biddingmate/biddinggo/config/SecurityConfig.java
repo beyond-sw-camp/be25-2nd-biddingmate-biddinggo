@@ -66,7 +66,7 @@ public class SecurityConfig {
                                 "/api/v1/payments/**", "/api/v1/files/**", "/api/v1/addresses/**",
                                 "/api/v1/auctions/**", "/api/v1/inspections/**",
                                 "/api/v1/direct-inquiries/**", "/api/v1/admins/direct-inquiries/**",
-                                "/api/v1/bidding/**",
+                                "/api/v1/bidding/**","/api/v1/points/**",
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/users/my",
                                 "/api/v1/auction/**",
