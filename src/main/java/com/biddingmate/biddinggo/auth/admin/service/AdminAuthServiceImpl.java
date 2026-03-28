@@ -1,6 +1,8 @@
 package com.biddingmate.biddinggo.auth.admin.service;
 
 import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
+import com.biddingmate.biddinggo.auth.admin.dto.AdminSignupRequestDto;
+import com.biddingmate.biddinggo.auth.jwt.JWTProvider;
 import com.biddingmate.biddinggo.auth.jwt.AdminJWTUtil;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
@@ -20,19 +22,26 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
     private final AdminJWTUtil adminJWTUtil;
+    private final JWTProvider jwtProvider;
 
     @Override
     public AdminLoginResponse login(String username, String password) {
-
-        // username으로 사용자조회
+        // 사용자의 아이디와 비밀번호로 인증 처리를 진행한다.
+        // 1. username으로 사용자를 조회
         Member member = memberMapper.selectMemberByUsername(username);
 
-        // db에 있는 비밀 버호 확인
+        // 2. PasswordEncoder를 사용해 데이터베이스에 저장된 비밀번호와 입력받은 비밀번호가 일치하는지 확인
         if (member == null || !passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(ErrorType.INVALID_CREDENTIALS);
         }
 
+        // 3. LoginResponse 객체를 생성해서 반환
         return createLoginResponse(member);
+    }
+
+    @Override
+    public void signup(AdminSignupRequestDto signupRequestDto) {
+
     }
 
     private AdminLoginResponse createLoginResponse(Member member) {
@@ -43,7 +52,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
         // 엑세스토큰 발급
         String accessToken =
-                jwtTokenProvider.createAccessToken(member.getUsername(), authorities);
+                jwtProvider.createAccessToken(member.getUsername(), authorities);
 
 
         return AdminLoginResponse.builder()
@@ -51,7 +60,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 .type("Bearer")
                 .username(member.getUsername())
                 .authorities(authorities)
-                .issuedAt(jWTUtil.getIssuedAT)
+                .issuedAt(adminJWTUtil.getIssuedAt(accessToken))
+                .expiredAt(adminJWTUtil.getExpiredAt(accessToken))
                 .build();
     }
+
+
+
 }

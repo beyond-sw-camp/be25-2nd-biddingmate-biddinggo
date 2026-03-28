@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -32,5 +33,7 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     // 아이디를 통한 사용자 조회(auth)
     Member selectMemberByUsername (@Param("username") String username);
+
+
 
 }

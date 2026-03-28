@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,8 +34,6 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JWTUtil jwtUtil;
-
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver) throws Exception {
@@ -62,6 +62,7 @@ public class SecurityConfig {
                         .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService)))
                         .successHandler(customSuccessHandler))
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/","/login/**", "/oauth2/**",
@@ -78,7 +79,8 @@ public class SecurityConfig {
                                 "/api/v1/users/me",
                                 "/api/v1/users/**",
                                 "/api/v1/bids/**",
-                                "/api/v1/users/me/profile"
+                                "/api/v1/users/me/profile",
+                                "/api/v1/admin/auth/login"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 );
@@ -107,6 +109,13 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .requestMatchers("/favicon.ico", "/error");
+    }
+
+    // 패스워드인코딩 빈 추가
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+
+        return new BCryptPasswordEncoder();
     }
 
 

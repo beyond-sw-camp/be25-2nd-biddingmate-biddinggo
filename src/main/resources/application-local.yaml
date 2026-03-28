@@ -63,3 +63,7 @@ cloudflare:
     public-base-url: ${R2_PUBLIC_BASE_URL}
     region: ${R2_REGION:auto}
     presigned-url-duration-minutes: ${R2_PRESIGNED_URL_DURATION_MINUTES:10}
+
+jwt:
+  issuer: bidding-mate
+  secret: ${JWT_SECRET_KEY}
