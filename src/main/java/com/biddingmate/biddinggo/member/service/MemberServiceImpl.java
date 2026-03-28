@@ -79,6 +79,21 @@ public class MemberServiceImpl implements MemberService {
         return memberMapper.findProfileById(memberId);
     }
 
+    @Override
+    public void deleteMyAccount(Long memberId) {
+
+        // 회원 존재 여부 확인
+        Member member = getMember(memberId);
+
+        // 이미 탈퇴한 회원이라면 예외 처리
+        if ("DELETED".equals(member.getStatus())) {
+            throw new CustomException(ErrorType.ALREADY_DELETED_MEMBER);
+        }
+
+        // 탈퇴 처리 (soft delete)
+        memberMapper.deleteMember(memberId);
+    }
+
     // 회원 존재 여부 확인
     private void memberExists(Long memberId) {
 

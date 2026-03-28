@@ -10,4 +10,6 @@ public interface MemberService {
     MemberProfileResponse getMyProfile(Long memberId);
 
     MemberProfileResponse updateMyProfile(Long memberId, MemberProfileUpdateRequest request);
+
+    void deleteMyAccount(Long memberId);
 }
