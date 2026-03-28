@@ -29,4 +29,8 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     // 입찰 중 물품 목록
     List<MemberBiddingItemResponse> findBiddingItemsById(@Param("memberId") Long memberId);
+
+    // 아이디를 통한 사용자 조회(auth)
+    Member selectMemberByUsername (@Param("username") String username);
+
 }

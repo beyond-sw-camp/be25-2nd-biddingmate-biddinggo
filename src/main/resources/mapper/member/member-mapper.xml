@@ -129,4 +129,27 @@
                  LEFT JOIN address a ON m.id = a.member_id
         WHERE m.id = #{memberId}
     </select>
+
+    <select id="selectMemberByUsername" parameterType="String" resultType="Member">
+
+        SELECT
+            id,
+            username,
+            password,
+            name,
+            nickname,
+            email,
+            image_url AS imageUrl,
+            point,
+            bank_code AS bankCode,
+            bank_account AS bankAccount,
+            grade,
+            role,
+            status,
+            last_change_nick AS lastChangeNick,
+            created_at AS createdAt
+        FROM member
+        WHERE username = #{username}
+
+    </select>
 </mapper>
