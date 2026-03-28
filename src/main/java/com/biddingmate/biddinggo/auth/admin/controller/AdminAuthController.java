@@ -1,11 +1,13 @@
 package com.biddingmate.biddinggo.auth.admin.controller;
 
 import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginRequestDto;
+import com.biddingmate.biddinggo.auth.admin.dto.AdminSignupRequestDto;
 import com.biddingmate.biddinggo.auth.admin.service.AdminAuthService;
 import com.biddingmate.biddinggo.common.dto.BaseResponseDto;
 import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +24,10 @@ public class AdminAuthController {
 
     private final AdminAuthService authService;
 
-    @Operation(summary = "로그인", description = "아이디와 패스워드를 JSON 문자열로 받아서 로그인한다.")
+    @Operation(summary = "로그인")
     @PostMapping("/login")
     public ResponseEntity<BaseResponseDto<AdminLoginResponse>> login(
-        @RequestBody AdminLoginRequestDto loginRequestDto) {
+        @Valid @RequestBody AdminLoginRequestDto loginRequestDto) {
 
         AdminLoginResponse loginResponse = authService.login(
                 loginRequestDto.getUsername(),
@@ -37,6 +39,18 @@ public class AdminAuthController {
 
     }
 
+    @Operation(summary = "회원가입")
+    @PostMapping("/signup")
+    public ResponseEntity<BaseResponseDto<String>> signup (
+            @Valid @RequestBody AdminSignupRequestDto signupRequestDto
+            ) {
+
+        authService.signup(signupRequestDto);
+
+        return ResponseEntity.ok(new BaseResponseDto<>(HttpStatus.CREATED, "회원가입완료"));
+
+
+    }
 
 
 }

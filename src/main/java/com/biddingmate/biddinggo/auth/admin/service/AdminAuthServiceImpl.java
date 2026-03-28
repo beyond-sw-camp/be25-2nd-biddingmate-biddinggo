@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,6 +42,31 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public void signup(AdminSignupRequestDto signupRequestDto) {
+
+        // 중복 이메일 체크
+        if (memberMapper.selectMemberByUsername(signupRequestDto.getUsername()) != null) {
+            throw new CustomException(ErrorType.DUPLICATE_USERNAME);
+        }
+
+        if (memberMapper.selectMemberByEmail(signupRequestDto.getEmail()) != null) {
+            throw new CustomException(ErrorType.DUPLICATE_EMAIL);
+        }
+
+        if (memberMapper.selectMemberByNickname(signupRequestDto.getNickname()) != null) {
+            throw new CustomException(ErrorType.DUPLICATE_NICKNAME);
+        }
+
+        Member member = Member.builder()
+                .username(signupRequestDto.getUsername())
+                .password(passwordEncoder.encode(signupRequestDto.getPassword()))
+                .name(signupRequestDto.getName())
+                .email(signupRequestDto.getEmail())
+                .nickname(signupRequestDto.getNickname())
+                .role("ADMIN")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        memberMapper.insert(member);
 
     }
 

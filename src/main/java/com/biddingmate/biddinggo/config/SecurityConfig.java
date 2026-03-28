@@ -80,7 +80,8 @@ public class SecurityConfig {
                                 "/api/v1/users/**",
                                 "/api/v1/bids/**",
                                 "/api/v1/users/me/profile",
-                                "/api/v1/admin/auth/login"
+                                "/api/v1/admin/auth/login",
+                                "/api/v1/admin/auth/signup"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 );
