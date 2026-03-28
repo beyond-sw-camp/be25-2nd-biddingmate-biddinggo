@@ -35,4 +35,7 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     // 수정할 닉네임이 사용 중 인지 확인
     int countByNickname(@Param("nickname") String nickname);
+
+    // member status를 DELETED로 변경
+    void deleteMember(Long memberId);
 }

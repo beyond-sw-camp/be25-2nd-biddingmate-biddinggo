@@ -155,4 +155,10 @@
         </set>
         WHERE id = #{memberId}
     </update>
+
+    <update id="deleteMember" parameterType="long">
+        UPDATE member
+        SET status = 'DELETED'
+        WHERE id = #{memberId}
+    </update>
 </mapper>

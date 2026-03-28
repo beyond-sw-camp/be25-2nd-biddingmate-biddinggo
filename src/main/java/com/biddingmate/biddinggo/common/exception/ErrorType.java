@@ -96,6 +96,7 @@ public enum ErrorType {
     MEMBER_NOT_FOUND("member-001", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
     INVALID_NICKNAME_CHANGE_PERIOD("member-002", "닉네임은 30일 이후에 변경할 수 있습니다.", HttpStatus.BAD_REQUEST),
     DUPLICATED_NICKNAME("member-003", "이미 사용 중인 닉네임입니다.", HttpStatus.BAD_REQUEST),
+    ALREADY_DELETED_MEMBER("member-004", "탈퇴한 회원입니다.", HttpStatus.BAD_REQUEST),
 
     // 입찰
     BID_SAVE_FAILED("bid-001", "입찰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

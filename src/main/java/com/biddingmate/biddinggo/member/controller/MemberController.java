@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,5 +42,11 @@ public class MemberController {
             ) {
         MemberProfileResponse result = memberService.updateMyProfile(memberId, request);
         return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 수정 성공", result);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(@RequestParam Long memberId) {
+        memberService.deleteMyAccount(memberId);
+        return ApiResponse.of(HttpStatus.OK, null, "회원 탈퇴 성공", null);
     }
 }
