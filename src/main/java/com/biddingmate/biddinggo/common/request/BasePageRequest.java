@@ -26,31 +26,28 @@ import org.springframework.data.domain.Pageable;
 @SuperBuilder
 @Schema(description = "공용 페이징 요청 DTO")
 public class BasePageRequest {
-    private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_SIZE = 10;
     private static final int MAX_SIZE = 100;
-    private static final String DEFAULT_ORDER = "ASC";
 
-    @Schema(description = "0부터 시작하는 페이지 번호", example = "0", defaultValue = "0")
+    @Schema(description = "1부터 시작하는 페이지 번호", example = "1", defaultValue = "1")
     @NotNull(message = "페이지 번호는 필수입니다.")
-    @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.")
-    protected Integer page;
+    @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
+    @Builder.Default
+    protected Integer page = 1;
 
     @Schema(description = "페이지 크기", example = "20", defaultValue = "20")
     @NotNull(message = "페이지 크기는 필수입니다.")
     @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.")
     @Max(value = MAX_SIZE, message = "페이지 크기는 100 이하여야 합니다.")
-    protected Integer size;
+    @Builder.Default
+    protected Integer size = 10;
 
     @Schema(description = "정렬 방향", example = "ASC", defaultValue = "ASC")
-    protected String order;
+    @NotNull(message = "정렬 방향은 필수입니다.")
+    @Builder.Default
+    protected String order = "ASC";
 
     public int getOffset() {
         // page가 1부터 시작한다고 가정할 경우
-        return (page > 0) ? (page - 1) * size : 0;
-    }
-
-    public int getLimit() {
-        return size;
+        return (page - 1) * size;
     }
 }
