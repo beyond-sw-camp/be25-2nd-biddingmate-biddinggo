@@ -209,6 +209,7 @@
             nickname,
             email,
             role,
+            status,
             created_at
 
         ) VALUES (
@@ -218,8 +219,53 @@
             #{nickname},
             #{email},
             #{role},
+            #{status},
             NOW()
                  )
     </insert>
+
+    <!-- 소셜 회원 저장: 필수 필드와 선택 필드를 구분하여 처리 -->
+    <insert id="saveMember" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO member (
+        username,
+        name,
+        nickname,
+        email,
+        role,
+        image_url,
+        created_at
+        ) VALUES (
+
+        #{username},
+        #{name},
+        #{nickname},
+        #{email},
+        #{role},
+        #{imageUrl},
+        NOW()
+        )
+
+    </insert>
+
+    <!-- 소셜 회원 수정: 변경된 필드만 업데이트하도록 <set> 태그 사용 -->
+    <update id="updateMember">
+        UPDATE member
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!--  소셜 회원 필수 정보 입력  -->
+    <update id="updateMemberInfo" parameterType="com.biddingmate.biddinggo.auth.dto.SocialInfoUpdateDto">
+        UPDATE MEMBER
+        SET name = #{name},
+            nickname = #{nickname},
+            status = #{status}
+        WHERE username = #{username}
+    </update>
 
 </mapper>
