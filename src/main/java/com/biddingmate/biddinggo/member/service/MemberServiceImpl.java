@@ -2,10 +2,13 @@ package com.biddingmate.biddinggo.member.service;
 
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
@@ -92,6 +95,54 @@ public class MemberServiceImpl implements MemberService {
 
         // 탈퇴 처리 (soft delete)
         memberMapper.deleteMember(memberId);
+    }
+
+    @Override
+    public PageResponse<MemberSalesItemResponse> getMySales(Long memberId, BasePageRequest pageRequest) {
+
+        // 회원 존재 여부 확인
+        memberExists(memberId);
+
+        // 최신순으로 정렬
+        if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
+            pageRequest.setOrder("DESC");
+        }
+
+        // 판매내역 목록 조회
+        List<MemberSalesItemResponse> content = memberMapper.findSalesByMember(memberId, pageRequest);
+
+        // 전체 개수 조회
+        long totalElements = memberMapper.countSalesByMemberId(memberId);
+
+        // 전체 페이지 수 계산
+        int totalPages = (totalElements == 0) ? 0 : (int) Math.ceil((double) totalElements / pageRequest.getSize());
+
+        // 현재 페이지 데이터 개수
+        int numberOfElements = content.size();
+
+        boolean hasPrevious = pageRequest.getPage() > 1;
+
+        boolean hasNext = pageRequest.getPage() < totalPages;
+
+        boolean first = pageRequest.getPage() == 1;
+
+        boolean last = totalPages == 0 || pageRequest.getPage() == totalPages;
+
+        boolean empty = content.isEmpty();
+
+        return PageResponse.<MemberSalesItemResponse>builder()
+                .content(content)
+                .page(pageRequest.getPage())
+                .size(pageRequest.getSize())
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .numberOfElements(numberOfElements)
+                .hasNext(hasNext)
+                .hasPrevious(hasPrevious)
+                .first(first)
+                .last(last)
+                .empty(empty)
+                .build();
     }
 
     // 회원 존재 여부 확인
