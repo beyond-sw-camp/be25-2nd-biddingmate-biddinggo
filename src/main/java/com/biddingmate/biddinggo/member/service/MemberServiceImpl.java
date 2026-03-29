@@ -2,10 +2,13 @@ package com.biddingmate.biddinggo.member.service;
 
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
+import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
@@ -92,6 +95,58 @@ public class MemberServiceImpl implements MemberService {
 
         // 탈퇴 처리 (soft delete)
         memberMapper.deleteMember(memberId);
+    }
+
+    @Override
+    public PageResponse<MemberPurchaseItemResponse> getMyPurchases(Long memberId, BasePageRequest pageRequest) {
+
+        // 회원 존재 여부 확인
+        getMember(memberId);
+
+        // 정렬 값이 없는 경우
+        if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
+            pageRequest.setOrder("DESC");
+        }
+
+        // 구매내역 목록 조회
+        List<MemberPurchaseItemResponse> content =
+                memberMapper.findPurchasesByMemberId(memberId, pageRequest);
+
+        // 전체 개수 조회
+        long totalElements = memberMapper.countPurchasesByMemberId(memberId);
+
+        // 전체 페이지 수
+        int totalPages = (totalElements == 0) ? 0 : (int) Math.ceil((double) totalElements / pageRequest.getSize());
+
+        int numberOfElements = content.size();
+
+        boolean hasPrevious = pageRequest.getPage() > 0;
+
+        // 다음 페이지 존재 여부
+        boolean hasNext = pageRequest.getPage() < totalPages - 1;
+
+        // 첫 페이지 여부
+        boolean first = pageRequest.getPage() == 0;
+
+        // 마지막 페이지 여부
+        boolean last = totalPages == 0 || pageRequest.getPage() == totalPages - 1;
+
+        // 현재 페이지 데이터 비어있는지 여부
+        boolean empty = content.isEmpty();
+
+        return PageResponse.<MemberPurchaseItemResponse>builder()
+                .content(content)
+                .page(pageRequest.getPage())
+                .size(pageRequest.getSize())
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .hasNext(hasNext)
+                .hasPrevious(hasPrevious)
+                .first(first)
+                .last(last)
+                .empty(empty)
+                .numberOfElements(numberOfElements)
+                .build();
     }
 
     // 회원 존재 여부 확인
