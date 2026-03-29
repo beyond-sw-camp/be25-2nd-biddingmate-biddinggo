@@ -23,4 +23,6 @@ public class CreateAuctionInquiryRequest {
     @Schema(description = "문의 내용", example = "직거래 가능한가요?", required = true)
     @NotBlank(message = "문의 내용은 필수입니다.")
     private String content;
+
+    private boolean secretYn;
 }
