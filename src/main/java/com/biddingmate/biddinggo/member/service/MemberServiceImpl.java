@@ -114,40 +114,12 @@ public class MemberServiceImpl implements MemberService {
         // 전체 개수 조회
         long totalElements = memberMapper.countSalesByMemberId(memberId);
 
-        // 전체 페이지 수 계산
-        int totalPages = (totalElements == 0) ? 0 : (int) Math.ceil((double) totalElements / pageRequest.getSize());
-
-        // 현재 페이지 데이터 개수
-        int numberOfElements = content.size();
-
-        // 이전 페이지 존재 여부
-        boolean hasPrevious = pageRequest.getPage() > 1;
-
-        // 다음 페이지 존재 여부
-        boolean hasNext = pageRequest.getPage() < totalPages;
-
-        // 첫 페이지 여부
-        boolean first = pageRequest.getPage() == 1;
-
-        // 마지막 페이지 여부
-        boolean last = totalPages == 0 || pageRequest.getPage() == totalPages;
-
-        // 현재 페이지 데이터 비어있는지 여부
-        boolean empty = content.isEmpty();
-
-        return PageResponse.<MemberSalesItemResponse>builder()
-                .content(content)
-                .page(pageRequest.getPage())
-                .size(pageRequest.getSize())
-                .totalElements(totalElements)
-                .totalPages(totalPages)
-                .numberOfElements(numberOfElements)
-                .hasNext(hasNext)
-                .hasPrevious(hasPrevious)
-                .first(first)
-                .last(last)
-                .empty(empty)
-                .build();
+        return PageResponse.of(
+                content,
+                pageRequest.getPage(),
+                pageRequest.getSize(),
+                totalElements
+        );
     }
 
     // 회원 존재 여부 확인
