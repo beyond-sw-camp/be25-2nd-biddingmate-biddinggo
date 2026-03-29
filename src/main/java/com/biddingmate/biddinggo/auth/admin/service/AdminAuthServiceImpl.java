@@ -43,15 +43,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Override
     public void signup(AdminSignupRequestDto signupRequestDto) {
 
-        // 중복 이메일 체크
+        // 아이디 중복 체크
         if (memberMapper.selectMemberByUsername(signupRequestDto.getUsername()) != null) {
             throw new CustomException(ErrorType.DUPLICATE_USERNAME);
         }
 
+        // 이메일 중복 체크
         if (memberMapper.selectMemberByEmail(signupRequestDto.getEmail()) != null) {
             throw new CustomException(ErrorType.DUPLICATE_EMAIL);
         }
 
+        // 닉네임 중복 체크
         if (memberMapper.selectMemberByNickname(signupRequestDto.getNickname()) != null) {
             throw new CustomException(ErrorType.DUPLICATE_NICKNAME);
         }
@@ -67,6 +69,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 .build();
 
         memberMapper.insert(member);
+
+    }
+
+    @Override
+    public void logout(String bearerToken) {
+        String accessToken = jwtProvider.resolveToken(bearerToken);
+
+        jwtProvider.addBlacklist(accessToken);
 
     }
 

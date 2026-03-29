@@ -9,4 +9,5 @@ public interface AdminAuthService {
 
     void signup(AdminSignupRequestDto signupRequestDto);
 
+    void logout(String bearerToken);
 }

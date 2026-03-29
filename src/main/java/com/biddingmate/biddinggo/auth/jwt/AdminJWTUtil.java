@@ -42,8 +42,6 @@ public class AdminJWTUtil {
     }
 
 
-
-
     public String getJti(String token) {
 
         return getClaims(token).getId();

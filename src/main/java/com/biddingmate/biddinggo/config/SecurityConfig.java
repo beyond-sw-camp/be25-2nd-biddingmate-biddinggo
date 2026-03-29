@@ -1,5 +1,7 @@
 package com.biddingmate.biddinggo.config;
 
+import com.biddingmate.biddinggo.auth.handler.AccessDeniedHandlerImpl;
+import com.biddingmate.biddinggo.auth.handler.AuthenticationEntryPointImpl;
 import com.biddingmate.biddinggo.auth.jwt.JWTFilter;
 import com.biddingmate.biddinggo.auth.jwt.JWTUtil;
 import com.biddingmate.biddinggo.auth.oauth2.CustomSuccessHandler;
@@ -48,14 +50,11 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTFilter(jwtUtil,handlerExceptionResolver), OAuth2LoginAuthenticationFilter.class)
                 // 필터내부 예외 발생시 GlobalExceptionHandler으로 던짐
                 .exceptionHandling(exception -> exception
-                        // 인증 실패(404)시 GlobalExceptionHandler로 던짐
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            handlerExceptionResolver.resolveException(request,response,null,authException);
-                        })
-                        // 인가 거부(403)시 GlobalExceptionHandler로 던짐
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            handlerExceptionResolver.resolveException(request,response,null, accessDeniedException);
-                        })
+                        // 401 Unauthorized (인증 되지 않은 사용자가 리소스 접근시)
+                        .authenticationEntryPoint(new AuthenticationEntryPointImpl())
+
+                        // 403 Forbidden (인증된 사용자가 권한 없는 리소스 접근시)
+                        .accessDeniedHandler(new AccessDeniedHandlerImpl())
                 )
                 // oauth2 로그인 관련
                 .oauth2Login((oauth2)-> oauth2
