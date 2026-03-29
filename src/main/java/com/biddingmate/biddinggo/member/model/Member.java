@@ -25,7 +25,7 @@ public class Member {
     private String grade;
     private String role;
     private String status;
-    private String lastChangeNick;
+    private LocalDateTime lastChangeNick;
     private LocalDateTime createdAt;
 
     public void update(String name, String email) {
