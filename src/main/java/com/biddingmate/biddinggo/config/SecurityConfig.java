@@ -36,11 +36,11 @@ import java.util.List;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JWTUtil jwtUtil;
+
     private final AdminJWTUtil adminJWTUtil;
 
     @Bean
@@ -73,7 +73,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/","/login/**", "/oauth2/**",
                                 "/index.html",
-                                "/api/v1/payments/**", "/api/v1/files/**",
+                                "/api/v1/payments/**", "/api/v1/files/**", "/api/v1/addresses/**",
                                 "/api/v1/auctions/**", "/api/v1/inspections/**",
                                 "/api/v1/direct-inquiries/**", "/api/v1/admins/direct-inquiries/**",
                                 "/api/v1/bidding/**",
@@ -91,8 +91,6 @@ public class SecurityConfig {
                         ).permitAll()
                                 .anyRequest().authenticated()
                 );
-
-
         return http.build();
     }
 
@@ -124,8 +122,4 @@ public class SecurityConfig {
 
         return new BCryptPasswordEncoder();
     }
-
-
-
-
 }

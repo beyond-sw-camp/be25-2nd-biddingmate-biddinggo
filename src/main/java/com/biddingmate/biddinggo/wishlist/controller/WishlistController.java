@@ -6,7 +6,6 @@ import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.wishlist.dto.CreateWishlistRequest;
 import com.biddingmate.biddinggo.wishlist.dto.CreateWishlistResponse;
-import com.biddingmate.biddinggo.wishlist.dto.WishlistCountResponse;
 import com.biddingmate.biddinggo.wishlist.service.WishlistService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,16 +42,6 @@ public class WishlistController {
         CreateWishlistResponse result = wishlistService.createWishlist(request, memberId);
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 등록 성공", result);
-    }
-
-    @GetMapping("/count")
-    @Operation(summary = "경매 관심 수 조회", description = "경매의 관심 수를 조회합니다.")
-    public ResponseEntity<ApiResponse<WishlistCountResponse>> getWishlistCount(
-            @NotNull @RequestParam Long auctionId
-    ){
-        WishlistCountResponse result = wishlistService.getWishlistCount(auctionId);
-
-        return ApiResponse.of(HttpStatus.OK, null, "경매 관심 수 조회 성공", result);
     }
 
     @GetMapping("")

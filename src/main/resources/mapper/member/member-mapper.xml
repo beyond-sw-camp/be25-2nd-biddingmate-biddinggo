@@ -130,7 +130,7 @@
                  LEFT JOIN address a ON m.id = a.member_id
         WHERE m.id = #{memberId}
     </select>
-
+  
 <!-- auth 아아디조회 -->
     <select id="selectMemberByUsername" parameterType="String" resultType="Member">
 
@@ -222,4 +222,36 @@
                  )
     </insert>
 
+    <select id="countByNickname" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM member
+        WHERE nickname =#{nickname}
+    </select>
+
+    <update id="updateProfile" parameterType="map">
+        UPDATE member
+        <set>
+            <if test="request.nickname != null and request.nickname != ''">
+                nickname = #{request.nickname},
+                last_change_nick = NOW(),
+            </if>
+            <if test="request.imageUrl != null and request.imageUrl != ''">
+                image_url = #{request.imageUrl},
+            </if>
+            <if test="request.bankCode != null and request.bankCode != ''">
+                bank_code = #{request.bankCode},
+            </if>
+            <if test="request.bankAccount != null and request.bankAccount != ''">
+                bank_account = #{request.bankAccount},
+            </if>
+        </set>
+        WHERE id = #{memberId}
+    </update>
+
+    <update id="deleteMember" parameterType="long">
+        UPDATE member
+        SET status = 'DELETED'
+        WHERE id = #{memberId}
+    </update>
+  
 </mapper>

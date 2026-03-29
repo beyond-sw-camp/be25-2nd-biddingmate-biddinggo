@@ -17,6 +17,7 @@ public enum ErrorType {
 
     // 페이징 처리
     INVALID_SORT_ORDER("paging-001", "정렬 방향이 존재하질 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_SORT_BY("paging-002", "정렬 기준이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
     // 도메인 별 예시
     // auth
@@ -82,6 +83,13 @@ public enum ErrorType {
     ADMIN_INQUIRY_NOT_FOUND("admin-inquiry-003", "해당 1대1 문의가 존재하질 않습니다.", HttpStatus.NOT_FOUND),
     ADMIN_INQUIRY_ALREADY_ANSWERED("admin-inquiry-004", "해당 1대1 문의는 이미 답변이 완료된 상태입니다.", HttpStatus.CONFLICT),
 
+    // 배송지 관리
+    ADDRESS_CREATED_FAIL("address-001", "배송지 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
+    ADDRESS_MAX_COUNT_EXCEEDED("address-002", "배송지는 최대 3개까지 등록 가능합니다.", HttpStatus.CONFLICT),
+    ADDRESS_NOT_FOUND("address-003", "해당 배송지는 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    ADDRESS_UPDATE_DEFAULT_FAIL("address-004", "기본 배송지 변경에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ADDRESS_DELETE_DEFAULT_FAIL("address-005", "배송지 삭제를 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // 경매 문의
     AUCTION_INQUIRY_CONTENT_INVALID("auction-inquiry-001", "문의 내용이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_INQUIRY_CREATE_FAIL("auction-inquiry-002", "경매 문의 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -89,8 +97,12 @@ public enum ErrorType {
     AUCTION_INQUIRY_NOT_FOUND("auction-inquiry-004", "해당 경매 문의가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     AUCTION_INQUIRY_ALREADY_ANSWERED("auction-inquiry-005", "이미 답변이 등록된 문의입니다.", HttpStatus.CONFLICT),
     AUCTION_INQUIRY_UPDATE_FAIL("auction-inquiry-006", "경매 문의 답변 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // 회원 정보
     MEMBER_NOT_FOUND("member-001", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
+    INVALID_NICKNAME_CHANGE_PERIOD("member-002", "닉네임은 30일 이후에 변경할 수 있습니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATED_NICKNAME("member-003", "이미 사용 중인 닉네임입니다.", HttpStatus.BAD_REQUEST),
+    ALREADY_DELETED_MEMBER("member-004", "탈퇴한 회원입니다.", HttpStatus.BAD_REQUEST),
 
     // 입찰
     BID_SAVE_FAILED("bid-001", "입찰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

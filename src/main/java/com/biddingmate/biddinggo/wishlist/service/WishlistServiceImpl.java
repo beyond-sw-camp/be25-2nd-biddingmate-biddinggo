@@ -2,14 +2,12 @@ package com.biddingmate.biddinggo.wishlist.service;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
-import com.biddingmate.biddinggo.auction.service.AuctionService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.wishlist.dto.CreateWishlistRequest;
 import com.biddingmate.biddinggo.wishlist.dto.CreateWishlistResponse;
-import com.biddingmate.biddinggo.wishlist.dto.WishlistCountResponse;
 import com.biddingmate.biddinggo.wishlist.mapper.WishlistMapper;
 import com.biddingmate.biddinggo.wishlist.model.Wishlist;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ import java.util.List;
 public class WishlistServiceImpl implements WishlistService {
     private final AuctionMapper auctionMapper;
     private final WishlistMapper wishlistMapper;
-    private final AuctionService auctionService;
 
     @Override
     @Transactional
@@ -57,20 +54,6 @@ public class WishlistServiceImpl implements WishlistService {
                 .memberId(wishlist.getMemberId())
                 .auctionId(wishlist.getAuctionId())
                 .createdAt(wishlist.getCreatedAt())
-                .build();
-    }
-
-    @Override
-    public WishlistCountResponse getWishlistCount(Long auctionId) {
-        if(auctionMapper.findById(auctionId) == null){
-            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
-        }
-
-        int count = wishlistMapper.getCountByAuctionId(auctionId);
-
-        return WishlistCountResponse.builder()
-                .auctionId(auctionId)
-                .count(count)
                 .build();
     }
 

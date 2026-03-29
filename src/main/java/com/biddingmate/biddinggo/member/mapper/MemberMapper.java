@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
+import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import org.apache.ibatis.annotations.Mapper;
@@ -36,6 +37,14 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // 이메일을 통한 사용자 조회(auth)
     Member selectMemberByEmail(@Param("email") String email);
 
-
     Member selectMemberByNickname(@Param("nickname") String nickname);
+
+    void updateProfile(@Param("memberId") Long memberId, @Param("request") MemberProfileUpdateRequest request);
+
+    // 수정할 닉네임이 사용 중 인지 확인
+    int countByNickname(@Param("nickname") String nickname);
+
+    // member status를 DELETED로 변경
+    void deleteMember(Long memberId);
+
 }

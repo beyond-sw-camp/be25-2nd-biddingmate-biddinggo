@@ -14,7 +14,7 @@ public class AuctionInquiry {
     private Long auctionId;
     private Long writerId;
     private Long answererId;
-
+    private String title;
     private String content;
     private String answer;
 

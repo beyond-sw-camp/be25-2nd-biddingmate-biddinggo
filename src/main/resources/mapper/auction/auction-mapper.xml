@@ -3,6 +3,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.biddingmate.biddinggo.auction.mapper.AuctionMapper">
 
+    <resultMap id="auctionListResultMap" type="com.biddingmate.biddinggo.auction.dto.AuctionListResponse">
+        <id property="auctionId" column="auction_id"/>
+        <result property="itemId" column="item_id"/>
+        <result property="brand" column="brand"/>
+        <result property="name" column="name"/>
+        <result property="status" column="status"/>
+        <result property="startPrice" column="start_price"/>
+        <result property="buyNowPrice" column="buy_now_price"/>
+        <result property="bidCount" column="bid_count"/>
+        <result property="wishCount" column="wish_count"/>
+        <result property="endDate" column="end_date"/>
+        <result property="representativeImageUrl" column="representative_image_url"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
     <resultMap id="auctionDetailResultMap" type="com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse">
         <id property="auctionId" column="auction_id"/>
         <result property="sellerId" column="seller_id"/>
@@ -104,6 +119,61 @@
         INNER JOIN auction_item ai ON a.item_id = ai.id
         INNER JOIN category c3 ON ai.category_id = c3.id
         WHERE a.id = #{auctionId}
+    </select>
+
+    <select id="findAuctionList" parameterType="map" resultMap="auctionListResultMap">
+        SELECT
+            a.id AS auction_id,
+            ai.id AS item_id,
+            ai.brand,
+            ai.name,
+            a.status,
+            a.start_price,
+            a.buy_now_price,
+            a.bid_count,
+            a.wish_count,
+            a.end_date,
+            ii.url AS representative_image_url,
+            a.created_at
+        FROM auction a
+        INNER JOIN auction_item ai ON a.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id
+            AND ii.display_order = (
+                SELECT MIN(ii2.display_order)
+                FROM item_image ii2
+                WHERE ii2.item_id = ai.id
+            )
+        WHERE 1 = 1
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        <if test="sellerId != null">
+            AND a.seller_id = #{sellerId}
+        </if>
+        <if test="categoryId != null">
+            AND ai.category_id = #{categoryId}
+        </if>
+        ORDER BY
+        <choose>
+            <when test='sortBy == "WISH_COUNT"'>a.wish_count ${order}, a.created_at DESC</when>
+            <otherwise>a.created_at ${order}</otherwise>
+        </choose>
+    </select>
+
+    <select id="countAuctionList" parameterType="map" resultType="_int">
+        SELECT COUNT(*)
+        FROM auction a
+        INNER JOIN auction_item ai ON a.item_id = ai.id
+        WHERE 1 = 1
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        <if test="sellerId != null">
+            AND a.seller_id = #{sellerId}
+        </if>
+        <if test="categoryId != null">
+            AND ai.category_id = #{categoryId}
+        </if>
     </select>
 
     <select id="findById" parameterType="long" resultType="com.biddingmate.biddinggo.auction.model.Auction">

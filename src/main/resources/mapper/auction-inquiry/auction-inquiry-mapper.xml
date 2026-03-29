@@ -10,12 +10,14 @@
             auction_id,
             writer_id,
             answerer_id,
+            title,
             content,
             created_at
         ) VALUES (
                      #{auctionId},
                      #{writerId},
                      #{answererId},
+                     #{title},
                      #{content},
                      #{createdAt}
                  )
@@ -27,6 +29,7 @@
             auction_id AS auctionId,
             writer_id AS writerId,
             answerer_id AS answererId,
+            title,
             content,
             answer,
             status,
@@ -43,4 +46,25 @@
             status      = #{status}
         WHERE id = #{id}
           AND answer IS NULL </update>
+
+    <select id="selectInquiryList" resultType="AuctionInquiryView">
+        SELECT
+            ai.id,
+            ai.title,
+            ai.content,
+            m.nickname AS writerName,
+            ai.answer,
+            ai.status,
+            ai.created_at AS createdAt
+        FROM auction_inquiry ai
+                 LEFT JOIN member m ON ai.writer_id = m.id
+        WHERE ai.auction_id = #{auctionId}
+        ORDER BY ai.created_at DESC
+    </select>
+
+    <select id="selectInquiryCount" resultType="int">
+        SELECT COUNT(*)
+        FROM auction_inquiry
+        WHERE auction_id = #{auctionId}
+    </select>
 </mapper>

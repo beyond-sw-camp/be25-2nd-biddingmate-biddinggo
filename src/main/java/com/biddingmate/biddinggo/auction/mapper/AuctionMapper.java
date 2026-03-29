@@ -1,17 +1,31 @@
 package com.biddingmate.biddinggo.auction.mapper;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.RowBounds;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Mapper
 public interface AuctionMapper extends IMybatisCRUD<Auction> {
     AuctionDetailResponse findDetailById(Long auctionId);
+
+    List<AuctionListResponse> findAuctionList(RowBounds rowBounds,
+                                              @Param("status") AuctionStatus status,
+                                              @Param("sellerId") Long sellerId,
+                                              @Param("categoryId") Long categoryId,
+                                              @Param("sortBy") String sortBy,
+                                              @Param("order") String order);
+
+    int countAuctionList(@Param("status") AuctionStatus status,
+                         @Param("sellerId") Long sellerId,
+                         @Param("categoryId") Long categoryId);
 
     int updateAuction(Auction auction);
 
