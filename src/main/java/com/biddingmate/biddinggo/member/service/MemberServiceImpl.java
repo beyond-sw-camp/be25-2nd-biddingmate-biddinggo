@@ -115,40 +115,24 @@ public class MemberServiceImpl implements MemberService {
         // 전체 개수 조회
         long totalElements = memberMapper.countPurchasesByMemberId(memberId);
 
-        // 전체 페이지 수
-        int totalPages = (totalElements == 0) ? 0 : (int) Math.ceil((double) totalElements / pageRequest.getSize());
+        PageResponse<MemberPurchaseItemResponse> response = PageResponse.of(
+                content,
+                pageRequest.getPage(),
+                pageRequest.getSize(),
+                totalElements
+        );
 
-        // 현재 페이지에 포함된 데이터 개수
-        int numberOfElements = content.size();
+        int page = pageRequest.getPage();
+        int totalPages = response.getTotalPages();
 
-        // 이전 페이지 존재 여부
-        boolean hasPrevious = pageRequest.getPage() > 1;
+        response.setHasPrevious(page > 1);
+        response.setHasNext(page < totalPages);
+        response.setFirst(page == 1);
+        response.setLast(totalPages == 0 || page == totalPages);
+        response.setEmpty(content.isEmpty());
+        response.setNumberOfElements(content.size());
 
-        // 다음 페이지 존재 여부
-        boolean hasNext = pageRequest.getPage() < totalPages;
-
-        // 첫 페이지 여부
-        boolean first = pageRequest.getPage() == 1;
-
-        // 마지막 페이지 여부
-        boolean last = totalPages == 0 || pageRequest.getPage() == totalPages;
-
-        // 현재 페이지 데이터 비어있는지 여부
-        boolean empty = content.isEmpty();
-
-        return PageResponse.<MemberPurchaseItemResponse>builder()
-                .content(content)
-                .page(pageRequest.getPage())
-                .size(pageRequest.getSize())
-                .totalElements(totalElements)
-                .totalPages(totalPages)
-                .hasNext(hasNext)
-                .hasPrevious(hasPrevious)
-                .first(first)
-                .last(last)
-                .empty(empty)
-                .numberOfElements(numberOfElements)
-                .build();
+        return response;
     }
 
     // 회원 존재 여부 확인
