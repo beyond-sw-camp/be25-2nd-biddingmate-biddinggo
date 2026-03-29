@@ -2,9 +2,11 @@ package com.biddingmate.biddinggo.auth.admin.service;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+@Service
 public class JWTCookieServiceImpl implements JWTCookieService {
     @Override
     public ResponseCookie createRefreshTokenCookie(String refreshToken, Duration duration) {
@@ -16,6 +18,11 @@ public class JWTCookieServiceImpl implements JWTCookieService {
                 .maxAge(duration)
                 .build();
 
+    }
+
+    @Override
+    public ResponseCookie deleteRefreshTokenCookie() {
+        return createRefreshTokenCookie("", Duration.ofSeconds(0));
     }
 
     @Override

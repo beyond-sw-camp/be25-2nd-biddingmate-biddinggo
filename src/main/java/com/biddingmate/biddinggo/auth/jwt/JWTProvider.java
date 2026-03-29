@@ -50,8 +50,15 @@ public class JWTProvider {
 
         return accessToken != null
                 && adminJWTUtil.validateToken(accessToken)
-                && isBlacklisted(accessToken);
+                && !isBlacklisted(accessToken)
+                && isAccessToken(accessToken);
 
+
+    }
+
+    private boolean isAccessToken(String accessToken) {
+
+        return adminJWTUtil.getTokenType(accessToken).equals("access");
     }
 
     // securityContext 객체에 저장될 Authentication 객체를 생성
@@ -105,6 +112,16 @@ public class JWTProvider {
                 .set(refreshKey, refreshToken, REFRESH_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
 
         return refreshToken;
+
+    }
+
+    public boolean isValidRefresh(String refreshToken) {
+
+        String username = adminJWTUtil.getUsername(refreshToken);
+        String storedRefreshToken =
+                redisTemplate.opsForValue().get(String.format("refresh:%S", username));
+
+        return storedRefreshToken != null && storedRefreshToken.equals(refreshToken);
 
     }
 }

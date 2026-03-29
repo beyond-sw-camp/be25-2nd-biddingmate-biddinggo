@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -35,7 +36,7 @@ public class AdminAuthController {
     @Operation(summary = "로그인")
     @PostMapping("/login")
     public ResponseEntity<BaseResponseDto<AdminLoginResponse>> login(
-        @Valid @RequestBody AdminLoginRequestDto loginRequestDto) {
+            @Valid @RequestBody AdminLoginRequestDto loginRequestDto) {
 
         AdminLoginResponse loginResponse = authService.login(
                 loginRequestDto.getUsername(),
@@ -57,9 +58,9 @@ public class AdminAuthController {
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<BaseResponseDto<String>> signup (
+    public ResponseEntity<BaseResponseDto<String>> signup(
             @Valid @RequestBody AdminSignupRequestDto signupRequestDto
-            ) {
+    ) {
 
         authService.signup(signupRequestDto);
 
@@ -75,10 +76,25 @@ public class AdminAuthController {
     ) {
 
         authService.logout(bearerToken);
+        ResponseCookie responseCookie = jwtCookieService.deleteRefreshTokenCookie();
+        HttpHeaders headers = jwtCookieService.createRefreshTokenCookieHeaders(responseCookie);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .headers(headers)
+                .build();
 
     }
 
+    @PostMapping("/refresh")
+    @Operation(summary = "토근 재발급")
+    public ResponseEntity<BaseResponseDto<AdminLoginResponse>> refreshToken(
+            @Parameter(hidden = true) @CookieValue(name = "refresh_token", defaultValue = "") String refreshToken) {
 
+        AdminLoginResponse loginResponse = authService.refreshAccessToken(refreshToken);
+
+        return ResponseEntity.ok(new BaseResponseDto<>(HttpStatus.OK, loginResponse));
+
+
+    }
 }

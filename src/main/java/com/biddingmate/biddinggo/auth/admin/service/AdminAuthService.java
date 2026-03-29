@@ -12,4 +12,6 @@ public interface AdminAuthService {
     void logout(String bearerToken);
 
     String createRefreshToken(String username);
+
+    AdminLoginResponse refreshAccessToken(String refreshToken);
 }

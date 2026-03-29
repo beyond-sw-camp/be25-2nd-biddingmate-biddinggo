@@ -86,6 +86,26 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return jwtProvider.createRefreshToken(username);
     }
 
+    @Override
+    public AdminLoginResponse refreshAccessToken(String refreshToken) {
+
+        if (refreshToken.isBlank() || !adminJWTUtil.validateToken(refreshToken)) {
+
+            throw new CustomException(ErrorType.REFRESH_TOKEN_INVALID);
+        }
+
+        if (!jwtProvider.isValidRefresh(refreshToken)) {
+
+            throw new CustomException(ErrorType.REFRESH_TOKEN_INVALID);
+
+        }
+
+        Member member = memberMapper.selectMemberByUsername(adminJWTUtil.getUsername(refreshToken));
+
+        return createLoginResponse(member);
+
+    }
+
     private AdminLoginResponse createLoginResponse(Member member) {
 
         // 사용자 권한 추출
