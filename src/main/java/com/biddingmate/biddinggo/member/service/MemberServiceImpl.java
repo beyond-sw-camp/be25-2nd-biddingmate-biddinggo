@@ -122,16 +122,16 @@ public class MemberServiceImpl implements MemberService {
         int numberOfElements = content.size();
 
         // 이전 페이지 존재 여부
-        boolean hasPrevious = pageRequest.getPage() > 0;
+        boolean hasPrevious = pageRequest.getPage() > 1;
 
         // 다음 페이지 존재 여부
-        boolean hasNext = pageRequest.getPage() < totalPages - 1;
+        boolean hasNext = pageRequest.getPage() < totalPages;
 
         // 첫 페이지 여부
-        boolean first = pageRequest.getPage() == 0;
+        boolean first = pageRequest.getPage() == 1;
 
         // 마지막 페이지 여부
-        boolean last = totalPages == 0 || pageRequest.getPage() == totalPages - 1;
+        boolean last = totalPages == 0 || pageRequest.getPage() == totalPages;
 
         // 현재 페이지 데이터 비어있는지 여부
         boolean empty = content.isEmpty();
