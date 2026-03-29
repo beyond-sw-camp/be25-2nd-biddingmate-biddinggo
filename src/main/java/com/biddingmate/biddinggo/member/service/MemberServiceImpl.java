@@ -103,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
         // 회원 존재 여부 확인
         getMember(memberId);
 
-        // 정렬 값이 없는 경우
+        // 정렬값은 최신순으로
         if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
             pageRequest.setOrder("DESC");
         }
@@ -118,8 +118,10 @@ public class MemberServiceImpl implements MemberService {
         // 전체 페이지 수
         int totalPages = (totalElements == 0) ? 0 : (int) Math.ceil((double) totalElements / pageRequest.getSize());
 
+        // 현재 페이지에 포함된 데이터 개수
         int numberOfElements = content.size();
 
+        // 이전 페이지 존재 여부
         boolean hasPrevious = pageRequest.getPage() > 0;
 
         // 다음 페이지 존재 여부
