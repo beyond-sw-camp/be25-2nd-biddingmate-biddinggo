@@ -110,8 +110,17 @@ public enum ErrorType {
     WISHLIST_SAVE_FAIL("wishlist-001", "관심 경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     WISHLIST_ALREADY_EXISTS("wishlist-002", "해당 관심 경매가 이미 존재합니다.", HttpStatus.BAD_REQUEST),
     WISHLIST_NOT_FOUND("wishlist-003", "해당 관심 경매가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
-    WISHLIST_DELETE_FAIL("wishlist-004", "관심 경매 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    WISHLIST_DELETE_FAIL("wishlist-004", "관심 경매 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
+    // 낙찰
+    DEAL_NOT_FOUND("review-007", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    // 리뷰
+    REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ALREADY_REVIEWED("review-002", "이미 해당 거래에 대한 리뷰를 작성했습니다.", HttpStatus.BAD_REQUEST),
+    REVIEW_NOT_FOUND("review-003", "해당 리뷰가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    REVIEW_DELETE_FAIL("review-004", "리뷰 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    NOT_THE_WINNER("review-005", "낙찰자만 해당 경매의 리뷰를 남길 수 있습니다.", HttpStatus.FORBIDDEN),
+    SELLER_NOT_FOUND("review-006", "해당 경매의 판매자 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
     private final String errorCode;
     private final String message;
     private final HttpStatus httpStatus;
