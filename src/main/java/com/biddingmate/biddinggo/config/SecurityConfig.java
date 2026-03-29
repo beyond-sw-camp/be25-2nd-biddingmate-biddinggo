@@ -4,13 +4,10 @@ import com.biddingmate.biddinggo.auth.handler.AccessDeniedHandlerImpl;
 import com.biddingmate.biddinggo.auth.handler.AuthenticationEntryPointImpl;
 import com.biddingmate.biddinggo.auth.jwt.AdminJWTAuthenticationFilter;
 import com.biddingmate.biddinggo.auth.jwt.AdminJWTUtil;
-import com.biddingmate.biddinggo.auth.jwt.JWTFilter;
 import com.biddingmate.biddinggo.auth.jwt.JWTProvider;
-import com.biddingmate.biddinggo.auth.jwt.JWTUtil;
 import com.biddingmate.biddinggo.auth.oauth2.CustomSuccessHandler;
 import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -21,7 +18,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,7 +36,6 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final HandlerExceptionResolver handlerExceptionResolver;
-    private final JWTUtil jwtUtil;
     private final AdminJWTUtil adminJWTUtil;
 
     @Bean
@@ -54,7 +49,6 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 무한 루프 방지
                 .addFilterBefore(new AdminJWTAuthenticationFilter(jWTProvider), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new JWTFilter(jwtUtil,handlerExceptionResolver), AdminJWTAuthenticationFilter.class)
                 // 필터내부 예외 발생시 GlobalExceptionHandler으로 던짐
                 .exceptionHandling(exception -> exception
                         // 401 Unauthorized (인증 되지 않은 사용자가 리소스 접근시)
@@ -72,7 +66,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/","/login/**", "/oauth2/**",
-                                "/index.html",
+                                "/index.html","/success.html", "/register-info.html",
                                 "/api/v1/payments/**", "/api/v1/files/**",
                                 "/api/v1/auctions/**", "/api/v1/inspections/**",
                                 "/api/v1/direct-inquiries/**", "/api/v1/admins/direct-inquiries/**",
@@ -87,7 +81,8 @@ public class SecurityConfig {
                                 "/api/v1/bids/**",
                                 "/api/v1/users/me/profile",
                                 "/api/v1/admin/auth/login",
-                                "/api/v1/admin/auth/signup"
+                                "/api/v1/admin/auth/signup",
+                                "/api/v1/auth/check"
                         ).permitAll()
                                 .anyRequest().authenticated()
                 );
@@ -103,7 +98,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("*"));
-        configuration.setAllowCredentials(false);
+        configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

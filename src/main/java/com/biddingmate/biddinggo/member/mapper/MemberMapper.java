@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.member.mapper;
 
+import com.biddingmate.biddinggo.auth.dto.SocialInfoUpdateDto;
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
@@ -36,6 +37,11 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // 이메일을 통한 사용자 조회(auth)
     Member selectMemberByEmail(@Param("email") String email);
 
-
     Member selectMemberByNickname(@Param("nickname") String nickname);
+
+    int saveMember(Member member);
+
+    int updateMember(Member member);
+
+    void updateMemberInfo(SocialInfoUpdateDto updateDto);
 }
