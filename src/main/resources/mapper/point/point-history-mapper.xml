@@ -22,4 +22,22 @@
                );
     </insert>
 
+    <!-- 회원별 포인트 히스토리 조회 -->
+    <select id="findByMemberId" parameterType="map" resultType="PointHistoryDto">
+        SELECT id,
+               type,
+               amount,
+               created_at
+        FROM point_history
+        WHERE member_id = #{memberId}
+        ORDER BY created_at ${order}
+    </select>
+
+    <!-- 회원별 총 건수 조회 -->
+    <select id="countByMemberId" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM point_history
+        WHERE member_id = #{memberId}
+    </select>
+
 </mapper>

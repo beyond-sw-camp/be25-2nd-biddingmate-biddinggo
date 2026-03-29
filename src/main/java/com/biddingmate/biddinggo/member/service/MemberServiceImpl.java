@@ -11,6 +11,7 @@ import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -92,6 +93,12 @@ public class MemberServiceImpl implements MemberService {
 
         // 탈퇴 처리 (soft delete)
         memberMapper.deleteMember(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long getCurrentPoint(Long memberId) {
+        return getMember(memberId).getPoint();
     }
 
     // 회원 존재 여부 확인

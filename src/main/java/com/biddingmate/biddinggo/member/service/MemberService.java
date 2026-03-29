@@ -12,4 +12,6 @@ public interface MemberService {
     MemberProfileResponse updateMyProfile(Long memberId, MemberProfileUpdateRequest request);
 
     void deleteMyAccount(Long memberId);
+
+    long getCurrentPoint(Long memberId);
 }
