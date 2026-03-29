@@ -21,6 +21,7 @@ public class JWTProvider {
     private final UserDetailsService userDetailsService;
     private final RedisTemplate<String, String> redisTemplate;
     private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 30; // 30분
+    private static final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60L * 24L; // 1일
 
     public String createAccessToken(String username, List<String> authorities) {
 
@@ -81,5 +82,29 @@ public class JWTProvider {
         String blacklistKey = String.format("blacklist:%S", adminJWTUtil.getJti(accessToken));
 
         return redisTemplate.hasKey(blacklistKey);
+    }
+
+    // 리프레시 토큰 제거
+    public void deleteRefreshToken(String accessToken) {
+        String username = adminJWTUtil.getUsername(accessToken);
+
+        redisTemplate.delete(String.format("refresh:%S", username));
+
+    }
+
+    // 리프레시 토큰 생성
+    public String createRefreshToken(String username) {
+
+        Map<String, Object> claims =
+                Map.of("username", username, "token_type", "refresh");
+
+        String refreshToken = adminJWTUtil.createJwtToken(claims, REFRESH_TOKEN_EXPIRATION);
+        String refreshKey = String.format("refresh:%S", username);
+
+        redisTemplate.opsForValue()
+                .set(refreshKey, refreshToken, REFRESH_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+
+        return refreshToken;
+
     }
 }

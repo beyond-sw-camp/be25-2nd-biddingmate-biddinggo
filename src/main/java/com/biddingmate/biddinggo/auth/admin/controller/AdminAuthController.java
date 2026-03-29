@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auth.admin.controller;
 import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginRequestDto;
 import com.biddingmate.biddinggo.auth.admin.dto.AdminSignupRequestDto;
 import com.biddingmate.biddinggo.auth.admin.service.AdminAuthService;
+import com.biddingmate.biddinggo.auth.admin.service.JWTCookieService;
 import com.biddingmate.biddinggo.common.dto.BaseResponseDto;
 import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,13 +11,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/v1/admin/auth")
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminAuthController {
 
     private final AdminAuthService authService;
+    private final JWTCookieService jwtCookieService;
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
@@ -37,7 +43,15 @@ public class AdminAuthController {
 
         );
 
-        return ResponseEntity.ok(new BaseResponseDto<>(HttpStatus.OK, loginResponse));
+        String refreshToken = authService.createRefreshToken(loginResponse.getUsername());
+        ResponseCookie cookie =
+                jwtCookieService.createRefreshTokenCookie(refreshToken, Duration.ofDays(1));
+        HttpHeaders headers = jwtCookieService.createRefreshTokenCookieHeaders(cookie);
+
+        return ResponseEntity.
+                ok()
+                .headers(headers)
+                .body(new BaseResponseDto<>(HttpStatus.OK, loginResponse));
 
     }
 

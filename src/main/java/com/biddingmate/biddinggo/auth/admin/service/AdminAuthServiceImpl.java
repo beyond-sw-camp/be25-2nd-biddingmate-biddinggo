@@ -77,7 +77,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         String accessToken = jwtProvider.resolveToken(bearerToken);
 
         jwtProvider.addBlacklist(accessToken);
+        jwtProvider.deleteRefreshToken(accessToken);
 
+    }
+
+    @Override
+    public String createRefreshToken(String username) {
+        return jwtProvider.createRefreshToken(username);
     }
 
     private AdminLoginResponse createLoginResponse(Member member) {
