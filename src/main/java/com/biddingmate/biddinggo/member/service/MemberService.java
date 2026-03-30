@@ -21,4 +21,5 @@ public interface MemberService {
 
     long getCurrentPoint(Long memberId);
 
+    void deductPoint(Long memberId, Long amount);
 }
