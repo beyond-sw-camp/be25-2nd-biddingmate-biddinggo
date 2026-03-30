@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>추가 정보 입력 - BiddingGo</title>
+    <style>
+        /* 기존 스타일 유지 및 폼 스타일 추가 */
+        body { font-family: 'Pretendard', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f5f6f7; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; width: 360px; }
+        h2 { margin-bottom: 10px; color: #333; }
+        p { color: #666; font-size: 14px; margin-bottom: 25px; }
+
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .form-group input:focus { outline: none; border-color: #2e7d32; }
+
+        .btn-submit { width: 100%; padding: 13px; background-color: #2e7d32; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+        .btn-submit:hover { background-color: #1b5e20; }
+
+        #message { margin-top: 15px; font-size: 13px; font-weight: bold; }
+        .error { color: #d32f2f; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>👋 환영합니다!</h2>
+    <p>서비스 이용을 위해 추가 정보를 입력해주세요.</p>
+
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" placeholder="실명을 입력하세요" required>
+        </div>
+        <div class="form-group">
+            <label for="nickname">닉네임</label>
+            <input type="text" id="nickname" placeholder="사용할 닉네임을 입력하세요" required>
+        </div>
+
+        <button type="submit" class="btn-submit">가입 완료하기</button>
+    </form>
+
+    <div id="message"></div>
+</div>
+
+<script>
+    let accessToken = "";
+
+    window.onload = function() {
+        // 1. URL에서 토큰 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        accessToken = urlParams.get('accessToken')?.trim();
+
+        if (!accessToken) {
+            document.getElementById('message').innerHTML = "<span class='error'>❌ 인증 토큰이 없습니다. 다시 로그인해주세요.</span>";
+            document.querySelector('.btn-submit').disabled = true;
+        }
+    };
+
+    // 2. 폼 제출 이벤트 처리
+    document.getElementById('registerForm').onsubmit = async function(e) {
+        e.preventDefault();
+
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = "처리 중...";
+
+        const registrationData = {
+            name: document.getElementById('name').value,
+            nickname: document.getElementById('nickname').value,
+        };
+
+        try {
+            // 3. 서버의 정보 업데이트 API 호출 (경로는 실제 컨트롤러에 맞게 수정)
+            const response = await fetch('/api/v1/auth/register', {
+                method: 'PATCH', // 정보 수정을 위한 PATCH 요청
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}` // 헤더에 토큰 포함
+                },
+                body: JSON.stringify(registrationData)
+            });
+
+            if (response.ok) {
+                alert("정보 등록이 완료되었습니다!");
+                // 4. 등록 성공 시 메인 또는 성공 페이지로 이동
+                window.location.href = `/success.html?accessToken=${accessToken}`;
+            } else {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `에러 발생: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("등록 에러:", error);
+            messageDiv.innerHTML = `<span class='error'>❌ 등록 실패: ${error.message}</span>`;
+        }
+    };
+</script>
+</body>
+</html>

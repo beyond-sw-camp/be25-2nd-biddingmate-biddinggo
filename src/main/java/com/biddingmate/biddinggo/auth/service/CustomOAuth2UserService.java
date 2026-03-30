@@ -5,7 +5,8 @@ import com.biddingmate.biddinggo.auth.dto.GoogleResponse;
 import com.biddingmate.biddinggo.auth.dto.KakaoResponse;
 import com.biddingmate.biddinggo.auth.dto.MemberDto;
 import com.biddingmate.biddinggo.auth.dto.OAuth2Response;
-import com.biddingmate.biddinggo.auth.mapper.AuthMemberMapper;
+import com.biddingmate.biddinggo.auth.mapper.AuthSocialMapper;
+import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final AuthMemberMapper authMemberMapper;
+    private final MemberMapper memberMapper;
+    private final AuthSocialMapper authSocialMapper;
 
     @Override
     @Transactional
@@ -51,30 +53,32 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String provider = oAuth2Response.getProvider();
         String providerId = oAuth2Response.getProviderId();
         // JWT에서 식별자로 쓸 이름 -> 우리 db엔 social_account에 각각 들어간다.
-        String membername = oAuth2Response.getProvider()+oAuth2Response.getProviderId();
+        String username = oAuth2Response.getProvider()+oAuth2Response.getProviderId();
 
-        Member member = authMemberMapper.findBySocialInfo(provider,providerId);
+        Member member = authSocialMapper.findBySocialInfo(provider,providerId);
 
         if (member == null) {
 
             member = Member.builder()
+                    .username(username)
                     .email(oAuth2Response.getEmail())
                     .name(oAuth2Response.getName())
+                    .nickname(null)
                     .role("USER")
                     .build();
 
-            authMemberMapper.saveMember(member);
-            authMemberMapper.saveSocialAccount(member.getId(), provider, providerId);
+            memberMapper.saveMember(member);
+            authSocialMapper.saveSocialAccount(member.getId(), provider, providerId);
 
         } else {
 
             member.update(oAuth2Response.getName(), oAuth2Response.getEmail());
-            authMemberMapper.updateMember(member);
+            memberMapper.updateMember(member);
 
         }
 
         MemberDto memberDto = new MemberDto();
-        memberDto.setMembername(membername);
+        memberDto.setMembername(username);
         memberDto.setRole(member.getRole());
         memberDto.setName(member.getName());
 

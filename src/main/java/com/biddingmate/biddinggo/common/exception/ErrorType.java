@@ -30,6 +30,7 @@ public enum ErrorType {
     DUPLICATE_EMAIL("auth-007","이미 가입된 이메일입니다.",HttpStatus.BAD_REQUEST),
     DUPLICATE_NICKNAME("auth-008","이미 사용 중인 닉네임입니다.",HttpStatus.BAD_REQUEST),
     REFRESH_TOKEN_INVALID("auth-009","리프레쉬 토큰이 유효하지 않습니다.",HttpStatus.BAD_REQUEST),
+    USER_NOT_FOUND("auth-010","필수 정보를 입력할 사용자를 찾지 못했습니다.",HttpStatus.NOT_FOUND),
 
 
     // 결제

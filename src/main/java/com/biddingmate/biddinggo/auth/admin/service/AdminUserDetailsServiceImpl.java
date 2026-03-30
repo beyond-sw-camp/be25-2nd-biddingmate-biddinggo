@@ -26,8 +26,6 @@ public class AdminUserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(String.format("%s not found",username));
         }
 
-        log.info("Username : {}", member.getUsername());
-
         return member;
     }
 }
