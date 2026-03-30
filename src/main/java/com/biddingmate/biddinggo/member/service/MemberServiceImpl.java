@@ -9,6 +9,7 @@ import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
@@ -102,15 +103,16 @@ public class MemberServiceImpl implements MemberService {
     public PageResponse<MemberSalesItemResponse> getMySales(Long memberId, BasePageRequest pageRequest) {
 
         // 회원 존재 여부 확인
-        memberExists(memberId);
+        getMember(memberId);
 
-        // 최신순으로 정렬
+        // 정렬값은 최신순으로
         if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
             pageRequest.setOrder("DESC");
         }
 
         // 판매내역 목록 조회
-        List<MemberSalesItemResponse> content = memberMapper.findSalesByMember(memberId, pageRequest);
+        List<MemberSalesItemResponse> content =
+                memberMapper.findSalesByMember(memberId, pageRequest);
 
         // 전체 개수 조회
         long totalElements = memberMapper.countSalesByMemberId(memberId);
@@ -121,10 +123,49 @@ public class MemberServiceImpl implements MemberService {
                 pageRequest.getSize(),
                 totalElements
         );
-      
+    }
+
+    @Override
+    public PageResponse<MemberPurchaseItemResponse> getMyPurchases(Long memberId, BasePageRequest pageRequest) {
+
+        // 회원 존재 여부 확인
+        getMember(memberId);
+
+        // 정렬값은 최신순으로
+        if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
+            pageRequest.setOrder("DESC");
+        }
+
+        // 구매내역 목록 조회
+        List<MemberPurchaseItemResponse> content =
+                memberMapper.findPurchasesByMemberId(memberId, pageRequest);
+
+        // 전체 개수 조회
+        long totalElements = memberMapper.countPurchasesByMemberId(memberId);
+
+        return PageResponse.of(
+                content,
+                pageRequest.getPage(),
+                pageRequest.getSize(),
+                totalElements
+        );
+    }
+  
+    @Override
     @Transactional(readOnly = true)
     public long getCurrentPoint(Long memberId) {
         return getMember(memberId).getPoint();
+    }
+
+    @Override
+    @Transactional
+    public void deductPoint(Long memberId, Long amount) {
+        memberMapper.usePoint(memberId, amount);
+
+        // 리펙터링 대상
+//        if (updated != 1) {
+//            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
+//        }
     }
 
     // 회원 존재 여부 확인

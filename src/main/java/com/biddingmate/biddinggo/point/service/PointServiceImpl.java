@@ -6,14 +6,18 @@ import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryView;
 import com.biddingmate.biddinggo.member.service.MemberService;
+import com.biddingmate.biddinggo.point.dto.ExchangePointRequest;
 import com.biddingmate.biddinggo.point.dto.MyPointResponse;
 import com.biddingmate.biddinggo.point.dto.PointHistoryDto;
 import com.biddingmate.biddinggo.point.mapper.PointHistoryMapper;
+import com.biddingmate.biddinggo.point.model.PointHistory;
+import com.biddingmate.biddinggo.point.model.PointHistoryType;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -47,5 +51,24 @@ public class PointServiceImpl implements PointService {
                 .currentPoint(currentPoint)
                 .histroies(pointhistory)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void exchangePoint(ExchangePointRequest request, Long memberId) {
+        memberService.deductPoint(memberId, request.getAmount());
+
+        PointHistory pointHistory = PointHistory.builder()
+                .memberId(memberId)
+                .type(PointHistoryType.EXCHANGE)
+                .amount(request.getAmount())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        int insert = pointHistoryMapper.insert(pointHistory);
+
+        if (insert != 1) {
+            throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
     }
 }

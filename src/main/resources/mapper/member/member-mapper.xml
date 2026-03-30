@@ -254,45 +254,78 @@
         WHERE id = #{memberId}
     </update>
 
-    <select id="findSalesByMember" resultType="MemberSalesItemResponse">
-        SELECT
-        ai.name AS itemName,                 -- 상품명
-        buyer.name AS buyerName,            -- 구매자 이름
-        wd.winner_price AS price,           -- 판매 금액
-        wd.confirmed_at AS completedAt,     -- 거래 완료 날짜
-        wd.delivery_status AS deliveryStatus -- 배송 상태
-        FROM winner_deal wd
-
-        INNER JOIN auction a
+<select id="findSalesByMember" resultType="MemberSalesItemResponse">
+    SELECT
+        ai.name AS itemName,                   -- 상품명
+        buyer.name AS buyerName,              -- 구매자 이름
+        wd.winner_price AS price,             -- 판매 금액
+        wd.confirmed_at AS completedAt,       -- 거래 완료 날짜
+        wd.delivery_status AS deliveryStatus  -- 배송 상태
+    FROM winner_deal wd
+    INNER JOIN auction a
         ON wd.auction_id = a.id
-
-        INNER JOIN auction_item ai
+    INNER JOIN auction_item ai
         ON a.item_id = ai.id
-
-        INNER JOIN member buyer
+    INNER JOIN member buyer
         ON wd.winner_id = buyer.id
+    WHERE wd.seller_id = #{memberId}
+      AND wd.status IN ('PAID', 'CONFIRMED')
 
-        WHERE wd.seller_id = #{memberId}
-        AND wd.status IN ('PAID', 'CONFIRMED')
+    <choose>
+        <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
+            ORDER BY wd.confirmed_at ASC
+        </when>
+        <otherwise>
+            ORDER BY wd.confirmed_at DESC
+        </otherwise>
+    </choose>
 
-        <choose>
-            <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
-                ORDER BY wd.confirmed_at ASC
-            </when>
-            <otherwise>
-                ORDER BY wd.confirmed_at DESC
-            </otherwise>
-        </choose>
+    LIMIT #{pageRequest.limit}
+    OFFSET #{pageRequest.offset}
+</select>
 
-        LIMIT #{pageRequest.limit}
-        OFFSET #{pageRequest.offset}
-    </select>
+<select id="countSalesByMemberId" resultType="long">
+    SELECT COUNT(*)
+    FROM winner_deal wd
+    WHERE wd.seller_id = #{memberId}
+      AND wd.status IN ('PAID', 'CONFIRMED')
+</select>
 
-    <select id="countSalesByMemberId" resultType="long">
-        SELECT COUNT(*)
-        FROM winner_deal wd
-        WHERE wd.seller_id = #{memberId}
-          AND wd.status IN ('PAID', 'CONFIRMED')
-    </select>
-  
+<select id="findPurchasesByMemberId" resultType="MemberPurchaseItemResponse">
+    SELECT
+        ai.name AS itemName,
+        seller.name AS sellerName,
+        wd.winner_price AS price,
+        wd.confirmed_at AS completedAt,
+        wd.delivery_status AS deliveryStatus
+    FROM winner_deal wd
+    INNER JOIN auction a
+        ON wd.auction_id = a.id
+    INNER JOIN auction_item ai
+        ON a.item_id = ai.id
+    INNER JOIN member seller
+        ON wd.seller_id = seller.id
+    WHERE wd.winner_id = #{memberId}
+      AND wd.status IN ('PAID', 'CONFIRMED')
+
+    <choose>
+        <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
+            ORDER BY wd.confirmed_at ASC
+        </when>
+        <otherwise>
+            ORDER BY wd.confirmed_at DESC
+        </otherwise>
+    </choose>
+
+    LIMIT #{pageRequest.limit}
+    OFFSET #{pageRequest.offset}
+</select>
+
+<select id="countPurchasesByMemberId" resultType="long">
+    SELECT COUNT(*)
+    FROM winner_deal wd
+    WHERE wd.winner_id = #{memberId}
+      AND wd.status IN ('PAID', 'CONFIRMED')
+</select>
+
 </mapper>
