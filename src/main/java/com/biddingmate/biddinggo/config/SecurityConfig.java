@@ -1,10 +1,16 @@
 package com.biddingmate.biddinggo.config;
 
+import com.biddingmate.biddinggo.auth.handler.AccessDeniedHandlerImpl;
+import com.biddingmate.biddinggo.auth.handler.AuthenticationEntryPointImpl;
+import com.biddingmate.biddinggo.auth.jwt.AdminJWTAuthenticationFilter;
+import com.biddingmate.biddinggo.auth.jwt.AdminJWTUtil;
 import com.biddingmate.biddinggo.auth.jwt.JWTFilter;
+import com.biddingmate.biddinggo.auth.jwt.JWTProvider;
 import com.biddingmate.biddinggo.auth.jwt.JWTUtil;
 import com.biddingmate.biddinggo.auth.oauth2.CustomSuccessHandler;
 import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,8 +19,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,8 +41,10 @@ public class SecurityConfig {
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JWTUtil jwtUtil;
 
+    private final AdminJWTUtil adminJWTUtil;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver, JWTProvider jWTProvider) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -42,23 +53,22 @@ public class SecurityConfig {
                 .sessionManagement((seession) -> seession
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 무한 루프 방지
-                .addFilterBefore(new JWTFilter(jwtUtil,handlerExceptionResolver), OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(new AdminJWTAuthenticationFilter(jWTProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JWTFilter(jwtUtil,handlerExceptionResolver), AdminJWTAuthenticationFilter.class)
                 // 필터내부 예외 발생시 GlobalExceptionHandler으로 던짐
                 .exceptionHandling(exception -> exception
-                        // 인증 실패(404)시 GlobalExceptionHandler로 던짐
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            handlerExceptionResolver.resolveException(request,response,null,authException);
-                        })
-                        // 인가 거부(403)시 GlobalExceptionHandler로 던짐
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            handlerExceptionResolver.resolveException(request,response,null, accessDeniedException);
-                        })
+                        // 401 Unauthorized (인증 되지 않은 사용자가 리소스 접근시)
+                        .authenticationEntryPoint(new AuthenticationEntryPointImpl())
+
+                        // 403 Forbidden (인증된 사용자가 권한 없는 리소스 접근시)
+                        .accessDeniedHandler(new AccessDeniedHandlerImpl())
                 )
                 // oauth2 로그인 관련
                 .oauth2Login((oauth2)-> oauth2
                         .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService)))
                         .successHandler(customSuccessHandler))
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/","/login/**", "/oauth2/**",
@@ -66,7 +76,7 @@ public class SecurityConfig {
                                 "/api/v1/payments/**", "/api/v1/files/**", "/api/v1/addresses/**",
                                 "/api/v1/auctions/**", "/api/v1/inspections/**",
                                 "/api/v1/direct-inquiries/**", "/api/v1/admins/direct-inquiries/**",
-                                "/api/v1/bidding/**",
+                                "/api/v1/bidding/**","/api/v1/points/**",
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/users/my",
                                 "/api/v1/auction/**",
@@ -75,8 +85,10 @@ public class SecurityConfig {
                                 "/api/v1/users/me",
                                 "/api/v1/users/**",
                                 "/api/v1/bids/**",
-                                "/api/v1/users/me/profile"
-                                ).permitAll()
+                                "/api/v1/users/me/profile",
+                                "/api/v1/admin/auth/login",
+                                "/api/v1/admin/auth/signup"
+                        ).permitAll()
                                 .anyRequest().authenticated()
                 );
         return http.build();
@@ -97,10 +109,17 @@ public class SecurityConfig {
         return source;
     }
 
-    // 계속 로그에 에러떠서 추가함
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .requestMatchers("/favicon.ico", "/error");
+                .requestMatchers(org.springframework.boot.autoconfigure.security.servlet.PathRequest.toStaticResources().atCommonLocations())
+                .requestMatchers("/favicon.ico", "/resources/**", "/error");
+    }
+
+    // 패스워드인코딩 빈 추가
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+
+        return new BCryptPasswordEncoder();
     }
 }

@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.biddingmate.biddinggo.member.mapper.MemberMapper">
 
+
     <select id="getPointById" resultType="long">
         SELECT point
         FROM member
@@ -129,6 +130,97 @@
                  LEFT JOIN address a ON m.id = a.member_id
         WHERE m.id = #{memberId}
     </select>
+  
+<!-- auth 아아디조회 -->
+    <select id="selectMemberByUsername" parameterType="String" resultType="Member">
+
+        SELECT
+            id,
+            username,
+            password,
+            name,
+            nickname,
+            email,
+            image_url AS imageUrl,
+            point,
+            bank_code AS bankCode,
+            bank_account AS bankAccount,
+            grade,
+            role,
+            status,
+            last_change_nick AS lastChangeNick,
+            created_at AS createdAt
+        FROM member
+        WHERE username = #{username}
+
+    </select>
+
+    <!-- auth 이메일조회 -->
+    <select id="selectMemberByEmail" parameterType="string" resultType="Member">
+        SELECT
+            id,
+            username,
+            password,
+            name,
+            nickname,
+            email,
+            image_url AS imageUrl,
+            point,
+            bank_code AS bankCode,
+            bank_account AS bankAccount,
+            grade,
+            role,
+            status,
+            last_change_nick AS lastChangeNick,
+            created_at AS createdAt
+        FROM member
+        WHERE email = #{email}
+    </select>
+
+    <!-- auth 닉네임조회 -->
+    <select id="selectMemberByNickname" parameterType="string" resultType="Member">
+        SELECT
+            id,
+            username,
+            password,
+            name,
+            nickname,
+            email,
+            image_url AS imageUrl,
+            point,
+            bank_code AS bankCode,
+            bank_account AS bankAccount,
+            grade,
+            role,
+            status,
+            last_change_nick AS lastChangeNick,
+            created_at AS createdAt
+        FROM member
+        WHERE nickname = #{nickname}
+    </select>
+
+    <!-- auth 회원가입 -->
+    <insert id="insert" parameterType="Member">
+        INSERT INTO member (
+
+            username,
+            password,
+            name,
+            nickname,
+            email,
+            role,
+            created_at
+
+        ) VALUES (
+            #{username},
+            #{password},
+            #{name},
+            #{nickname},
+            #{email},
+            #{role},
+            NOW()
+                 )
+    </insert>
 
     <select id="countByNickname" parameterType="string" resultType="int">
         SELECT COUNT(*)
@@ -202,4 +294,5 @@
         WHERE wd.seller_id = #{memberId}
           AND wd.status IN ('PAID', 'CONFIRMED')
     </select>
+  
 </mapper>

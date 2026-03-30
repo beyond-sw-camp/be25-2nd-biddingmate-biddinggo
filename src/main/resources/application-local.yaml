@@ -7,6 +7,12 @@ spring:
     url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      port: ${REDIS_PORT:6379}
 
   flyway:
     enabled: true
@@ -63,3 +69,7 @@ cloudflare:
     public-base-url: ${R2_PUBLIC_BASE_URL}
     region: ${R2_REGION:auto}
     presigned-url-duration-minutes: ${R2_PRESIGNED_URL_DURATION_MINUTES:10}
+
+jwt:
+  issuer: bidding-mate
+  secret: ${JWT_SECRET_KEY}
