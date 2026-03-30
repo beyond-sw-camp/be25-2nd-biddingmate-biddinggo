@@ -25,6 +25,12 @@ public enum ErrorType {
     INVALID_TOKEN("auth-002", "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN("auth-003", "만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
     TOKEN_NOT_FOUND("auth-004", "토큰이 존재하지 않습니다.", HttpStatus.UNAUTHORIZED),
+    INVALID_CREDENTIALS("auth-005","아이디 또는 비밀번호가 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATE_USERNAME("auth-006","이미 가입된 아이디입니다.",HttpStatus.BAD_REQUEST),
+    DUPLICATE_EMAIL("auth-007","이미 가입된 이메일입니다.",HttpStatus.BAD_REQUEST),
+    DUPLICATE_NICKNAME("auth-008","이미 사용 중인 닉네임입니다.",HttpStatus.BAD_REQUEST),
+    REFRESH_TOKEN_INVALID("auth-009","리프레쉬 토큰이 유효하지 않습니다.",HttpStatus.BAD_REQUEST),
+
 
     // 결제
     VIRTUAL_ACCOUNT_ALREADY_EXISTS("payment-001", "가상계좌가 이미 존재합니다.", HttpStatus.CONFLICT),

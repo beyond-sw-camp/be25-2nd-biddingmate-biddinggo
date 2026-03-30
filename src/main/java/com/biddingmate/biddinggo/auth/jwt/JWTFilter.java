@@ -11,7 +11,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,11 +30,18 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+
         try {
 
         String authorization = null;
         Cookie[] cookies = request.getCookies();
         String requestUri = request.getRequestURI();
+
+            // 관리자 경로는 Admin 필터가 처리했으므로 소셜 필터는 그냥 통과!
+            if (requestUri.startsWith("/api/v1/admin")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
         if (requestUri.matches("^\\/login(?:\\/.*)?$")) {
 
@@ -68,10 +74,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 토큰 소멸시간 검증
         if (jwtUtil.isExpired(token)) {
-
+            System.out.println("인증 결과: 토큰 만료");
             throw new CustomException(ErrorType.EXPIRED_ACCESS_TOKEN);
         }
-
 
 
         // 토큰에서 username과 role획든
@@ -90,6 +95,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         //세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
+
 
         filterChain.doFilter(request, response);
 
