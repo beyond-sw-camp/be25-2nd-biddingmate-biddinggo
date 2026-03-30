@@ -298,4 +298,38 @@
         WHERE id = #{memberId}
     </update>
 
+    <select id="findPurchasesByMemberId" resultType="MemberPurchaseItemResponse">
+        SELECT
+        ai.name AS itemName,
+        seller.name AS sellerName,
+        wd.winner_price AS price,
+        wd.confirmed_at AS completedAt,
+        wd.delivery_status AS deliveryStatus
+        FROM winner_deal wd
+        INNER JOIN auction a ON wd.auction_id = a.id
+        INNER JOIN auction_item ai ON a.item_id = ai.id
+        INNER JOIN member seller ON wd.seller_id = seller.id
+        WHERE wd.winner_id = #{memberId}
+        AND wd.status IN ('PAID', 'CONFIRMED')
+
+        <choose>
+            <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
+                ORDER BY wd.confirmed_at ASC
+            </when>
+            <otherwise>
+                ORDER BY wd.confirmed_at DESC
+            </otherwise>
+        </choose>
+
+        LIMIT #{pageRequest.limit}
+        OFFSET #{pageRequest.offset}
+    </select>
+
+    <select id="countPurchasesByMemberId" resultType="long">
+        SELECT COUNT(*)
+        FROM winner_deal wd
+        WHERE wd.winner_id = #{memberId}
+          AND wd.status IN ('PAID', 'CONFIRMED')
+    </select>
+  
 </mapper>
