@@ -17,6 +17,7 @@ public class AuctionInquiry {
     private String title;
     private String content;
     private String answer;
+    private boolean secretYn;
 
     private LocalDateTime answeredAt;
 
