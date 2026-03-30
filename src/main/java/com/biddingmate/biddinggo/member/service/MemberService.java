@@ -18,4 +18,7 @@ public interface MemberService {
     void deleteMyAccount(Long memberId);
 
     PageResponse<MemberPurchaseItemResponse> getMyPurchases(Long memberId, BasePageRequest pageRequest);
+
+    long getCurrentPoint(Long memberId);
+
 }
