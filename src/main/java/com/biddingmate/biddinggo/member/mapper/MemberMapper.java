@@ -1,10 +1,12 @@
 package com.biddingmate.biddinggo.member.mapper;
 
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
+import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import org.apache.ibatis.annotations.Mapper;
@@ -47,4 +49,10 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // member status를 DELETED로 변경
     void deleteMember(Long memberId);
 
+    // 구매내역 목록
+    List<MemberPurchaseItemResponse> findPurchasesByMemberId(
+            @Param("memberId") Long memberId, @Param("pageRequest") BasePageRequest pageRequest);
+
+    // 총 구매 개수 조회
+    long countPurchasesByMemberId(@Param("memberId") Long memberId);
 }

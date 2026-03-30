@@ -1,10 +1,14 @@
 package com.biddingmate.biddinggo.member.controller;
 
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
+import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,5 +52,17 @@ public class MemberController {
     public ResponseEntity<ApiResponse<Void>> deleteAccount(@RequestParam Long memberId) {
         memberService.deleteMyAccount(memberId);
         return ApiResponse.of(HttpStatus.OK, null, "회원 탈퇴 성공", null);
+    }
+
+    @GetMapping("/me/purchases")
+    public ResponseEntity<ApiResponse<PageResponse<MemberPurchaseItemResponse>>> getPurchases(
+            @RequestParam Long memberId,
+            @Valid BasePageRequest pageRequest
+            ) {
+
+        PageResponse<MemberPurchaseItemResponse> result = memberService.getMyPurchases(memberId, pageRequest);
+
+        return ApiResponse.of(HttpStatus.OK, null, "구매 내역 조회 성공", result);
+
     }
 }
