@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Auction Inquiry", description = "경매 문의 API")
@@ -82,10 +83,15 @@ public class AuctionInquiryController {
     @GetMapping("/auctions/{auctionId}/inquiries")
     public ResponseEntity<ApiResponse<PageResponse<AuctionInquiryView>>> getInquiryList(
             @PathVariable Long auctionId,
-            BasePageRequest request
+            BasePageRequest request,
+
+            // TODO: 토큰에서 유저 정보 및 권한 추출로 변경 예정
+            @RequestParam(required = false, defaultValue = "1") Long currentUserId,
+            @RequestParam(required = false, defaultValue = "USER") com.biddingmate.biddinggo.member.model.MemberRole role
     ) {
+
         PageResponse<AuctionInquiryView> result =
-                auctionInquiryService.getInquiriesByAuctionId(auctionId, request);
+                auctionInquiryService.getInquiriesByAuctionId(auctionId, request,currentUserId, role);
 
         return ApiResponse.of(
                 HttpStatus.OK,

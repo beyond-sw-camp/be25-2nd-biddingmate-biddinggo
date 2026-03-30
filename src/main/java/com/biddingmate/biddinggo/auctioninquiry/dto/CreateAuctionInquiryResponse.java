@@ -1,6 +1,5 @@
 package com.biddingmate.biddinggo.auctioninquiry.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +27,5 @@ public class CreateAuctionInquiryResponse {
     private String content;
 
     @Schema(description = "생성 시간", example = "2026-03-22T12:00:00")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 }

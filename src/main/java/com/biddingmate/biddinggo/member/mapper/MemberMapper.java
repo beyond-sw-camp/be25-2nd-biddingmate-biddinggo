@@ -33,6 +33,14 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // 입찰 중 물품 목록
     List<MemberBiddingItemResponse> findBiddingItemsById(@Param("memberId") Long memberId);
 
+    // 아이디를 통한 사용자 조회(auth)
+    Member selectMemberByUsername (@Param("username") String username);
+
+    // 이메일을 통한 사용자 조회(auth)
+    Member selectMemberByEmail(@Param("email") String email);
+
+    Member selectMemberByNickname(@Param("nickname") String nickname);
+
     void updateProfile(@Param("memberId") Long memberId, @Param("request") MemberProfileUpdateRequest request);
 
     // 수정할 닉네임이 사용 중 인지 확인

@@ -1,37 +1,44 @@
 package com.biddingmate.biddinggo.auctioninquiry.dto;
 
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiryStatus;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
-@NoArgsConstructor
+@Builder(toBuilder = true) // 기존 객체를 바탕으로 일부 필드만 바꾼 새 객체 생성을 위함
 @AllArgsConstructor
 public class AuctionInquiryView {
-    private Long id;
-    private String title;
-    private String content;
-    private String writerName;
-    private String answer;
-    private AuctionInquiryStatus status;
+    private final Long id;
+    private final Long writerId;
+    private final String title;
+    private final String content;
+    private final String writerName;
+    private final String answer;
+    private final boolean secretYn;
+    private final AuctionInquiryStatus status;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
-    // 닉네임 마스킹 로직
-    public void maskWriterName() {
+    // 닉네임 마스킹 처리된 '새 객체' 반환
+    public AuctionInquiryView withMaskedWriterName() {
+        String maskedName;
         if (this.writerName != null && this.writerName.length() >= 3) {
-            this.writerName = this.writerName.substring(0, 3) + "***";
-        } else if (this.writerName != null && !this.writerName.isEmpty()) {
-            this.writerName = this.writerName + "***";
+            maskedName = this.writerName.substring(0, 3) + "***";
         } else {
-            this.writerName = "익명***";
+            maskedName = (this.writerName == null || this.writerName.isEmpty()) ? "익명***" : this.writerName + "***";
         }
+        return this.toBuilder().writerName(maskedName).build();
+    }
+
+    // 비밀글 마스킹 처리된 '새 객체' 반환
+    public AuctionInquiryView withSecretMasking() {
+        return this.toBuilder()
+                .title("비밀글입니다.")
+                .content("작성자와 판매자만 볼 수 있는 문의입니다.")
+                .answer(this.answer != null ? "비밀 답변입니다." : null)
+                .build();
     }
 }

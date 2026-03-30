@@ -60,6 +60,10 @@ dependencies {
 
     // cloudflare r2 (s3 compatible)
     implementation 'software.amazon.awssdk:s3:2.31.3'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.session:spring-session-data-redis'
 }
 
 tasks.named('test') {

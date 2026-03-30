@@ -12,6 +12,7 @@
             answerer_id,
             title,
             content,
+            secret_yn,
             created_at
         ) VALUES (
                      #{auctionId},
@@ -19,6 +20,7 @@
                      #{answererId},
                      #{title},
                      #{content},
+                     #{secretYn},
                      #{createdAt}
                  )
     </insert>
@@ -50,10 +52,12 @@
     <select id="selectInquiryList" resultType="AuctionInquiryView">
         SELECT
             ai.id,
+            ai.writer_id AS writerId,
             ai.title,
             ai.content,
             m.nickname AS writerName,
             ai.answer,
+            ai.secret_yn AS secretYn,
             ai.status,
             ai.created_at AS createdAt
         FROM auction_inquiry ai

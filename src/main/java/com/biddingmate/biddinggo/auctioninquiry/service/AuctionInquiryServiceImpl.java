@@ -10,6 +10,7 @@ import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse
 import com.biddingmate.biddinggo.auctioninquiry.mapper.AuctionInquiryMapper;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiryStatus;
+import com.biddingmate.biddinggo.member.model.MemberRole;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
@@ -47,6 +48,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                 .answererId(auction.getSellerId())
                 .title(request.getTitle())
                 .content(request.getContent())
+                .secretYn(request.isSecretYn())
                 .status(AuctionInquiryStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -105,27 +107,50 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<AuctionInquiryView> getInquiriesByAuctionId(Long auctionId, BasePageRequest request) {
+    public PageResponse<AuctionInquiryView> getInquiriesByAuctionId(
+            Long auctionId,
+            BasePageRequest request,
+            Long currentUserId, // 컨트롤러에서 넘겨받은 유저 ID
+            MemberRole role      // String 대신 Enum 사용
+    ) {
 
-        // 공통 메서드를 통한 경매 존재 여부 확인
-        validateAndGetAuction(auctionId);
+        // 경매 존재 여부 확인
+        Auction auction = validateAndGetAuction(auctionId);
+        boolean isAdmin = role.isAdmin(); // Enum 메서드 활용
 
         // 페이지 번호 검증
         if (request.getPage() < 1) {
             throw new CustomException(ErrorType.BAD_REQUEST);
         }
 
-        // RowBounds 생성
+        // DB 조회 (원본 리스트)
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
-
-        // DB 조회
-        List<AuctionInquiryView> list = auctionInquiryMapper.selectInquiryList(rowBounds, auctionId);
+        List<AuctionInquiryView> rawList = auctionInquiryMapper.selectInquiryList(rowBounds, auctionId);
         int totalCount = auctionInquiryMapper.selectInquiryCount(auctionId);
 
-        // 닉네임 마스킹 로직
-        list.forEach(AuctionInquiryView::maskWriterName);
+        // 4. 불변 DTO 특성을 살린 권한별 마스킹 처리
+        List<AuctionInquiryView> processedList = rawList.stream()
+                .map(view -> {
+                    // 작성자 본인인가? OR 해당 경매 판매자인가? OR 관리자인가?
+                    boolean hasFullAccess = view.getWriterId().equals(currentUserId) ||
+                            auction.getSellerId().equals(currentUserId) ||
+                            isAdmin;
 
-        return PageResponse.of(list, request.getPage(), request.getSize(), totalCount);
+                    // 권한이 있는 경우: 원본 그대로 반환
+                    if (hasFullAccess) {
+                        return view;
+                    }
+
+                    // 권한이 없는 경우: 닉네임 마스킹 + 비밀글 여부에 따른 내용 마스킹
+                    AuctionInquiryView maskedView = view.withMaskedWriterName();
+                    if (maskedView.isSecretYn()) {
+                        maskedView = maskedView.withSecretMasking();
+                    }
+                    return maskedView;
+                })
+                .toList();
+
+        return PageResponse.of(processedList, request.getPage(), request.getSize(), totalCount);
     }
 
     // 경매 존재 여부 확인 로직 공통 메서드
