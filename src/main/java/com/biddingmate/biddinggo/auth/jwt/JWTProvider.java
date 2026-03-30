@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.auth.jwt;
 
+import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -122,6 +122,33 @@ public class JWTProvider {
                 redisTemplate.opsForValue().get(String.format("refresh:%S", username));
 
         return storedRefreshToken != null && storedRefreshToken.equals(refreshToken);
+
+    }
+
+    // Oauth2 리펙터링
+    public Map<String, Object> createTotalTokenResponse(String username, List<String> authorities) {
+
+        // access token 생성
+        String accessToken = createAccessToken(username, authorities);
+
+        AdminLoginResponse loginResponse = AdminLoginResponse.builder()
+                .accessToken(accessToken)
+                .type("Bearer")
+                .username(username)
+                .authorities(authorities)
+                .issuedAt(adminJWTUtil.getIssuedAt(accessToken))
+                .expiredAt(adminJWTUtil.getExpiredAt(accessToken))
+                .build();
+
+
+        String refreshToken = createRefreshToken(username);
+
+
+        return Map.of(
+                "loginResponse", loginResponse, // 프론트 전달용 (URL 파라미터용)
+                "refreshToken", refreshToken    // 쿠키 생성용 (JWTCookieService용)
+        );
+
 
     }
 }
