@@ -1,6 +1,6 @@
 package com.biddingmate.biddinggo.auth.controller;
 
-import com.biddingmate.biddinggo.auth.admin.service.AdminAuthService;
+import com.biddingmate.biddinggo.auth.service.AdminAuthService;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

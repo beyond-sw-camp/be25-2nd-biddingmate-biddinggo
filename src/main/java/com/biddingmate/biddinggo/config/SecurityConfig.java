@@ -2,9 +2,8 @@ package com.biddingmate.biddinggo.config;
 
 import com.biddingmate.biddinggo.auth.handler.AccessDeniedHandlerImpl;
 import com.biddingmate.biddinggo.auth.handler.AuthenticationEntryPointImpl;
-import com.biddingmate.biddinggo.auth.jwt.AdminJWTAuthenticationFilter;
-import com.biddingmate.biddinggo.auth.jwt.AdminJWTUtil;
-import com.biddingmate.biddinggo.auth.jwt.JWTProvider;
+import com.biddingmate.biddinggo.auth.jwt.JwtAuthenticationFilter;
+import com.biddingmate.biddinggo.auth.jwt.JwtProvider;
 import com.biddingmate.biddinggo.auth.oauth2.CustomSuccessHandler;
 import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +35,9 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final HandlerExceptionResolver handlerExceptionResolver;
-    private final AdminJWTUtil adminJWTUtil;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver, JWTProvider jWTProvider) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver, JwtProvider jWTProvider) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -48,7 +46,7 @@ public class SecurityConfig {
                 .sessionManagement((seession) -> seession
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 무한 루프 방지
-                .addFilterBefore(new AdminJWTAuthenticationFilter(jWTProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jWTProvider), UsernamePasswordAuthenticationFilter.class)
                 // 필터내부 예외 발생시 GlobalExceptionHandler으로 던짐
                 .exceptionHandling(exception -> exception
                         // 401 Unauthorized (인증 되지 않은 사용자가 리소스 접근시)

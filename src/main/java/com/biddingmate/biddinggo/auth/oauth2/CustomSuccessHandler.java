@@ -1,9 +1,9 @@
 package com.biddingmate.biddinggo.auth.oauth2;
 
-import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
-import com.biddingmate.biddinggo.auth.admin.service.JWTCookieService;
+import com.biddingmate.biddinggo.auth.dto.LoginResponse;
+import com.biddingmate.biddinggo.auth.jwt.JwtCookieService;
 import com.biddingmate.biddinggo.auth.dto.CustomOAuth2Member;
-import com.biddingmate.biddinggo.auth.jwt.JWTProvider;
+import com.biddingmate.biddinggo.auth.jwt.JwtProvider;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import jakarta.servlet.ServletException;
@@ -29,8 +29,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JWTProvider jwtProvider;
-    private final JWTCookieService jwtCookieService;
+    private final JwtProvider jwtProvider;
+    private final JwtCookieService jwtCookieService;
     private final MemberMapper memberMapper;
 
     // oauth2 리팩터링
@@ -51,7 +51,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // provider를 통해 토큰 발생
         Map<String, Object> tokens = jwtProvider.createTotalTokenResponse(username, authorities);
-        AdminLoginResponse loginResponse = (AdminLoginResponse) tokens.get("loginResponse");
+        LoginResponse loginResponse = (LoginResponse) tokens.get("loginResponse");
         String refreshToken = (String) tokens.get("refreshToken");
 
         String accessToken = loginResponse.getAccessToken();

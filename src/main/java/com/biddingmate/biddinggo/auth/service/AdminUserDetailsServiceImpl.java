@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.admin.service;
+package com.biddingmate.biddinggo.auth.service;
 
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;

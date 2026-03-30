@@ -1,11 +1,11 @@
-package com.biddingmate.biddinggo.auth.admin.controller;
+package com.biddingmate.biddinggo.auth.controller;
 
-import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginRequestDto;
-import com.biddingmate.biddinggo.auth.admin.dto.AdminSignupRequestDto;
-import com.biddingmate.biddinggo.auth.admin.service.AdminAuthService;
-import com.biddingmate.biddinggo.auth.admin.service.JWTCookieService;
+import com.biddingmate.biddinggo.auth.dto.AdminLoginRequestDto;
+import com.biddingmate.biddinggo.auth.dto.AdminSignupRequestDto;
+import com.biddingmate.biddinggo.auth.dto.LoginResponse;
+import com.biddingmate.biddinggo.auth.service.AdminAuthService;
+import com.biddingmate.biddinggo.auth.jwt.JwtCookieService;
 import com.biddingmate.biddinggo.common.dto.BaseResponseDto;
-import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,14 +31,14 @@ import java.time.Duration;
 public class AdminAuthController {
 
     private final AdminAuthService authService;
-    private final JWTCookieService jwtCookieService;
+    private final JwtCookieService jwtCookieService;
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public ResponseEntity<BaseResponseDto<AdminLoginResponse>> login(
+    public ResponseEntity<BaseResponseDto<LoginResponse>> login(
             @Valid @RequestBody AdminLoginRequestDto loginRequestDto) {
 
-        AdminLoginResponse loginResponse = authService.login(
+        LoginResponse loginResponse = authService.login(
                 loginRequestDto.getUsername(),
                 loginRequestDto.getPassword()
 
@@ -88,10 +88,10 @@ public class AdminAuthController {
 
     @PostMapping("/refresh")
     @Operation(summary = "토근 재발급")
-    public ResponseEntity<BaseResponseDto<AdminLoginResponse>> refreshToken(
+    public ResponseEntity<BaseResponseDto<LoginResponse>> refreshToken(
             @Parameter(hidden = true) @CookieValue(name = "refresh_token", defaultValue = "") String refreshToken) {
 
-        AdminLoginResponse loginResponse = authService.refreshAccessToken(refreshToken);
+        LoginResponse loginResponse = authService.refreshAccessToken(refreshToken);
 
         return ResponseEntity.ok(new BaseResponseDto<>(HttpStatus.OK, loginResponse));
 

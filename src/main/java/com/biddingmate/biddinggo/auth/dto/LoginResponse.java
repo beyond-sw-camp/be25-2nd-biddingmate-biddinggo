@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.admin.dto;
+package com.biddingmate.biddinggo.auth.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.List;
 @ToString
 @RequiredArgsConstructor
 @Builder
-public class AdminLoginResponse {
+public class LoginResponse {
 
     private final String accessToken;
     private final String type;

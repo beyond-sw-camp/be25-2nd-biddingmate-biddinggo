@@ -1,6 +1,6 @@
 package com.biddingmate.biddinggo.auth.jwt;
 
-import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
+import com.biddingmate.biddinggo.auth.dto.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,9 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
-public class JWTProvider {
+public class JwtProvider {
 
-    private final AdminJWTUtil adminJWTUtil;
+    private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
     private final RedisTemplate<String, String> redisTemplate;
     private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 30; // 30분
@@ -30,7 +30,7 @@ public class JWTProvider {
                 Map.of("username", username, "authorities", authorities, "token_type", "access");
 
 
-        return adminJWTUtil.createJwtToken(claims, ACCESS_TOKEN_EXPIRATION);
+        return jwtUtil.createJwtToken(claims, ACCESS_TOKEN_EXPIRATION);
 
 
     }
@@ -49,7 +49,7 @@ public class JWTProvider {
     public boolean isUsableAccessToken(String accessToken) {
 
         return accessToken != null
-                && adminJWTUtil.validateToken(accessToken)
+                && jwtUtil.validateToken(accessToken)
                 && !isBlacklisted(accessToken)
                 && isAccessToken(accessToken);
 
@@ -58,13 +58,13 @@ public class JWTProvider {
 
     private boolean isAccessToken(String accessToken) {
 
-        return adminJWTUtil.getTokenType(accessToken).equals("access");
+        return jwtUtil.getTokenType(accessToken).equals("access");
     }
 
     // securityContext 객체에 저장될 Authentication 객체를 생성
     public Authentication createAuthentication(String token) {
 
-        String username = adminJWTUtil.getUsername(token);
+        String username = jwtUtil.getUsername(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         return new UsernamePasswordAuthenticationToken(
@@ -76,7 +76,7 @@ public class JWTProvider {
 
     public void addBlacklist(String accessToken) {
 
-        String blacklistKey = String.format("blacklist:%S", adminJWTUtil.getJti(accessToken));
+        String blacklistKey = String.format("blacklist:%S", jwtUtil.getJti(accessToken));
 
         redisTemplate.opsForValue()
                 .set(blacklistKey, accessToken, ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
@@ -86,14 +86,14 @@ public class JWTProvider {
 
     private boolean isBlacklisted(String accessToken) {
 
-        String blacklistKey = String.format("blacklist:%S", adminJWTUtil.getJti(accessToken));
+        String blacklistKey = String.format("blacklist:%S", jwtUtil.getJti(accessToken));
 
         return redisTemplate.hasKey(blacklistKey);
     }
 
     // 리프레시 토큰 제거
     public void deleteRefreshToken(String accessToken) {
-        String username = adminJWTUtil.getUsername(accessToken);
+        String username = jwtUtil.getUsername(accessToken);
 
         redisTemplate.delete(String.format("refresh:%S", username));
 
@@ -105,7 +105,7 @@ public class JWTProvider {
         Map<String, Object> claims =
                 Map.of("username", username, "token_type", "refresh");
 
-        String refreshToken = adminJWTUtil.createJwtToken(claims, REFRESH_TOKEN_EXPIRATION);
+        String refreshToken = jwtUtil.createJwtToken(claims, REFRESH_TOKEN_EXPIRATION);
         String refreshKey = String.format("refresh:%S", username);
 
         redisTemplate.opsForValue()
@@ -117,7 +117,7 @@ public class JWTProvider {
 
     public boolean isValidRefresh(String refreshToken) {
 
-        String username = adminJWTUtil.getUsername(refreshToken);
+        String username = jwtUtil.getUsername(refreshToken);
         String storedRefreshToken =
                 redisTemplate.opsForValue().get(String.format("refresh:%S", username));
 
@@ -131,13 +131,13 @@ public class JWTProvider {
         // access token 생성
         String accessToken = createAccessToken(username, authorities);
 
-        AdminLoginResponse loginResponse = AdminLoginResponse.builder()
+        LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
                 .type("Bearer")
                 .username(username)
                 .authorities(authorities)
-                .issuedAt(adminJWTUtil.getIssuedAt(accessToken))
-                .expiredAt(adminJWTUtil.getExpiredAt(accessToken))
+                .issuedAt(jwtUtil.getIssuedAt(accessToken))
+                .expiredAt(jwtUtil.getExpiredAt(accessToken))
                 .build();
 
 
