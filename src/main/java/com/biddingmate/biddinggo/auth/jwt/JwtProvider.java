@@ -1,7 +1,10 @@
 package com.biddingmate.biddinggo.auth.jwt;
 
 import com.biddingmate.biddinggo.auth.dto.LoginResponse;
+import com.biddingmate.biddinggo.common.exception.CustomException;
+import com.biddingmate.biddinggo.common.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -56,11 +59,6 @@ public class JwtProvider {
 
     }
 
-    private boolean isAccessToken(String accessToken) {
-
-        return jwtUtil.getTokenType(accessToken).equals("access");
-    }
-
     // securityContext 객체에 저장될 Authentication 객체를 생성
     public Authentication createAuthentication(String token) {
 
@@ -78,9 +76,8 @@ public class JwtProvider {
 
         String blacklistKey = String.format("blacklist:%S", jwtUtil.getJti(accessToken));
 
-        redisTemplate.opsForValue()
-                .set(blacklistKey, accessToken, ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
-
+        redisWrite(() -> redisTemplate.opsForValue()
+                .set(blacklistKey, accessToken, ACCESS_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS));
 
     }
 
@@ -88,14 +85,14 @@ public class JwtProvider {
 
         String blacklistKey = String.format("blacklist:%S", jwtUtil.getJti(accessToken));
 
-        return redisTemplate.hasKey(blacklistKey);
+        return redisRead(() -> redisTemplate.hasKey(blacklistKey));
     }
 
     // 리프레시 토큰 제거
     public void deleteRefreshToken(String accessToken) {
         String username = jwtUtil.getUsername(accessToken);
 
-        redisTemplate.delete(String.format("refresh:%S", username));
+        redisWrite(() -> redisTemplate.delete(String.format("refresh:%S", username)));
 
     }
 
@@ -108,8 +105,8 @@ public class JwtProvider {
         String refreshToken = jwtUtil.createJwtToken(claims, REFRESH_TOKEN_EXPIRATION);
         String refreshKey = String.format("refresh:%S", username);
 
-        redisTemplate.opsForValue()
-                .set(refreshKey, refreshToken, REFRESH_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+        redisWrite(() -> redisTemplate.opsForValue()
+                .set(refreshKey, refreshToken, REFRESH_TOKEN_EXPIRATION, TimeUnit.MILLISECONDS));
 
         return refreshToken;
 
@@ -118,8 +115,8 @@ public class JwtProvider {
     public boolean isValidRefresh(String refreshToken) {
 
         String username = jwtUtil.getUsername(refreshToken);
-        String storedRefreshToken =
-                redisTemplate.opsForValue().get(String.format("refresh:%S", username));
+        String storedRefreshToken = redisRead(() ->
+                redisTemplate.opsForValue().get(String.format("refresh:%S", username)));
 
         return storedRefreshToken != null && storedRefreshToken.equals(refreshToken);
 
@@ -149,6 +146,34 @@ public class JwtProvider {
                 "refreshToken", refreshToken    // 쿠키 생성용 (JWTCookieService용)
         );
 
+
+    }
+
+    private boolean isAccessToken(String accessToken) {
+
+        return jwtUtil.getTokenType(accessToken).equals("access");
+    }
+
+    private void redisWrite(Runnable action) {
+
+        try {
+            action.run();
+        } catch (DataAccessException e) {
+
+            throw new CustomException(ErrorType.REDIS_UNAVAILABLE);
+        }
+
+    }
+
+    private <T> T redisRead(java.util.function.Supplier<T> action) {
+
+        try {
+            return action.get();
+
+        } catch (DataAccessException e) {
+
+            throw new CustomException(ErrorType.REDIS_UNAVAILABLE);
+        }
 
     }
 }

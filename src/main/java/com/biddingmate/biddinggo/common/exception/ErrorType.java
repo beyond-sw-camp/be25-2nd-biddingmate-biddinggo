@@ -31,6 +31,8 @@ public enum ErrorType {
     DUPLICATE_NICKNAME("auth-008","이미 사용 중인 닉네임입니다.",HttpStatus.BAD_REQUEST),
     REFRESH_TOKEN_INVALID("auth-009","리프레쉬 토큰이 유효하지 않습니다.",HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND("auth-010","필수 정보를 입력할 사용자를 찾지 못했습니다.",HttpStatus.NOT_FOUND),
+    REDIS_UNAVAILABLE("auth-011", "인증 저장소 연결에 실패했습니다. 잠시 후 다시 시도해주세요.", HttpStatus.SERVICE_UNAVAILABLE),
+
 
 
     // 결제
