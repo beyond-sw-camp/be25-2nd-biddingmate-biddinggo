@@ -82,7 +82,8 @@ public class SecurityConfig {
                                 "/api/v1/users/me/profile",
                                 "/api/v1/admin/auth/login",
                                 "/api/v1/admin/auth/signup",
-                                "/api/v1/auth/check"
+                                "/api/v1/auth/check",
+                                "/api/v1/auth/refresh"
                         ).permitAll()
                                 .anyRequest().authenticated()
                 );
