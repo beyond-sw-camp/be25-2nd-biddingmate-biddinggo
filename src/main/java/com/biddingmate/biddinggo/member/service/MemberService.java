@@ -5,8 +5,8 @@ import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
-import jakarta.validation.Valid;
 
 public interface MemberService {
     MemberDashboardResponse getMyDashboard(Long id);
@@ -17,6 +17,8 @@ public interface MemberService {
 
     void deleteMyAccount(Long memberId);
 
+    PageResponse<MemberSalesItemResponse> getMySales(Long memberId, BasePageRequest pageRequest);
+  
     PageResponse<MemberPurchaseItemResponse> getMyPurchases(Long memberId, BasePageRequest pageRequest);
 
     long getCurrentPoint(Long memberId);

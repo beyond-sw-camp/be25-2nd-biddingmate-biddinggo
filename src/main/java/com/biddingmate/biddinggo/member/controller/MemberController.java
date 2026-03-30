@@ -7,6 +7,7 @@ import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MemberProfileResponse>> updateMyProfile(
             @RequestParam Long memberId,
             @RequestBody MemberProfileUpdateRequest request
-            ) {
+    ) {
         MemberProfileResponse result = memberService.updateMyProfile(memberId, request);
         return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 수정 성공", result);
     }
@@ -54,15 +55,21 @@ public class MemberController {
         return ApiResponse.of(HttpStatus.OK, null, "회원 탈퇴 성공", null);
     }
 
+    @GetMapping("/me/sales")
+    public ResponseEntity<ApiResponse<PageResponse<MemberSalesItemResponse>>> getSales(
+            @RequestParam Long memberId,
+            @Valid BasePageRequest pageRequest
+    ) {
+        PageResponse<MemberSalesItemResponse> result = memberService.getMySales(memberId, pageRequest);
+        return ApiResponse.of(HttpStatus.OK, null, "판매 내역 조회 성공", result);
+    }
+
     @GetMapping("/me/purchases")
     public ResponseEntity<ApiResponse<PageResponse<MemberPurchaseItemResponse>>> getPurchases(
             @RequestParam Long memberId,
             @Valid BasePageRequest pageRequest
-            ) {
-
+    ) {
         PageResponse<MemberPurchaseItemResponse> result = memberService.getMyPurchases(memberId, pageRequest);
-
         return ApiResponse.of(HttpStatus.OK, null, "구매 내역 조회 성공", result);
-
     }
 }

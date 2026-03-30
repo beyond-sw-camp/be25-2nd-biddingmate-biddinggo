@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
@@ -99,6 +100,32 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public PageResponse<MemberSalesItemResponse> getMySales(Long memberId, BasePageRequest pageRequest) {
+
+        // 회원 존재 여부 확인
+        getMember(memberId);
+
+        // 정렬값은 최신순으로
+        if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
+            pageRequest.setOrder("DESC");
+        }
+
+        // 판매내역 목록 조회
+        List<MemberSalesItemResponse> content =
+                memberMapper.findSalesByMember(memberId, pageRequest);
+
+        // 전체 개수 조회
+        long totalElements = memberMapper.countSalesByMemberId(memberId);
+
+        return PageResponse.of(
+                content,
+                pageRequest.getPage(),
+                pageRequest.getSize(),
+                totalElements
+        );
+    }
+
+    @Override
     public PageResponse<MemberPurchaseItemResponse> getMyPurchases(Long memberId, BasePageRequest pageRequest) {
 
         // 회원 존재 여부 확인
@@ -124,6 +151,7 @@ public class MemberServiceImpl implements MemberService {
         );
     }
   
+    @Override
     @Transactional(readOnly = true)
     public long getCurrentPoint(Long memberId) {
         return getMember(memberId).getPoint();

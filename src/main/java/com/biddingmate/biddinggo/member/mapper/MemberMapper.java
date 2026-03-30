@@ -7,6 +7,7 @@ import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import org.apache.ibatis.annotations.Mapper;
@@ -34,7 +35,7 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     List<MemberBiddingItemResponse> findBiddingItemsById(@Param("memberId") Long memberId);
 
     // 아이디를 통한 사용자 조회(auth)
-    Member selectMemberByUsername (@Param("username") String username);
+    Member selectMemberByUsername(@Param("username") String username);
 
     // 이메일을 통한 사용자 조회(auth)
     Member selectMemberByEmail(@Param("email") String email);
@@ -47,11 +48,22 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     int countByNickname(@Param("nickname") String nickname);
 
     // member status를 DELETED로 변경
-    void deleteMember(Long memberId);
+    void deleteMember(@Param("memberId") Long memberId);
+
+    // 판매내역 목록
+    List<MemberSalesItemResponse> findSalesByMember(
+            @Param("memberId") Long memberId,
+            @Param("pageRequest") BasePageRequest pageRequest
+    );
+
+    // 총 판매 개수 조회
+    long countSalesByMemberId(@Param("memberId") Long memberId);
 
     // 구매내역 목록
     List<MemberPurchaseItemResponse> findPurchasesByMemberId(
-            @Param("memberId") Long memberId, @Param("pageRequest") BasePageRequest pageRequest);
+            @Param("memberId") Long memberId,
+            @Param("pageRequest") BasePageRequest pageRequest
+    );
 
     // 총 구매 개수 조회
     long countPurchasesByMemberId(@Param("memberId") Long memberId);
