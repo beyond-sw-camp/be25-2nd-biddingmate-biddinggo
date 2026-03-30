@@ -101,6 +101,17 @@ public class MemberServiceImpl implements MemberService {
         return getMember(memberId).getPoint();
     }
 
+    @Override
+    @Transactional
+    public void deductPoint(Long memberId, Long amount) {
+        memberMapper.usePoint(memberId, amount);
+
+        // 리펙터링 대상
+//        if (updated != 1) {
+//            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
+//        }
+    }
+
     // 회원 존재 여부 확인
     private void memberExists(Long memberId) {
 

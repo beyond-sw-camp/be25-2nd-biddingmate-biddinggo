@@ -14,4 +14,6 @@ public interface MemberService {
     void deleteMyAccount(Long memberId);
 
     long getCurrentPoint(Long memberId);
+
+    void deductPoint(Long memberId, Long amount);
 }
