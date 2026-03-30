@@ -115,24 +115,12 @@ public class MemberServiceImpl implements MemberService {
         // 전체 개수 조회
         long totalElements = memberMapper.countPurchasesByMemberId(memberId);
 
-        PageResponse<MemberPurchaseItemResponse> response = PageResponse.of(
+        return PageResponse.of(
                 content,
                 pageRequest.getPage(),
                 pageRequest.getSize(),
                 totalElements
         );
-
-        int page = pageRequest.getPage();
-        int totalPages = response.getTotalPages();
-
-        response.setHasPrevious(page > 1);
-        response.setHasNext(page < totalPages);
-        response.setFirst(page == 1);
-        response.setLast(totalPages == 0 || page == totalPages);
-        response.setEmpty(content.isEmpty());
-        response.setNumberOfElements(content.size());
-
-        return response;
     }
 
     // 회원 존재 여부 확인
