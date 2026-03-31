@@ -9,6 +9,7 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import org.apache.ibatis.annotations.Mapper;
@@ -75,4 +76,12 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     // 총 구매 개수 조회
     long countPurchasesByMemberId(@Param("memberId") Long memberId);
+
+    List<MemberSellingItemResponse> findSellingItemsByMemberId(
+            @Param("memberId") Long memberId,
+            @Param("status") String upperCase,
+            @Param("pageRequest") BasePageRequest pageRequest
+    );
+
+    long countSellingItemsByMemberId(@Param("memberId") Long memberId, @Param("status") String upperCase);
 }

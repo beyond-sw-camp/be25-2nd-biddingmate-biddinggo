@@ -372,4 +372,44 @@
       AND wd.status IN ('PAID', 'CONFIRMED')
 </select>
 
+    <select id="findSellingItemsByMemberId" resultType="MemberSellingItemResponse">
+        SELECT
+        ai.name AS itemName,                                  -- 상품명
+        COALESCE(a.vickrey_price, a.start_price) AS currentPrice, -- 현재 최고가
+        a.start_price AS startPrice,                          -- 시작가
+        a.bid_count AS bidCount,                              -- 입찰 수
+        TIMESTAMPDIFF(SECOND, NOW(), a.end_date) AS remainingSeconds, -- 남은 시간(초)
+        a.type AS auctionType,                                -- 경매 타입
+        ii.url AS imageUrl                                    -- 대표 이미지 URL
+        FROM auction a
+
+        INNER JOIN auction_item ai
+        ON a.item_id = ai.id
+
+        LEFT JOIN item_image ii
+        ON ii.item_id = ai.id
+        AND ii.display_order = 1
+
+        WHERE a.seller_id = #{memberId}
+        AND a.status = #{status}
+
+        <choose>
+            <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
+                ORDER BY a.end_date ASC
+            </when>
+            <otherwise>
+                ORDER BY a.end_date DESC
+            </otherwise>
+        </choose>
+
+        LIMIT #{pageRequest.size}
+        OFFSET #{pageRequest.offset}
+    </select>
+
+    <select id="countSellingItemsByMemberId" resultType="long">
+        SELECT COUNT(*)
+        FROM auction a
+        WHERE a.seller_id = #{memberId}
+          AND a.status = #{status}
+    </select>
 </mapper>
