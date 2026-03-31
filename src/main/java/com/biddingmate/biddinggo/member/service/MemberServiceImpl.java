@@ -10,6 +10,7 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
@@ -166,6 +167,38 @@ public class MemberServiceImpl implements MemberService {
 //        if (updated != 1) {
 //            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
 //        }
+    }
+
+    @Override
+    public PageResponse<MemberSellingItemResponse> getMySellingItems(Long memberId, String status, BasePageRequest pageRequest) {
+
+        // 회원 존재 여부 확인
+        memberExists(memberId);
+
+        // 상태값 검증
+        if (!"ON_GOING".equalsIgnoreCase(status)) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_STATUS);
+        }
+
+        // 정렬값은 최신순으로
+        if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
+            pageRequest.setOrder("DESC");
+        }
+
+        // 판매중 상품 목록 조회
+        List<MemberSellingItemResponse> content =
+                memberMapper.findSellingItemsByMemberId(memberId, status.toUpperCase(), pageRequest);
+
+        // 전체 개수 조회
+        long totalElements =
+                memberMapper.countSellingItemsByMemberId(memberId, status.toUpperCase());
+
+        return PageResponse.of(
+                content,
+                pageRequest.getPage(),
+                pageRequest.getSize(),
+                totalElements
+        );
     }
 
     // 회원 존재 여부 확인
