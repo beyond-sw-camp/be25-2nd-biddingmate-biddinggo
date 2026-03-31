@@ -3,4 +3,11 @@ spring:
     name: bidding-go
   config:
     import: optional:file:.env[.properties]
-
+logging:
+  level:
+    '[org.springframework.web]': info
+    '[org.springframework.security]': info
+    '[org.mybatis]': debug
+    '[org.mariadb.jdbc.client.impl]': info
+    '[org.springframework.data.redis]': info
+    '[io.lettuce.core]': info
