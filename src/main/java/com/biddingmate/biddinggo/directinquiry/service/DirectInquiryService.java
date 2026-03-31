@@ -9,7 +9,7 @@ import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 
 public interface DirectInquiryService {
-    CreateDirectInquiryResponse createDirectInquiry(CreateDirectInquiryRequest request);
+    CreateDirectInquiryResponse createDirectInquiry(CreateDirectInquiryRequest request, Long memberId);
     PageResponse<DirectInquiryView> findDirectInquiry(BasePageRequest request, Long memberId);
     PageResponse<DirectInquiryView> findAllDirectInquiry(BasePageRequest request);
     AnswerDirectInquiryResponse answerDirectInquiry(Long inquiryId, AnswerDirectInquiryRequest request, Long adminId);

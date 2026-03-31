@@ -47,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public CreateVirtualAccountResponse createVirtualAccount(CreateVirtualAccountRequest request) {
+    public CreateVirtualAccountResponse createVirtualAccount(CreateVirtualAccountRequest request, Long memberId) {
         if (paymentMapper.existsByOrderId(request.getOrderId())) {
             throw new CustomException(ErrorType.VIRTUAL_ACCOUNT_ALREADY_EXISTS);
         }
@@ -74,7 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .block(); // 동기 호출
 
         Payment payment = Payment.builder()
-                .memberId(1L)
+                .memberId(memberId)
                 .orderId(responseData.getOrderId())
                 .paymentKey(responseData.getPaymentKey())
                 .paymentMethod(responseData.getMethod())

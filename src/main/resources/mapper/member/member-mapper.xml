@@ -130,7 +130,7 @@
                  LEFT JOIN address a ON m.id = a.member_id
         WHERE m.id = #{memberId}
     </select>
-  
+
 <!-- auth 아아디조회 -->
     <select id="selectMemberByUsername" parameterType="String" resultType="Member">
 
@@ -222,6 +222,50 @@
                  )
     </insert>
 
+    <!-- 소셜 회원 저장: 필수 필드와 선택 필드를 구분하여 처리 -->
+    <insert id="saveMember" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO member (
+        username,
+        name,
+        nickname,
+        email,
+        role,
+        image_url,
+        created_at
+        ) VALUES (
+
+        #{username},
+        #{name},
+        #{nickname},
+        #{email},
+        #{role},
+        #{imageUrl},
+        NOW()
+        )
+
+    </insert>
+
+    <!-- 소셜 회원 수정: 변경된 필드만 업데이트하도록 <set> 태그 사용 -->
+    <update id="updateMember">
+        UPDATE member
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!--  소셜 회원 필수 정보 입력  -->
+    <update id="updateMemberInfo" parameterType="com.biddingmate.biddinggo.auth.dto.SocialInfoUpdateDto">
+        UPDATE MEMBER
+        SET name = #{name},
+            nickname = #{nickname},
+            status = #{status}
+        WHERE username = #{username}
+    </update>
+
     <select id="countByNickname" parameterType="string" resultType="int">
         SELECT COUNT(*)
         FROM member
@@ -280,7 +324,7 @@
         </otherwise>
     </choose>
 
-    LIMIT #{pageRequest.limit}
+    LIMIT #{pageRequest.size}
     OFFSET #{pageRequest.offset}
 </select>
 
@@ -317,7 +361,7 @@
         </otherwise>
     </choose>
 
-    LIMIT #{pageRequest.limit}
+    LIMIT #{pageRequest.size}
     OFFSET #{pageRequest.offset}
 </select>
 
