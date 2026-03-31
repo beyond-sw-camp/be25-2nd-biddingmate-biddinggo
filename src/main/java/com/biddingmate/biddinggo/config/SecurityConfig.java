@@ -31,7 +31,6 @@ import java.util.List;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final HandlerExceptionResolver handlerExceptionResolver;
@@ -62,32 +61,11 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/","/login/**", "/oauth2/**",
-                                "/index.html",
-                                "/api/v1/payments/**", "/api/v1/files/**", "/api/v1/addresses/**",
-                                "/index.html","/success.html", "/register-info.html",
-                                "/api/v1/payments/**", "/api/v1/files/**",
-                                "/api/v1/auctions/**", "/api/v1/inspections/**",
-                                "/api/v1/direct-inquiries/**", "/api/v1/admins/direct-inquiries/**",
-                                "/api/v1/bidding/**","/api/v1/points/**",
-                                "/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/v1/users/my",
-                                "/api/v1/auction/**",
-                                "/api/v1/inquiries/**",
-                                "/api/v1/wishlists/**",
-                                "/api/v1/users/me",
-                                "/api/v1/users/**",
-                                "/api/v1/bids/**",
-                                "/api/v1/users/me/profile",
-                                "/api/v1/admin/auth/login",
-                                "/api/v1/admin/auth/signup",
-                                "/api/v1/auth/check",
-                                "/api/v1/auth/refresh"
-                        ).permitAll()
-                                .anyRequest().authenticated()
+                        .requestMatchers("/","/login/**", "/oauth2/**",
+                                "/api/v1/auth/check", "/api/v1/auth/refresh",
+                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .anyRequest().authenticated()
                 );
-
 
         return http.build();
     }
@@ -120,8 +98,4 @@ public class SecurityConfig {
 
         return new BCryptPasswordEncoder();
     }
-
-
-
-
 }
