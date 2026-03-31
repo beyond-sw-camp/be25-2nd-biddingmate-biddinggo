@@ -280,7 +280,7 @@
         </otherwise>
     </choose>
 
-    LIMIT #{pageRequest.limit}
+    LIMIT #{pageRequest.size}
     OFFSET #{pageRequest.offset}
 </select>
 
@@ -317,7 +317,7 @@
         </otherwise>
     </choose>
 
-    LIMIT #{pageRequest.limit}
+    LIMIT #{pageRequest.size}
     OFFSET #{pageRequest.offset}
 </select>
 
