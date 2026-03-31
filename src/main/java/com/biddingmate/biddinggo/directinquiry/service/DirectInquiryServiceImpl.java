@@ -26,9 +26,9 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
 
     @Override
     @Transactional
-    public CreateDirectInquiryResponse createDirectInquiry(CreateDirectInquiryRequest request) {
+    public CreateDirectInquiryResponse createDirectInquiry(CreateDirectInquiryRequest request, Long memberId) {
         DirectInquiry directInquiry = DirectInquiry.builder()
-                .writerId(1L)
+                .writerId(memberId)
                 .category(request.getCategory())
                 .content(request.getContent())
                 .createdAt(LocalDateTime.now())

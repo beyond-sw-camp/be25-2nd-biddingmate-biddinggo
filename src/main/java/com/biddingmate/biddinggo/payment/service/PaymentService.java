@@ -8,7 +8,7 @@ import com.biddingmate.biddinggo.payment.dto.TossDepositWebhook;
 import java.util.List;
 
 public interface PaymentService {
-    CreateVirtualAccountResponse createVirtualAccount(CreateVirtualAccountRequest request);
+    CreateVirtualAccountResponse createVirtualAccount(CreateVirtualAccountRequest request, Long memberId);
     List<GetVirtualAccountResponse> getVirtualAccount(Long id);
     void processDeposit(TossDepositWebhook request);
 }
