@@ -12,4 +12,6 @@ public interface CategoryMapper extends IMybatisCRUD<Category> {
     Category findById(Long id);
 
     List<CategoryResponse> findAllCategories();
+
+    boolean existsChildByParentId(Long parentId);
 }

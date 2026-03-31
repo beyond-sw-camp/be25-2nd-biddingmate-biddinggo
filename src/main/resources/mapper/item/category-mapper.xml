@@ -46,4 +46,12 @@
         ORDER BY c.level ASC, c.parent_id ASC, c.id ASC
     </select>
 
+    <select id="existsChildByParentId" parameterType="long" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM category
+            WHERE parent_id = #{parentId}
+        )
+    </select>
+
 </mapper>
