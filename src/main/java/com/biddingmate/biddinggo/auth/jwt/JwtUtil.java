@@ -13,12 +13,12 @@ import java.util.Date;
 import java.util.Map;
 
 @Component
-public class AdminJWTUtil {
+public class JwtUtil {
 
     private final String issuer;
     private final SecretKey secretKey;
 
-    public AdminJWTUtil(JWTProperties jwtProperties) {
+    public JwtUtil(JWTProperties jwtProperties) {
 
         this.issuer = jwtProperties.getIssuer();
         this.secretKey = new SecretKeySpec(

@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.admin.service;
+package com.biddingmate.biddinggo.auth.service;
 
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
@@ -25,8 +25,6 @@ public class AdminUserDetailsServiceImpl implements UserDetailsService {
 
             throw new UsernameNotFoundException(String.format("%s not found",username));
         }
-
-        log.info("Username : {}", member.getUsername());
 
         return member;
     }

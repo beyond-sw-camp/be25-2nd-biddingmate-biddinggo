@@ -1,4 +1,4 @@
-package com.biddingmate.biddinggo.auth.admin.dto;
+package com.biddingmate.biddinggo.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

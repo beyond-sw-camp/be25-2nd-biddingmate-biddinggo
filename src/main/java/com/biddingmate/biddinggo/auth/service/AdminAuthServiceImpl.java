@@ -1,14 +1,16 @@
-package com.biddingmate.biddinggo.auth.admin.service;
+package com.biddingmate.biddinggo.auth.service;
 
-import com.biddingmate.biddinggo.auth.admin.dto.AdminLoginResponse;
-import com.biddingmate.biddinggo.auth.admin.dto.AdminSignupRequestDto;
-import com.biddingmate.biddinggo.auth.jwt.JWTProvider;
-import com.biddingmate.biddinggo.auth.jwt.AdminJWTUtil;
+import com.biddingmate.biddinggo.auth.dto.AdminSignupRequestDto;
+import com.biddingmate.biddinggo.auth.dto.LoginResponse;
+import com.biddingmate.biddinggo.auth.dto.SocialInfoUpdateDto;
+import com.biddingmate.biddinggo.auth.jwt.JwtProvider;
+import com.biddingmate.biddinggo.auth.jwt.JwtUtil;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,25 +18,29 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminAuthServiceImpl implements AdminAuthService {
 
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
-    private final AdminJWTUtil adminJWTUtil;
-    private final JWTProvider jwtProvider;
+    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     @Override
-    public AdminLoginResponse login(String username, String password) {
+    public LoginResponse login(String username, String password) {
         // 사용자의 아이디와 비밀번호로 인증 처리를 진행한다.
         // 1. username으로 사용자를 조회
         Member member = memberMapper.selectMemberByUsername(username);
 
         // 2. PasswordEncoder를 사용해 데이터베이스에 저장된 비밀번호와 입력받은 비밀번호가 일치하는지 확인
         if (member == null || !passwordEncoder.matches(password, member.getPassword())) {
+            log.warn("[login-failed] username : {}", username);
             throw new CustomException(ErrorType.INVALID_CREDENTIALS);
         }
+
+        log.info("[Adminlogin] username : {}", username);
 
         // 3. LoginResponse 객체를 생성해서 반환
         return createLoginResponse(member);
@@ -65,8 +71,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 .email(signupRequestDto.getEmail())
                 .nickname(signupRequestDto.getNickname())
                 .role("ADMIN")
+                .status("ACTIVE")
                 .createdAt(LocalDateTime.now())
                 .build();
+
+        log.info("[signup] username : {}", signupRequestDto.getUsername());
 
         memberMapper.insert(member);
 
@@ -79,6 +88,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         jwtProvider.addBlacklist(accessToken);
         jwtProvider.deleteRefreshToken(accessToken);
 
+        String username = jwtUtil.getUsername(accessToken);
+        log.info("[logout] username : {}", username);
+
+
     }
 
     @Override
@@ -87,9 +100,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public AdminLoginResponse refreshAccessToken(String refreshToken) {
+    public LoginResponse refreshAccessToken(String refreshToken) {
 
-        if (refreshToken.isBlank() || !adminJWTUtil.validateToken(refreshToken)) {
+        if (refreshToken.isBlank() || !jwtUtil.validateToken(refreshToken)) {
 
             throw new CustomException(ErrorType.REFRESH_TOKEN_INVALID);
         }
@@ -100,13 +113,39 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
         }
 
-        Member member = memberMapper.selectMemberByUsername(adminJWTUtil.getUsername(refreshToken));
+        Member member = memberMapper.selectMemberByUsername(jwtUtil.getUsername(refreshToken));
 
         return createLoginResponse(member);
 
     }
 
-    private AdminLoginResponse createLoginResponse(Member member) {
+    @Override
+    public void updateInfo(String username, String name, String nickname) {
+
+        Member member = memberMapper.selectMemberByUsername(username);
+        if (member == null) {
+
+            throw new CustomException(ErrorType.USER_NOT_FOUND);
+        }
+
+        if (memberMapper.selectMemberByNickname(nickname) != null) {
+
+            throw new CustomException(ErrorType.DUPLICATE_NICKNAME);
+
+        }
+
+        SocialInfoUpdateDto updateDto = SocialInfoUpdateDto.builder()
+                .username(username)
+                .name(name)
+                .nickname(nickname)
+                .status("ACTIVE")
+                .build();
+
+        memberMapper.updateMemberInfo(updateDto);
+
+    }
+
+    private LoginResponse createLoginResponse(Member member) {
 
         // 사용자 권한 추출
         List<String> authorities =
@@ -117,13 +156,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 jwtProvider.createAccessToken(member.getUsername(), authorities);
 
 
-        return AdminLoginResponse.builder()
+        return LoginResponse.builder()
                 .accessToken(accessToken)
                 .type("Bearer")
                 .username(member.getUsername())
                 .authorities(authorities)
-                .issuedAt(adminJWTUtil.getIssuedAt(accessToken))
-                .expiredAt(adminJWTUtil.getExpiredAt(accessToken))
+                .issuedAt(jwtUtil.getIssuedAt(accessToken))
+                .expiredAt(jwtUtil.getExpiredAt(accessToken))
                 .build();
     }
 

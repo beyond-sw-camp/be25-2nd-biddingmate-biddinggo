@@ -2,15 +2,11 @@ package com.biddingmate.biddinggo.config;
 
 import com.biddingmate.biddinggo.auth.handler.AccessDeniedHandlerImpl;
 import com.biddingmate.biddinggo.auth.handler.AuthenticationEntryPointImpl;
-import com.biddingmate.biddinggo.auth.jwt.AdminJWTAuthenticationFilter;
-import com.biddingmate.biddinggo.auth.jwt.AdminJWTUtil;
-import com.biddingmate.biddinggo.auth.jwt.JWTFilter;
-import com.biddingmate.biddinggo.auth.jwt.JWTProvider;
-import com.biddingmate.biddinggo.auth.jwt.JWTUtil;
+import com.biddingmate.biddinggo.auth.jwt.JwtAuthenticationFilter;
+import com.biddingmate.biddinggo.auth.jwt.JwtProvider;
 import com.biddingmate.biddinggo.auth.oauth2.CustomSuccessHandler;
 import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.reactive.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -21,7 +17,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,12 +34,9 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final HandlerExceptionResolver handlerExceptionResolver;
-    private final JWTUtil jwtUtil;
-
-    private final AdminJWTUtil adminJWTUtil;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver, JWTProvider jWTProvider) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver, JwtProvider jWTProvider) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -53,8 +45,7 @@ public class SecurityConfig {
                 .sessionManagement((seession) -> seession
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 무한 루프 방지
-                .addFilterBefore(new AdminJWTAuthenticationFilter(jWTProvider), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new JWTFilter(jwtUtil,handlerExceptionResolver), AdminJWTAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jWTProvider), UsernamePasswordAuthenticationFilter.class)
                 // 필터내부 예외 발생시 GlobalExceptionHandler으로 던짐
                 .exceptionHandling(exception -> exception
                         // 401 Unauthorized (인증 되지 않은 사용자가 리소스 접근시)
@@ -70,27 +61,12 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/","/login/**", "/oauth2/**",
-                                "/index.html",
-                                "/api/v1/payments/**", "/api/v1/files/**", "/api/v1/addresses/**",
-                                "/api/v1/auctions/**", "/api/v1/inspections/**",
-                                "/api/v1/direct-inquiries/**", "/api/v1/admins/direct-inquiries/**",
-                                "/api/v1/bidding/**","/api/v1/points/**",
-                                "/swagger-ui/**", "/v3/api-docs/**",
-                                "/api/v1/users/my",
-                                "/api/v1/auction/**",
-                                "/api/v1/inquiries/**",
-                                "/api/v1/wishlists/**",
-                                "/api/v1/users/me",
-                                "/api/v1/users/**",
-                                "/api/v1/bids/**",
-                                "/api/v1/users/me/profile",
-                                "/api/v1/admin/auth/login",
-                                "/api/v1/admin/auth/signup"
-                        ).permitAll()
-                                .anyRequest().authenticated()
+                        .requestMatchers("/","/login/**", "/oauth2/**",
+                                "/api/v1/auth/check", "/api/v1/auth/refresh",
+                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .anyRequest().authenticated()
                 );
+
         return http.build();
     }
 

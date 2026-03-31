@@ -1,12 +1,11 @@
-package com.biddingmate.biddinggo.auth.admin.service;
+package com.biddingmate.biddinggo.auth.jwt;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-public interface JWTCookieService {
+public interface JwtCookieService {
 
     ResponseCookie createRefreshTokenCookie(String refreshToken, Duration duration);
 

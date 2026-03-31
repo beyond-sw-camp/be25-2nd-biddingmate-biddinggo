@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.biddingmate.biddinggo.auth.mapper.AuthMemberMapper">
+<mapper namespace="com.biddingmate.biddinggo.auth.mapper.AuthSocialMapper">
 
     <select id="findBySocialInfo" resultType="com.biddingmate.biddinggo.member.model.Member">
         SELECT m.*
@@ -10,20 +10,12 @@
         WHERE s.provider = #{provider} AND s.provider_id = #{providerId}
     </select>
 
-    <insert id="saveMember" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO member (email, name, role, created_at)
-        VALUES (#{email}, #{name}, #{role}, NOW())
-    </insert>
 
     <insert id="saveSocialAccount">
         INSERT INTO social_account (member_id, provider, provider_id, created_at)
         VALUES (#{memberId}, #{provider}, #{providerId}, NOW())
     </insert>
 
-    <update id="updateMember">
-        UPDATE member
-        SET name = #{name}, email = #{email}
-        WHERE id = #{id}
-    </update>
+
 
 </mapper>
