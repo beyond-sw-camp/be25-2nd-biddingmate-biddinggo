@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.inspection.service;
 
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionRequest;
+import com.biddingmate.biddinggo.inspection.dto.InspectionProcessRequest;
 
 /**
  * 상품 검수 등록 유스케이스를 조합하는 상위 서비스.

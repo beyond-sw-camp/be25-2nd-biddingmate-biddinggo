@@ -203,4 +203,21 @@
         </where>
     </select>
 
+    <update id="updateStatus">
+        UPDATE inspection
+        <set>
+            status = #{newStatus},
+            <if test="newStatus.name() == 'FAILED' and failureReason != null">
+                failure_reason = #{failureReason},
+            </if>
+            <if test="newStatus.name() != 'FAILED'">
+                failure_reason = NULL,
+            </if>
+        </set>
+        WHERE id = #{inspectionId}
+        <if test="currentStatus != null">
+            AND status = #{currentStatus}
+        </if>
+    </update>
+
 </mapper>

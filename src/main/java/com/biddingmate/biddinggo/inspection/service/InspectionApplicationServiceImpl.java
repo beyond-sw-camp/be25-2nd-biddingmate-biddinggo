@@ -1,7 +1,12 @@
 package com.biddingmate.biddinggo.inspection.service;
 
+import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.file.service.FileService;
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionRequest;
+import com.biddingmate.biddinggo.inspection.dto.InspectionProcessRequest;
+import com.biddingmate.biddinggo.inspection.model.Inspection;
+import com.biddingmate.biddinggo.inspection.model.InspectionStatus;
+import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import com.biddingmate.biddinggo.item.service.ItemImageService;
 import lombok.RequiredArgsConstructor;
