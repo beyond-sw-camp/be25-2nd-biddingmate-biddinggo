@@ -1,7 +1,10 @@
 package com.biddingmate.biddinggo.inspection.mapper;
 
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
+import com.biddingmate.biddinggo.inspection.dto.AdminInspectionListRequest;
+import com.biddingmate.biddinggo.inspection.dto.AdminInspectionListResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse;
+import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListResponse;
 import com.biddingmate.biddinggo.inspection.model.Inspection;
 import com.biddingmate.biddinggo.inspection.model.InspectionStatus;
@@ -29,4 +32,10 @@ public interface InspectionMapper extends IMybatisCRUD<Inspection> {
                             @Param("status") ItemInspectionStatus status);
 
     InspectionDetailResponse findDetailById(Long inspectionId);
+
+    List<AdminInspectionListResponse> findAllWithFilter(@Param("request") AdminInspectionListRequest request,
+                                                        RowBounds rowBounds,
+                                                        @Param("order") String sortOrder);
+
+    long countWithFilter(AdminInspectionListRequest request);
 }

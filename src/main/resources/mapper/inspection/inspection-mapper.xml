@@ -165,4 +165,42 @@
         </trim>
     </insert>
 
+    <!-- 관리자 검수 요청 물품 조회 -->
+    <select id="findAllWithFilter" parameterType="InspectionListRequest" resultType="AdminInspectionListResponse">
+        SELECT i.id AS inspectionId,
+               ai.id AS itemId,
+               ai.name AS name,
+               i.status AS status,
+               ai.quality AS quality,
+               i.created_at AS createdAt
+        FROM inspection i
+        INNER JOIN auction_item ai ON i.item_id = ai.id
+        <where>
+            <if test="request.status != null">
+                AND i.status = #{request.status}
+            </if>
+            <if test="request.name != null and request.name != ''">
+                AND ai.name LIKE CONCAT('%', #{request.name}, '%')
+            </if>
+        </where>
+        ORDER BY i.created_at ${order}
+    </select>
+
+    <!-- 관리자 검수 요청 물품 조회 페이징 카운트 -->
+    <select id="countWithFilter"
+            parameterType="InspectionListRequest"
+            resultType="long">
+        SELECT COUNT(*)
+        FROM inspection i
+        INNER JOIN auction_item ai ON i.item_id = ai.id
+        <where>
+            <if test="status != null">
+                AND i.status = #{status}
+            </if>
+            <if test="name != null and name != ''">
+                AND ai.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+
 </mapper>

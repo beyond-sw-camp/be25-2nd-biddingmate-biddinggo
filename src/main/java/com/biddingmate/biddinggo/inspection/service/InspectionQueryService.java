@@ -1,6 +1,8 @@
 package com.biddingmate.biddinggo.inspection.service;
 
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.inspection.dto.AdminInspectionListRequest;
+import com.biddingmate.biddinggo.inspection.dto.AdminInspectionListResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListResponse;
@@ -19,4 +21,8 @@ public interface InspectionQueryService {
      * 검수 ID를 기준으로 상세 정보를 조회한다.
      */
     InspectionDetailResponse getInspectionDetail(Long inspectionId);
+
+    // 모든 검수 요청 물품 조회
+    // 검수 상태 및 물품명에 의한 필터링 처리
+    PageResponse<AdminInspectionListResponse> findAllWithFilter(AdminInspectionListRequest request);
 }
