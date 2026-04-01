@@ -3,6 +3,8 @@ package com.biddingmate.biddinggo.inspection.service;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.inspection.dto.AdminInspectionListRequest;
+import com.biddingmate.biddinggo.inspection.dto.AdminInspectionListResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListRequest;
 import com.biddingmate.biddinggo.inspection.dto.InspectionListResponse;
@@ -82,5 +84,27 @@ public class InspectionQueryServiceImpl implements InspectionQueryService {
         detail.getItem().setImages(images);
 
         return detail;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<AdminInspectionListResponse> findAllWithFilter(AdminInspectionListRequest request) {
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+
+        String order = request.getOrder();
+
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
+
+        String sortOrder = order.toUpperCase();
+
+        List<AdminInspectionListResponse> content =
+                inspectionMapper.findAllWithFilter(request, rowBounds, sortOrder);
+
+        long totalCount =
+                inspectionMapper.countWithFilter(request);
+
+        return PageResponse.of(content, request.getPage(), request.getSize(), totalCount);
     }
 }
