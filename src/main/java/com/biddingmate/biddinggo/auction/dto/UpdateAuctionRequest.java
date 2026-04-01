@@ -19,10 +19,6 @@ import java.time.LocalDateTime;
 @Builder
 @Schema(description = "경매 수정 요청 DTO")
 public class UpdateAuctionRequest {
-    @Schema(description = "판매자 ID", example = "1")
-    @NotNull(message = "판매자 ID는 필수입니다.")
-    private Long sellerId;
-
     @Schema(description = "시작가", example = "100000")
     @PositiveOrZero(message = "시작가는 0 이상이어야 합니다.")
     private Long startPrice;

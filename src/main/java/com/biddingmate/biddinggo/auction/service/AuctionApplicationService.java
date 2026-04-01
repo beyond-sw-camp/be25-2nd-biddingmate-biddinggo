@@ -11,10 +11,10 @@ public interface AuctionApplicationService {
     /**
      * 경매 상품 생성과 경매 생성을 하나의 흐름으로 처리한다.
      */
-    Long createAuction(CreateAuctionRequest request);
+    Long createAuction(CreateAuctionRequest request, Long memberId);
 
     /**
      * 검수 완료된 기존 상품을 기준으로 경매를 생성한다.
      */
-    Long createAuctionFromInspectionItem(CreateAuctionFromInspectionItemRequest request);
+    Long createAuctionFromInspectionItem(CreateAuctionFromInspectionItemRequest request, Long memberId);
 }

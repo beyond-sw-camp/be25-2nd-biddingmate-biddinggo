@@ -30,8 +30,8 @@ public class AuctionItemServiceImpl implements AuctionItemService {
      * 경매 등록용 item 생성.
      * status/inspectionStatus를 null로 넘겨 DB 기본값을 사용한다.
      */
-    public Long createAuctionItem(AuctionItemCreateSource item) {
-        return createItem(item, null, null);
+    public Long createAuctionItem(AuctionItemCreateSource item, Long sellerId) {
+        return createItem(item, sellerId, null, null);
     }
 
     @Override
@@ -39,8 +39,8 @@ public class AuctionItemServiceImpl implements AuctionItemService {
      * 검수 등록용 item 생성.
      * 검수 대기 상품이므로 status와 inspectionStatus를 모두 PENDING으로 명시한다.
      */
-    public Long createInspectionItem(AuctionItemCreateSource item) {
-        return createItem(item, AuctionItemStatus.PENDING, ItemInspectionStatus.PENDING);
+    public Long createInspectionItem(AuctionItemCreateSource item, Long sellerId) {
+        return createItem(item, sellerId, AuctionItemStatus.PENDING, ItemInspectionStatus.PENDING);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class AuctionItemServiceImpl implements AuctionItemService {
      * {@code auction_item.status}, {@code auction_item.inspection_status} 초기값도 함께 결정한다.</p>
      * <p>두 값이 null이면 mapper에서 해당 컬럼을 INSERT에서 제외하고 DB 기본값을 사용한다.</p>
      */
-    private Long createItem(AuctionItemCreateSource item, AuctionItemStatus status, ItemInspectionStatus inspectionStatus) {
+    private Long createItem(AuctionItemCreateSource item, Long sellerId, AuctionItemStatus status, ItemInspectionStatus inspectionStatus) {
         // 등록 요청에서 선택한 categoryId가 실제 존재하는지 확인한다.
         Category category = categoryMapper.findById(item.getCategoryId());
 
@@ -107,15 +107,15 @@ public class AuctionItemServiceImpl implements AuctionItemService {
             throw new CustomException(ErrorType.CATEGORY_NOT_FOUND);
         }
 
-        // 현재 정책상 경매 등록은 최하위(level=3) 카테고리만 허용한다.
-        if (!Integer.valueOf(3).equals(category.getLevel())) {
+        // 현재 정책상 경매 등록은 자식이 없는 최하위 카테고리만 허용한다.
+        if (categoryMapper.existsChildByParentId(category.getId())) {
             throw new CustomException(ErrorType.INVALID_CATEGORY_LEVEL);
         }
 
         // request를 DB 저장용 auction_item 모델로 변환한다.
         // inspection_status는 AuctionService/InspectionService가 아니라 여기서 세팅된다.
         AuctionItem auctionItem = AuctionItem.builder()
-                .sellerId(item.getSellerId())
+                .sellerId(sellerId)
                 .categoryId(item.getCategoryId())
                 .brand(item.getBrand())
                 .name(item.getName())

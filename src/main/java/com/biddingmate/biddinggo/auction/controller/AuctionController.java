@@ -3,7 +3,6 @@ package com.biddingmate.biddinggo.auction.controller;
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
 import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
-import com.biddingmate.biddinggo.auction.dto.CancelAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionResponse;
@@ -14,11 +13,13 @@ import com.biddingmate.biddinggo.auction.service.AuctionService;
 import io.swagger.v3.oas.annotations.Operation;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.member.model.Member;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,9 +60,10 @@ public class AuctionController {
     @PostMapping("")
     @Operation(summary = "경매 등록", description = "경매 상품과 경매 정보를 함께 등록합니다.")
     public ResponseEntity<ApiResponse<CreateAuctionResponse>> createAuction(
-            @Valid @RequestBody CreateAuctionRequest request) {
+            @Valid @RequestBody CreateAuctionRequest request,
+            @AuthenticationPrincipal Member member) {
 
-        Long auctionId = auctionApplicationService.createAuction(request);
+        Long auctionId = auctionApplicationService.createAuction(request, member.getId());
 
         CreateAuctionResponse result = CreateAuctionResponse.builder()
                 .auctionId(auctionId)
@@ -73,9 +75,10 @@ public class AuctionController {
     @PostMapping("/inspection-items")
     @Operation(summary = "검수 완료 상품 경매 등록", description = "검수 완료된 기존 상품을 기준으로 경매를 등록합니다.")
     public ResponseEntity<ApiResponse<CreateAuctionResponse>> createAuctionFromInspectionItem(
-            @Valid @RequestBody CreateAuctionFromInspectionItemRequest request) {
+            @Valid @RequestBody CreateAuctionFromInspectionItemRequest request,
+            @AuthenticationPrincipal Member member) {
 
-        Long auctionId = auctionApplicationService.createAuctionFromInspectionItem(request);
+        Long auctionId = auctionApplicationService.createAuctionFromInspectionItem(request, member.getId());
 
         CreateAuctionResponse result = CreateAuctionResponse.builder()
                 .auctionId(auctionId)
@@ -88,9 +91,10 @@ public class AuctionController {
     @Operation(summary = "경매 정보 수정", description = "경매 정보를 수정합니다.")
     public ResponseEntity<ApiResponse<CreateAuctionResponse>> updateAuction(
             @PathVariable Long auctionId,
-            @Valid @RequestBody UpdateAuctionRequest request) {
+            @Valid @RequestBody UpdateAuctionRequest request,
+            @AuthenticationPrincipal Member member) {
 
-        auctionService.updateAuction(auctionId, request);
+        auctionService.updateAuction(auctionId, request, member.getId());
 
         CreateAuctionResponse result = CreateAuctionResponse.builder()
                 .auctionId(auctionId)
@@ -103,9 +107,9 @@ public class AuctionController {
     @Operation(summary = "경매 취소", description = "경매를 취소 처리합니다.")
     public ResponseEntity<ApiResponse<CreateAuctionResponse>> cancelAuction(
             @PathVariable Long auctionId,
-            @Valid @RequestBody CancelAuctionRequest request) {
+            @AuthenticationPrincipal Member member) {
 
-        auctionService.cancelAuction(auctionId, request.getSellerId());
+        auctionService.cancelAuction(auctionId, member.getId());
 
         CreateAuctionResponse result = CreateAuctionResponse.builder()
                 .auctionId(auctionId)

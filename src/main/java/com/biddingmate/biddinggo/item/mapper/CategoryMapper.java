@@ -7,4 +7,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CategoryMapper extends IMybatisCRUD<Category> {
     Category findById(Long id);
+
+    boolean existsChildByParentId(Long parentId);
 }

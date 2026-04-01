@@ -11,12 +11,14 @@ import com.biddingmate.biddinggo.inspection.service.InspectionApplicationService
 import com.biddingmate.biddinggo.inspection.service.InspectionService;
 import com.biddingmate.biddinggo.inspection.dto.InspectionDetailResponse;
 import com.biddingmate.biddinggo.inspection.service.InspectionQueryService;
+import com.biddingmate.biddinggo.member.model.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,9 +59,10 @@ public class InspectionController {
     @PostMapping("")
     @Operation(summary = "상품 검수 등록", description = "검수 대상 상품, 이미지, 검수 정보를 함께 등록합니다.")
     public ResponseEntity<ApiResponse<CreateInspectionResponse>> createInspection(
-            @Valid @RequestBody CreateInspectionRequest request) {
+            @Valid @RequestBody CreateInspectionRequest request,
+            @AuthenticationPrincipal Member member) {
 
-        Long inspectionId = inspectionApplicationService.createInspection(request);
+        Long inspectionId = inspectionApplicationService.createInspection(request, member.getId());
 
         CreateInspectionResponse result = CreateInspectionResponse.builder()
                 .inspectionId(inspectionId)

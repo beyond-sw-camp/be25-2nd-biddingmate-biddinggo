@@ -20,4 +20,12 @@
         WHERE id = #{id}
     </select>
 
+    <select id="existsChildByParentId" parameterType="long" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM category
+            WHERE parent_id = #{parentId}
+        )
+    </select>
+
 </mapper>

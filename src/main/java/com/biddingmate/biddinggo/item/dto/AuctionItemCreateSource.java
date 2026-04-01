@@ -1,8 +1,6 @@
 package com.biddingmate.biddinggo.item.dto;
 
 public interface AuctionItemCreateSource {
-    Long getSellerId();
-
     Long getCategoryId();
 
     String getBrand();

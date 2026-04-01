@@ -43,10 +43,6 @@ public class CreateAuctionRequest {
     @Builder
     @Schema(description = "경매 상품 요청 DTO")
     public static class Item implements AuctionItemCreateSource {
-        @Schema(description = "판매자 ID", example = "1")
-        @NotNull(message = "판매자 ID는 필수입니다.")
-        private Long sellerId;
-
         @Schema(description = "카테고리 ID", example = "10")
         @NotNull(message = "카테고리 ID는 필수입니다.")
         private Long categoryId;

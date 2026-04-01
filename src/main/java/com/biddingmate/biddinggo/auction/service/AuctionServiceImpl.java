@@ -30,12 +30,12 @@ public class AuctionServiceImpl implements AuctionService {
      * 경매 수정 메인 로직.
      * 판매자 본인 여부와 수정 가능 상태를 확인한 뒤 auction 테이블의 수정 가능 필드만 반영한다.
      */
-    public void updateAuction(Long auctionId, UpdateAuctionRequest request) {
-        validateUpdateRequest(auctionId, request);
+    public void updateAuction(Long auctionId, UpdateAuctionRequest request, Long sellerId) {
+        validateUpdateRequest(auctionId, request, sellerId);
 
         // 동시 수정 충돌을 줄이기 위해 수정 대상 경매를 lock 조회한다.
         Auction auction = getAuctionForModification(auctionId);
-        validateSeller(auction, request.getSellerId());
+        validateSeller(auction, sellerId);
 
         // 정책상 PENDING 또는 ON_GOING + bidCount == 0 인 경우에만 수정 가능하다.
         if (!isAuctionUpdatableOrCancelable(auction)) {
@@ -87,7 +87,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public Long createAuction(CreateAuctionRequest request, Long itemId) {
+    public Long createAuction(CreateAuctionRequest request, Long itemId, Long sellerId) {
         if (itemId == null) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }
@@ -95,7 +95,7 @@ public class AuctionServiceImpl implements AuctionService {
         // 일반 경매 등록은 검수 경매가 아니므로 inspectionYn은 서버에서 NO로 고정한다.
         Auction auction = Auction.builder()
                 .itemId(itemId)
-                .sellerId(request.getItem().getSellerId())
+                .sellerId(sellerId)
                 .type(request.getAuction().getType())
                 .inspectionYn(YesNo.NO)
                 .startPrice(request.getAuction().getStartPrice())
@@ -118,7 +118,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public Long createAuction(CreateAuctionFromInspectionItemRequest request) {
+    public Long createAuction(CreateAuctionFromInspectionItemRequest request, Long sellerId) {
         if (request.getItemId() == null) {
             throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
         }
@@ -126,7 +126,7 @@ public class AuctionServiceImpl implements AuctionService {
         // 검수 완료 상품 기반 경매 등록은 inspectionYn을 서버에서 YES로 고정한다.
         Auction auction = Auction.builder()
                 .itemId(request.getItemId())
-                .sellerId(request.getSellerId())
+                .sellerId(sellerId)
                 .type(request.getAuction().getType())
                 .inspectionYn(YesNo.YES)
                 .startPrice(request.getAuction().getStartPrice())
@@ -151,12 +151,12 @@ public class AuctionServiceImpl implements AuctionService {
      * 수정 요청 기본값을 검증한다.
      * 경매 ID, 판매자 ID, 수정 필수 필드가 비어 있으면 요청 오류로 처리한다.
      */
-    private void validateUpdateRequest(Long auctionId, UpdateAuctionRequest request) {
+    private void validateUpdateRequest(Long auctionId, UpdateAuctionRequest request, Long sellerId) {
         if (auctionId == null || auctionId <= 0 || request == null) {
             throw new CustomException(ErrorType.INVALID_AUCTION_UPDATE_REQUEST);
         }
 
-        if (request.getSellerId() == null || request.getSellerId() <= 0) {
+        if (sellerId == null || sellerId <= 0) {
             throw new CustomException(ErrorType.INVALID_AUCTION_UPDATE_REQUEST);
         }
 
