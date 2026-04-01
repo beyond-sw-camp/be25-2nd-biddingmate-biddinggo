@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.member.dto;
 
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,10 +11,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class MemberListView {
-    private Long memberId;
+    private Long id;
     private String nickname;
     private String email;
-    private String status;
+    private MemberStatus status;
     private LocalDateTime createdAt;
-    private int totalCount;
+
+    // 거래 건수 필드는 추후에 추가 예정
+    // private int dealTotalCount;
 }
