@@ -13,6 +13,7 @@
             title,
             content,
             secret_yn,
+            status,
             created_at
         ) VALUES (
                      #{auctionId},
@@ -21,6 +22,7 @@
                      #{title},
                      #{content},
                      #{secretYn},
+                     #{status},
                      #{createdAt}
                  )
     </insert>
@@ -44,10 +46,9 @@
     <update id="updateAnswer" parameterType="AuctionInquiry">
         UPDATE auction_inquiry
         SET answer      = #{answer},
-            answered_at = #{answeredAt},
-            status      = #{status}
-        WHERE id = #{id}
-          AND answer IS NULL </update>
+            answerer_id = #{answererId}, answered_at = #{answeredAt},
+            status      = #{status}      WHERE id = #{id}
+                                           AND status = 'PENDING'         </update>
 
     <select id="selectInquiryList" resultType="AuctionInquiryView">
         SELECT
