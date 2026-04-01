@@ -18,5 +18,6 @@ public interface AuctionItemMapper extends IMybatisCRUD<AuctionItem> {
 
     void updateInspectionStatus(@Param("itemId") Long itemId,
                                 @Param("newStatus") ItemInspectionStatus newStatus,
-                                @Param("currentStatus") ItemInspectionStatus currentStatus);
+                                @Param("currentStatus") ItemInspectionStatus currentStatus,
+                                @Param("quality") String quality);
 }

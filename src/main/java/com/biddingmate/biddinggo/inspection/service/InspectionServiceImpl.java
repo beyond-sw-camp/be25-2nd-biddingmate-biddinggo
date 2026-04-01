@@ -123,6 +123,6 @@ public class InspectionServiceImpl implements InspectionService {
                 ? ItemInspectionStatus.PASSED
                 : ItemInspectionStatus.FAILED;
 
-        auctionItemMapper.updateInspectionStatus(auctionItemId, itemStatus, ItemInspectionStatus.PENDING);
+        auctionItemMapper.updateInspectionStatus(auctionItemId, itemStatus, ItemInspectionStatus.PENDING, request.getQuality());
     }
 }

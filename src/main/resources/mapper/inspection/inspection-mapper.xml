@@ -207,6 +207,9 @@
         UPDATE inspection
         <set>
             status = #{newStatus},
+            <if test="newStatus.name() != 'PENDING'">
+                completed_at = NOW(),
+            </if>
             <if test="newStatus.name() == 'FAILED' and failureReason != null">
                 failure_reason = #{failureReason},
             </if>

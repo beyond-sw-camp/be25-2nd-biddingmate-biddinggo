@@ -9,5 +9,6 @@ import lombok.Getter;
 @Builder
 public class InspectionProcessRequest {
     private boolean approved;
+    private String quality;
     private String failureReason;
 }
