@@ -36,7 +36,7 @@ public class ReviewController {
             @AuthenticationPrincipal Member member
     ) {
         if (member == null) {
-            throw new CustomException(ErrorType.UNAUTHORIZED);
+            throw new CustomException(ErrorType.USER_NOT_FOUND);
         }
 
         CreateReviewResponse result = reviewService.createReview(auctionId, member, request);

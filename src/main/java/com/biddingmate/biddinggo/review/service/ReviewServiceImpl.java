@@ -28,7 +28,6 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public CreateReviewResponse createReview(Long auctionId, Member member, CreateReviewRequest request) {
 
-        if (member == null) throw new CustomException(ErrorType.USER_NOT_FOUND);
         Long writerId = member.getId();
 
         // 옥션 정보 조회
