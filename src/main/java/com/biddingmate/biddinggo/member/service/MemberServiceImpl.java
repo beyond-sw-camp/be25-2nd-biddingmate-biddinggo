@@ -4,8 +4,11 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryView;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
+import com.biddingmate.biddinggo.member.dto.MemberListView;
+import com.biddingmate.biddinggo.member.dto.MemberListViewRequest;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
@@ -15,6 +18,7 @@ import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -199,6 +203,25 @@ public class MemberServiceImpl implements MemberService {
                 pageRequest.getSize(),
                 totalElements
         );
+    }
+
+    @Override
+    public PageResponse<MemberListView> findAllMemberWithFilter(MemberListViewRequest request) {
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        String order = request.getOrder();
+
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
+        String sortOrder = order.toUpperCase();
+
+        List<MemberListView> list;
+        int count;
+
+        list = memberMapper.findAllWithFilter(rowBounds, sortOrder, request.getKeyword(), request.getStatus());
+        count = memberMapper.countTotalMember(request.getKeyword(), request.getStatus());
+
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
     }
 
     // 회원 존재 여부 확인
