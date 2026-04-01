@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -71,5 +72,17 @@ public class MemberController {
     ) {
         PageResponse<MemberPurchaseItemResponse> result = memberService.getMyPurchases(memberId, pageRequest);
         return ApiResponse.of(HttpStatus.OK, null, "구매 내역 조회 성공", result);
+    }
+
+    @GetMapping("/me/auctions")
+    public ResponseEntity<ApiResponse<PageResponse<MemberSellingItemResponse>>> getSellingItems(
+            @RequestParam Long memberId,
+            @RequestParam String status,
+            @Valid BasePageRequest pageRequest
+    ) {
+        PageResponse<MemberSellingItemResponse> result =
+                memberService.getMySellingItems(memberId, status, pageRequest);
+
+        return ApiResponse.of(HttpStatus.OK, null, "판매 중인 상품 조회 성공", result);
     }
 }

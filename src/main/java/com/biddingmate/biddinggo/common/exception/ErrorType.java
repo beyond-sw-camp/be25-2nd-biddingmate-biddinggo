@@ -61,6 +61,7 @@ public enum ErrorType {
     INVALID_AUCTION_CANCEL_REQUEST("auction-014", "경매 취소 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_UPDATE_NOT_ALLOWED("auction-015", "현재 상태에서는 경매를 수정할 수 없습니다.", HttpStatus.CONFLICT),
     AUCTION_CANCEL_NOT_ALLOWED("auction-016", "현재 상태에서는 경매를 취소할 수 없습니다.", HttpStatus.CONFLICT),
+    INVALID_AUCTION_STATUS("auction-017", "유효하지 않은 경매 상태값입니다.", HttpStatus.BAD_REQUEST),
 
     // 검수
     INVALID_INSPECTION_CREATE_REQUEST("inspection-001", "검수 등록 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
