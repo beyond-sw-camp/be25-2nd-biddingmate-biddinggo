@@ -140,7 +140,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
         // 불변 DTO 특성을 살린 권한별 마스킹 처리
         List<AuctionInquiryView> processedList = rawList.stream()
                 .map(view -> {
-                    // 작성자 본인인가? OR 해당 경매 판매자인가? OR 관리자인가?
+                    // 작성자 본인인가? OR 해당 경매 판매자인가?
                     boolean isWriter = (currentUserId != null) && view.getWriterId().equals(currentUserId);
                     boolean isSeller = (currentUserId != null) && auction.getSellerId().equals(currentUserId);
 
