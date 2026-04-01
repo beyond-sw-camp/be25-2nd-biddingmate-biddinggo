@@ -14,7 +14,6 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
-import com.biddingmate.biddinggo.member.model.MemberRole;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
@@ -122,13 +121,11 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
     public PageResponse<AuctionInquiryView> getInquiriesByAuctionId(
             Long auctionId,
             BasePageRequest request,
-            Long currentUserId,
-            MemberRole role
+            Long currentUserId
     ) {
 
         // 경매 존재 여부 확인
         Auction auction = validateAndGetAuction(auctionId);
-        boolean isAdmin = role.isAdmin();
 
         // 페이지 번호 검증
         if (request.getPage() < 1) {
@@ -147,7 +144,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
                     boolean isWriter = (currentUserId != null) && view.getWriterId().equals(currentUserId);
                     boolean isSeller = (currentUserId != null) && auction.getSellerId().equals(currentUserId);
 
-                    boolean hasFullAccess = isWriter || isSeller || isAdmin;
+                    boolean hasFullAccess = isWriter || isSeller;
 
                     // 권한이 있는 경우: 원본 그대로 반환
                     if (hasFullAccess) {

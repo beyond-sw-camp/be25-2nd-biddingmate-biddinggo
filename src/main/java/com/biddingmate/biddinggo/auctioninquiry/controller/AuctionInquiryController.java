@@ -12,7 +12,6 @@ import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.model.Member;
-import com.biddingmate.biddinggo.member.model.MemberRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -39,10 +38,6 @@ public class AuctionInquiryController {
     @PostMapping("/inquiries")
     public ResponseEntity<ApiResponse<CreateAuctionInquiryResponse>> createInquiry(
 
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "문의 등록 요청 정보",
-                    required = true
-            )
             @Valid @RequestBody CreateAuctionInquiryRequest request,
             @AuthenticationPrincipal Member member
     ) {
@@ -94,12 +89,9 @@ public class AuctionInquiryController {
 
     ) {
         Long currentUserId = (member != null) ? member.getId() : null;
-        MemberRole role = (member != null && member.getRole() != null)
-                ? MemberRole.valueOf(member.getRole().toUpperCase())
-                : MemberRole.USER;
 
         PageResponse<AuctionInquiryView> result =
-                auctionInquiryService.getInquiriesByAuctionId(auctionId, request,currentUserId, role);
+                auctionInquiryService.getInquiriesByAuctionId(auctionId, request,currentUserId);
 
         return ApiResponse.of(
                 HttpStatus.OK,
