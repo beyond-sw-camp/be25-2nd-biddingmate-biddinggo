@@ -25,10 +25,6 @@ public class CreateAuctionFromInspectionItemRequest {
     @NotNull(message = "상품 ID는 필수입니다.")
     private Long itemId;
 
-    @Schema(description = "판매자 ID", example = "1")
-    @NotNull(message = "판매자 ID는 필수입니다.")
-    private Long sellerId;
-
     @Schema(description = "경매 정보")
     @NotNull(message = "경매 정보는 필수입니다.")
     @Valid

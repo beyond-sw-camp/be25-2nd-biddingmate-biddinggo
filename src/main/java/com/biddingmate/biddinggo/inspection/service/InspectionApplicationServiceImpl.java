@@ -30,12 +30,12 @@ public class InspectionApplicationServiceImpl implements InspectionApplicationSe
      * 업로드된 임시 파일 목록을 먼저 확보해두고,
      * 중간 실패 시 R2 cleanup까지 함께 처리한다.
      */
-    public Long createInspection(CreateInspectionRequest request) {
+    public Long createInspection(CreateInspectionRequest request, Long memberId) {
         List<String> uploadedFileKeys = extractUploadedFileKeys(request);
 
         try {
             // 1. 검수 대상 상품을 먼저 생성하여 itemId를 확보한다.
-            Long itemId = auctionItemService.createInspectionItem(request.getItem());
+            Long itemId = auctionItemService.createInspectionItem(request.getItem(), memberId);
 
             // 2. 업로드된 이미지 메타데이터를 item_image에 저장한다.
             itemImageService.createItemImages(itemId, request.getItem().getImages());

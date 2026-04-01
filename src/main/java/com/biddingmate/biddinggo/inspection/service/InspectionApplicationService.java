@@ -10,5 +10,5 @@ public interface InspectionApplicationService {
     /**
      * 검수 대상 상품 생성, 이미지 저장, inspection 생성을 하나의 흐름으로 처리한다.
      */
-    Long createInspection(CreateInspectionRequest request);
+    Long createInspection(CreateInspectionRequest request, Long memberId);
 }

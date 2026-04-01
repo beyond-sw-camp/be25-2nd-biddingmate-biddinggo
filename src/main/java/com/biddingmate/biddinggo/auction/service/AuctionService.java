@@ -11,17 +11,17 @@ public interface AuctionService {
     /**
      * 이미 생성된 itemId를 기준으로 auction 데이터를 저장한다.
      */
-    Long createAuction(CreateAuctionRequest request, Long itemId);
+    Long createAuction(CreateAuctionRequest request, Long itemId, Long sellerId);
 
     /**
      * 검수 완료된 기존 itemId를 기준으로 auction 데이터를 저장한다.
      */
-    Long createAuction(CreateAuctionFromInspectionItemRequest request);
+    Long createAuction(CreateAuctionFromInspectionItemRequest request, Long sellerId);
 
     /**
      * 경매 정보를 수정한다.
      */
-    void updateAuction(Long auctionId, UpdateAuctionRequest request);
+    void updateAuction(Long auctionId, UpdateAuctionRequest request, Long sellerId);
 
     /**
      * 경매를 취소 처리한다.

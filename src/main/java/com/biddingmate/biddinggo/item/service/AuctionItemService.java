@@ -15,7 +15,7 @@ public interface AuctionItemService {
      * <p>{@code auction_item.inspection_status}는 이 단계에서 명시하지 않고,
      * DB 기본값({@code NONE})을 사용한다.</p>
      */
-    Long createAuctionItem(AuctionItemCreateSource item);
+    Long createAuctionItem(AuctionItemCreateSource item, Long sellerId);
 
     /**
      * 검수 등록용 auction_item을 생성한다.
@@ -24,7 +24,7 @@ public interface AuctionItemService {
      * {@code auction_item.status = PENDING},
      * {@code auction_item.inspection_status = PENDING}을 명시 저장한다.</p>
      */
-    Long createInspectionItem(AuctionItemCreateSource item);
+    Long createInspectionItem(AuctionItemCreateSource item, Long sellerId);
 
     /**
      * 검수 완료된 기존 상품이 경매 등록 가능한 상태인지 검증하고 반환한다.
