@@ -9,6 +9,7 @@ import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -60,12 +61,15 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)))
                         .successHandler(customSuccessHandler))
 
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/","/login/**", "/oauth2/**", "success.html", "register-info.html", "/index.html",
                                 "/api/v1/auth/check", "/api/v1/auth/refresh",
                                 "/api/v1/admin/auth/signup", "/api/v1/admin/auth/login",
                                 "/api/v1/payments/virtual-accounts/deposit",
-                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                "/swagger-ui/**", "/v3/api-docs/**",
+                                "/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auctions", "/api/v1/auctions/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

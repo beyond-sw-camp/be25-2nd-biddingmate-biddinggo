@@ -107,8 +107,8 @@ public class AuctionItemServiceImpl implements AuctionItemService {
             throw new CustomException(ErrorType.CATEGORY_NOT_FOUND);
         }
 
-        // 현재 정책상 경매 등록은 최하위(level=3) 카테고리만 허용한다.
-        if (!Integer.valueOf(3).equals(category.getLevel())) {
+        // 현재 정책상 경매 등록은 자식이 없는 최하위 카테고리만 허용한다.
+        if (categoryMapper.existsChildByParentId(category.getId())) {
             throw new CustomException(ErrorType.INVALID_CATEGORY_LEVEL);
         }
 
