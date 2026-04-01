@@ -166,7 +166,4 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 .expiredAt(jwtUtil.getExpiredAt(accessToken))
                 .build();
     }
-
-
-
 }
