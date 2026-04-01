@@ -13,7 +13,7 @@ public interface InspectionQueryService {
     /**
      * 회원 ID와 선택한 검수 상태를 기준으로 검수물품 목록을 조회한다.
      */
-    PageResponse<InspectionListResponse> getInspectionList(InspectionListRequest request);
+    PageResponse<InspectionListResponse> getInspectionList(InspectionListRequest request, Long memberId);
 
     /**
      * 검수 ID를 기준으로 상세 정보를 조회한다.

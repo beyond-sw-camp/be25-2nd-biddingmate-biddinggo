@@ -28,8 +28,8 @@ public class InspectionQueryServiceImpl implements InspectionQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<InspectionListResponse> getInspectionList(InspectionListRequest request) {
-        if (request.getMemberId() == null || request.getMemberId() <= 0) {
+    public PageResponse<InspectionListResponse> getInspectionList(InspectionListRequest request, Long memberId) {
+        if (memberId == null || memberId <= 0) {
             throw new CustomException(ErrorType.INVALID_INSPECTION_LIST_REQUEST);
         }
 
@@ -41,8 +41,8 @@ public class InspectionQueryServiceImpl implements InspectionQueryService {
         ItemInspectionStatus status = parseInspectionStatus(request.getStatus());
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
 
-        List<InspectionListResponse> list = inspectionMapper.findInspectionList(rowBounds, request.getMemberId(), status);
-        int count = inspectionMapper.countInspectionList(request.getMemberId(), status);
+        List<InspectionListResponse> list = inspectionMapper.findInspectionList(rowBounds, memberId, status);
+        int count = inspectionMapper.countInspectionList(memberId, status);
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
     }

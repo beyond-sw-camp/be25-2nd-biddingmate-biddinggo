@@ -39,9 +39,10 @@ public class InspectionController {
     @GetMapping("")
     @Operation(summary = "검수물품 목록 조회", description = "회원별 검수물품 목록을 조회하고, 선택한 검수 상태로 필터링합니다.")
     public ResponseEntity<ApiResponse<PageResponse<InspectionListResponse>>> getInspectionList(
-            @Valid InspectionListRequest request) {
+            @Valid InspectionListRequest request,
+            @AuthenticationPrincipal Member member) {
 
-        PageResponse<InspectionListResponse> result = inspectionQueryService.getInspectionList(request);
+        PageResponse<InspectionListResponse> result = inspectionQueryService.getInspectionList(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "검수물품 목록 조회 완료", result);
     }
