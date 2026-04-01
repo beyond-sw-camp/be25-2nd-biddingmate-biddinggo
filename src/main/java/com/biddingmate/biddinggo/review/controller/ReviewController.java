@@ -1,6 +1,9 @@
 package com.biddingmate.biddinggo.review.controller;
 
+import com.biddingmate.biddinggo.common.exception.CustomException;
+import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.review.dto.CreateReviewRequest;
 import com.biddingmate.biddinggo.review.dto.CreateReviewResponse;
 import com.biddingmate.biddinggo.review.service.ReviewService;
@@ -10,7 +13,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Review", description = "리뷰 API")
 @RestController
@@ -24,13 +32,15 @@ public class ReviewController {
     @PostMapping("/{auctionId}/reviews")
     public ResponseEntity<ApiResponse<CreateReviewResponse>> createReview(
             @PathVariable Long auctionId,
-            @Valid @RequestBody CreateReviewRequest request
+            @Valid @RequestBody CreateReviewRequest request,
+            @AuthenticationPrincipal Member member
     ) {
-        // TODO: 향후 토큰에서 유저 정보 추출하도록 변경 예정
-        Long currentUserId = 1L;
+        if (member == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
 
-        CreateReviewResponse result = reviewService.createReview(auctionId, currentUserId, request);
+        CreateReviewResponse result = reviewService.createReview(auctionId, member, request);
 
-        return ApiResponse.of(HttpStatus.OK, null, "리뷰 등록 성공", result);
+        return ApiResponse.of(HttpStatus.OK, "success", "리뷰 등록 성공", result);
     }
 }

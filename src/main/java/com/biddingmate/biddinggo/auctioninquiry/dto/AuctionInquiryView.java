@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder(toBuilder = true) // 기존 객체를 바탕으로 일부 필드만 바꾼 새 객체 생성을 위함
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class AuctionInquiryView {
     private final Long id;

@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/","/login/**", "/oauth2/**", "success.html", "register-info.html",
+                        .requestMatchers("/","/login/**", "/oauth2/**", "success.html", "register-info.html", "/index.html",
                                 "/api/v1/auth/check", "/api/v1/auth/refresh",
                                 "/api/v1/admin/auth/signup", "/api/v1/admin/auth/login",
                                 "/api/v1/payments/virtual-accounts/deposit",

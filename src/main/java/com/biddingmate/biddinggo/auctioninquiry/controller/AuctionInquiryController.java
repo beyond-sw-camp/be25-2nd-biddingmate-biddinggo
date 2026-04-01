@@ -6,48 +6,53 @@ import com.biddingmate.biddinggo.auctioninquiry.dto.AuctionInquiryView;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryRequest;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse;
 import com.biddingmate.biddinggo.auctioninquiry.service.AuctionInquiryService;
+import com.biddingmate.biddinggo.common.exception.CustomException;
+import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.member.model.Member;
+import com.biddingmate.biddinggo.member.model.MemberRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Auction Inquiry", description = "경매 문의 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/inquiries")
+@RequestMapping("/api/v1")
 public class AuctionInquiryController {
 
     private final AuctionInquiryService auctionInquiryService;
 
     @Operation(summary = "경매 문의 등록", description = "특정 경매에 대해 문의를 등록합니다.")
-    @PostMapping
+    @PostMapping("/inquiries")
     public ResponseEntity<ApiResponse<CreateAuctionInquiryResponse>> createInquiry(
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "문의 등록 요청 정보",
                     required = true
             )
-            @Valid @RequestBody CreateAuctionInquiryRequest request
+            @Valid @RequestBody CreateAuctionInquiryRequest request,
+            @AuthenticationPrincipal Member member
     ) {
 
-        Long writerId = 1L;
+        if (member == null) throw new CustomException(ErrorType.UNAUTHORIZED);
 
         CreateAuctionInquiryResponse result =
                 auctionInquiryService.createInquiry(
                         request.getAuctionId(),
-                        writerId,
+                        member.getId(),
                         request
                 );
 
@@ -60,16 +65,17 @@ public class AuctionInquiryController {
     }
 
     @Operation(summary = "경매 문의 답변 등록", description = "판매자가 특정 문의글에 답변을 남깁니다.")
-    @PostMapping("/{inquiryId}")
+    @PostMapping("/inquiries/{inquiryId}")
     public ResponseEntity<ApiResponse<AnswerAuctionInquiryResponse>> registerAnswer(
             @PathVariable Long inquiryId,
-            @Valid @RequestBody AnswerAuctionInquiryRequest request
+            @Valid @RequestBody AnswerAuctionInquiryRequest request,
+            @AuthenticationPrincipal Member member
     ) {
 
-        Long sellerId = 2L;
+        if (member == null) throw new CustomException(ErrorType.UNAUTHORIZED);
 
         AnswerAuctionInquiryResponse result =
-                auctionInquiryService.registerAnswer(inquiryId, sellerId, request);
+                auctionInquiryService.registerAnswer(inquiryId, member.getId(), request);
 
         return ApiResponse.of(
                 HttpStatus.OK,
@@ -84,11 +90,13 @@ public class AuctionInquiryController {
     public ResponseEntity<ApiResponse<PageResponse<AuctionInquiryView>>> getInquiryList(
             @PathVariable Long auctionId,
             BasePageRequest request,
+            @AuthenticationPrincipal Member member
 
-            // TODO: 토큰에서 유저 정보 및 권한 추출로 변경 예정
-            @RequestParam(required = false, defaultValue = "1") Long currentUserId,
-            @RequestParam(required = false, defaultValue = "USER") com.biddingmate.biddinggo.member.model.MemberRole role
     ) {
+        Long currentUserId = (member != null) ? member.getId() : null;
+        MemberRole role = (member != null && member.getRole() != null)
+                ? MemberRole.valueOf(member.getRole().toUpperCase())
+                : MemberRole.USER;
 
         PageResponse<AuctionInquiryView> result =
                 auctionInquiryService.getInquiriesByAuctionId(auctionId, request,currentUserId, role);

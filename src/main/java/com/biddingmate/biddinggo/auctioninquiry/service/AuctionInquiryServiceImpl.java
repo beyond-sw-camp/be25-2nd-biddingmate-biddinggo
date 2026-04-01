@@ -10,11 +10,12 @@ import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse
 import com.biddingmate.biddinggo.auctioninquiry.mapper.AuctionInquiryMapper;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiryStatus;
-import com.biddingmate.biddinggo.member.model.MemberRole;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.member.model.MemberRole;
+import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
     private final AuctionInquiryMapper auctionInquiryMapper;
     private final AuctionMapper auctionMapper;
+    private final WinnerDealMapper winnerDealMapper;
 
     @Override
     @Transactional
@@ -36,6 +38,16 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
         // 경매 존재 여부 검증
         Auction auction = validateAndGetAuction(auctionId);
+
+        var deal = winnerDealMapper.findByAuctionId(auctionId);
+        if (deal == null) {
+            // 아직 낙찰되지 않은 경매는 문의 불가
+            throw new CustomException(ErrorType.DEAL_NOT_FOUND);
+        }
+        if (!auction.getWinnerId().equals(writerId)) {
+            // 낙찰자가 아니면 문의 불가
+            throw new CustomException(ErrorType.INQUIRY_ONLY_FOR_WINNER);
+        }
 
         // 본인 경매 문의 제한
         if (auction.getSellerId().equals(writerId)) {
@@ -110,31 +122,32 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
     public PageResponse<AuctionInquiryView> getInquiriesByAuctionId(
             Long auctionId,
             BasePageRequest request,
-            Long currentUserId, // 컨트롤러에서 넘겨받은 유저 ID
-            MemberRole role      // String 대신 Enum 사용
+            Long currentUserId,
+            MemberRole role
     ) {
 
         // 경매 존재 여부 확인
         Auction auction = validateAndGetAuction(auctionId);
-        boolean isAdmin = role.isAdmin(); // Enum 메서드 활용
+        boolean isAdmin = role.isAdmin();
 
         // 페이지 번호 검증
         if (request.getPage() < 1) {
             throw new CustomException(ErrorType.BAD_REQUEST);
         }
 
-        // DB 조회 (원본 리스트)
+        // DB 조회 
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         List<AuctionInquiryView> rawList = auctionInquiryMapper.selectInquiryList(rowBounds, auctionId);
         int totalCount = auctionInquiryMapper.selectInquiryCount(auctionId);
 
-        // 4. 불변 DTO 특성을 살린 권한별 마스킹 처리
+        // 불변 DTO 특성을 살린 권한별 마스킹 처리
         List<AuctionInquiryView> processedList = rawList.stream()
                 .map(view -> {
                     // 작성자 본인인가? OR 해당 경매 판매자인가? OR 관리자인가?
-                    boolean hasFullAccess = view.getWriterId().equals(currentUserId) ||
-                            auction.getSellerId().equals(currentUserId) ||
-                            isAdmin;
+                    boolean isWriter = (currentUserId != null) && view.getWriterId().equals(currentUserId);
+                    boolean isSeller = (currentUserId != null) && auction.getSellerId().equals(currentUserId);
+
+                    boolean hasFullAccess = isWriter || isSeller || isAdmin;
 
                     // 권한이 있는 경우: 원본 그대로 반환
                     if (hasFullAccess) {
@@ -154,7 +167,6 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
     }
 
     // 경매 존재 여부 확인 로직 공통 메서드
-
     private Auction validateAndGetAuction(Long auctionId) {
         Auction auction = auctionMapper.findById(auctionId);
         if (auction == null) {

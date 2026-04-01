@@ -100,6 +100,7 @@ public enum ErrorType {
     AUCTION_INQUIRY_NOT_FOUND("auction-inquiry-004", "해당 경매 문의가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     AUCTION_INQUIRY_ALREADY_ANSWERED("auction-inquiry-005", "이미 답변이 등록된 문의입니다.", HttpStatus.CONFLICT),
     AUCTION_INQUIRY_UPDATE_FAIL("auction-inquiry-006", "경매 문의 답변 등록 실패", HttpStatus.INTERNAL_SERVER_ERROR),
+    INQUIRY_ONLY_FOR_WINNER("auction-inquiry-007", "구매자만 판매자에게 문의를 남길 수 있습니다.", HttpStatus.FORBIDDEN),
 
     // 회원 정보
     MEMBER_NOT_FOUND("member-001", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
