@@ -1,14 +1,15 @@
 package com.biddingmate.biddinggo.member.dto;
 
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class MemberListViewRequest extends BasePageRequest {
     private String keyword;
-    private String status;
+    private MemberStatus status;
 }

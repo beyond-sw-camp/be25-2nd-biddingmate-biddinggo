@@ -9,6 +9,7 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -71,7 +72,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 .email(signupRequestDto.getEmail())
                 .nickname(signupRequestDto.getNickname())
                 .role("ADMIN")
-                .status("ACTIVE")
+                .status(MemberStatus.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -138,7 +139,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 .username(username)
                 .name(name)
                 .nickname(nickname)
-                .status("ACTIVE")
+                .status(MemberStatus.ACTIVE)
                 .build();
 
         memberMapper.updateMemberInfo(updateDto);

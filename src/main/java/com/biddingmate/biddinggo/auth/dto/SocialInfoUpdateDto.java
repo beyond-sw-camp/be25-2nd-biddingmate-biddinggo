@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.auth.dto;
 
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,5 +17,5 @@ public class SocialInfoUpdateDto {
     private String username;
     private String name;
     private String nickname;
-    private String status;
+    private MemberStatus status;
 }
