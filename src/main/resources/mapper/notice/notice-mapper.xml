@@ -35,4 +35,28 @@
         WHERE id = #{id}
     </select>
 
+    <select id="findActiveNotices" resultType="NoticeResponse">
+        SELECT id, title, content, status, created_at AS createdAt
+        FROM notice
+        WHERE status = 'ACTIVE'
+        ORDER BY created_at ${order}
+    </select>
+
+    <select id="getActiveNoticeTotal" resultType="_int">
+        SELECT COUNT(id)
+        FROM notice
+        WHERE status = 'ACTIVE'
+    </select>
+
+    <select id="findAllNotices" resultType="NoticeResponse">
+        SELECT id, title, content, status, created_at AS createdAt
+        FROM notice
+        ORDER BY created_at ${order}
+    </select>
+
+    <select id="getNoticeTotal" resultType="_int">
+        SELECT COUNT(id)
+        FROM notice
+    </select>
+
 </mapper>
