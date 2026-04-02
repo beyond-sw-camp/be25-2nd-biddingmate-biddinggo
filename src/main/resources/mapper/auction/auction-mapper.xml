@@ -253,4 +253,20 @@
         SET wish_count = wish_count + #{wishCount}
         WHERE id = #{id}
     </update>
+
+    <select id="findActiveAuctionIdsBySeller" resultType="long">
+        SELECT id
+        FROM auction
+        WHERE seller_id = #{sellerId}
+          AND status = 'ON_GOING'
+    </select>
+
+    <update id="updateAuctionStatus">
+        UPDATE auction
+        SET status = #{status}
+        WHERE id IN
+        <foreach collection="auctionIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

@@ -90,4 +90,7 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     List<MemberListView> findAllWithFilter(RowBounds rowBounds, String sortOrder, String keyword, MemberStatus status);
     int countTotalMember(String keyword, MemberStatus status);
+
+    void updateMemberStatus(@Param("memberId") Long memberId,
+                            @Param("status") MemberStatus status);
 }

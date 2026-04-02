@@ -9,11 +9,13 @@ import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * auction 엔티티 생성만 담당하는 서비스 구현체.
@@ -23,6 +25,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionMapper auctionMapper;
+    private final AuctionItemService auctionItemService;
 
     @Override
     @Transactional
@@ -84,6 +87,25 @@ public class AuctionServiceImpl implements AuctionService {
         if (updatedCount != 1) {
             throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> findActiveAuctionsBySeller(Long memberId) {
+        // auctionMapper에서 ON_AUCTION 상태인 경매 ID 조회
+        return auctionMapper.findActiveAuctionIdsBySeller(memberId);
+    }
+
+    @Override
+    @Transactional
+    public void cancelAuctionsAndItems(List<Long> auctionIds) {
+        if (auctionIds == null || auctionIds.isEmpty()) return;
+
+        // Item 상태를 CANCELLED로 변경 (ItemService 호출
+        auctionItemService.cancelItemsByAuctionIds(auctionIds);
+
+        // Auction 상태를 CANCELLED로 변경
+        auctionMapper.updateAuctionStatus(auctionIds, AuctionStatus.CANCELLED);
     }
 
     @Override

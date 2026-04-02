@@ -5,6 +5,8 @@ import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 
+import java.util.List;
+
 /**
  * auction_item 테이블 저장 책임을 담당하는 서비스.
  */
@@ -46,4 +48,7 @@ public interface AuctionItemService {
      * 경매 등록 유스케이스에서는 이 메서드를 통해 상태 전이를 수행한다.</p>
      */
     void markAsOnAuction(Long itemId);
+
+    // 강제 취소된 물품들 상태 변경
+    void cancelItemsByAuctionIds(List<Long> auctionIds);
 }

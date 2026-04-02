@@ -11,8 +11,10 @@ import com.biddingmate.biddinggo.item.model.Category;
 import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * auction_item 엔티티 생성만 담당하는 서비스 구현체.
@@ -90,6 +92,13 @@ public class AuctionItemServiceImpl implements AuctionItemService {
      */
     public void markAsOnAuction(Long itemId) {
         changeStatus(itemId, AuctionItemStatus.ON_AUCTION, AuctionItemStatus.PENDING, ItemInspectionStatus.PASSED);
+    }
+
+    @Override
+    @Transactional
+    public void cancelItemsByAuctionIds(List<Long> auctionIds) {
+        if (auctionIds == null || auctionIds.isEmpty()) return;
+        auctionItemMapper.updateItemsStatusByAuctionIds(auctionIds, AuctionItemStatus.CANCELLED);
     }
 
     /**

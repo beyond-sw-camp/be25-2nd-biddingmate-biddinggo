@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.bid.service;
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
+import com.biddingmate.biddinggo.auction.service.AuctionService;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
@@ -14,6 +15,7 @@ import com.biddingmate.biddinggo.common.response.PageResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
+    private final AuctionService auctionService;
 
     @Override
     public Bid createBid(Long memberId, Auction auction, CreateBidRequest request) {
