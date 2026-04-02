@@ -5,6 +5,7 @@ import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
+import com.biddingmate.biddinggo.member.dto.MemberListView;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
@@ -12,8 +13,10 @@ import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 
@@ -84,4 +87,7 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     );
 
     long countSellingItemsByMemberId(@Param("memberId") Long memberId, @Param("status") String upperCase);
+
+    List<MemberListView> findAllWithFilter(RowBounds rowBounds, String sortOrder, String keyword, MemberStatus status);
+    int countTotalMember(String keyword, MemberStatus status);
 }

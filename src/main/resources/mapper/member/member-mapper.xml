@@ -412,4 +412,47 @@
         WHERE a.seller_id = #{memberId}
           AND a.status = #{status}
     </select>
+
+    <!-- 관리자용 모든 사용자 계정 조회 -->
+    <select id="findAllWithFilter" resultType="MemberListView">
+        SELECT id,
+               nickname,
+               email,
+               status,
+               created_at AS createdAt
+        FROM member
+        <where>
+            role = 'USER'
+            <if test="keyword != null and keyword != ''">
+                AND (
+                nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR email LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY created_at ${sortOrder}
+    </select>
+
+    <select id="countTotalMember" resultType="int">
+        SELECT COUNT(*)
+        FROM member
+        <where>
+            role = 'USER'
+            <if test="keyword != null and keyword != ''">
+                AND (
+                name LIKE CONCAT('%', #{keyword}, '%')
+                OR email LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
 </mapper>

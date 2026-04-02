@@ -33,7 +33,7 @@ public class Member implements UserDetails {
     private String bankAccount;
     private String grade;
     private String role;
-    private String status;
+    private MemberStatus status;
     private LocalDateTime lastChangeNick;
     private LocalDateTime createdAt;
 

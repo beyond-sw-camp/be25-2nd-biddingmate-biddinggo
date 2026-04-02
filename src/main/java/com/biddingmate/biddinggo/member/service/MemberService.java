@@ -3,6 +3,8 @@ package com.biddingmate.biddinggo.member.service;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
+import com.biddingmate.biddinggo.member.dto.MemberListView;
+import com.biddingmate.biddinggo.member.dto.MemberListViewRequest;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
@@ -28,4 +30,6 @@ public interface MemberService {
     void deductPoint(Long memberId, Long amount);
 
     PageResponse<MemberSellingItemResponse> getMySellingItems(Long memberId, String status, BasePageRequest pageRequest);
+
+    PageResponse<MemberListView> findAllMemberWithFilter(@Valid MemberListViewRequest request);
 }
