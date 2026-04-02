@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.wishlist.dto.CreateWishlistRequest;
 import com.biddingmate.biddinggo.wishlist.dto.CreateWishlistResponse;
 import com.biddingmate.biddinggo.wishlist.service.WishlistService;
@@ -12,14 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import software.amazon.awssdk.annotations.NotNull;
 
 @RestController
 @RequestMapping("/api/v1/wishlists")
@@ -32,14 +32,10 @@ public class WishlistController {
     @Operation(summary = "관심 경매 등록", description = "관심 경매를 등록합니다.")
     public ResponseEntity<ApiResponse<CreateWishlistResponse>> createWishlist(
             @RequestBody CreateWishlistRequest request,
-            /*
-              <<to-do>>
-              이후 인증 구현 완료 후, 로그인 정보 받아와서 memberId에 주입
-             */
-            @NotNull @RequestParam Long memberId
+            @AuthenticationPrincipal Member member
     ) {
 
-        CreateWishlistResponse result = wishlistService.createWishlist(request, memberId);
+        CreateWishlistResponse result = wishlistService.createWishlist(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 등록 성공", result);
     }
@@ -48,13 +44,9 @@ public class WishlistController {
     @Operation(summary = "내 관심 경매 조회", description = "사용자의 관심 경매를 조회합니다.")
     public ResponseEntity<ApiResponse<PageResponse<AuctionDetailResponse>>> getWishlist(
             BasePageRequest request,
-            /*
-              <<to-do>>
-              이후 인증 구현 완료 후, 로그인 정보 받아와서 memberId에 주입
-             */
-            @NotNull @RequestParam Long memberId
+            @AuthenticationPrincipal Member member
     ) {
-        PageResponse<AuctionDetailResponse> result = wishlistService.findWishlistAuctionsByMemberId(request, memberId);
+        PageResponse<AuctionDetailResponse> result = wishlistService.findWishlistAuctionsByMemberId(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 조회 성공", result);
     }
@@ -63,14 +55,10 @@ public class WishlistController {
     @Operation(summary = "관심 경매 삭제", description = "관심 경매를 삭제합니다.")
     public ResponseEntity<ApiResponse<Integer>> deleteWishlist(
             @RequestBody CreateWishlistRequest request,
-            /*
-              <<to-do>>
-              이후 인증 구현 완료 후, 로그인 정보 받아와서 memberId에 주입
-             */
-            @NotNull @RequestParam Long memberId
+            @AuthenticationPrincipal Member member
     ) {
 
-        int result = wishlistService.deleteWishlist(request, memberId);
+        int result = wishlistService.deleteWishlist(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 삭제 성공", result);
     }
