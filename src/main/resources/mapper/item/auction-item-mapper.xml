@@ -39,10 +39,10 @@
         SET status = #{newStatus}
         WHERE id = #{itemId}
         <if test="currentStatus != null">
-          AND status = #{currentStatus}
+            AND status = #{currentStatus}
         </if>
         <if test="currentInspectionStatus != null">
-          AND inspection_status = #{currentInspectionStatus}
+            AND inspection_status = #{currentInspectionStatus}
         </if>
     </update>
 
@@ -73,5 +73,19 @@
             #{createdAt}
         </trim>
     </insert>
+
+    <update id="updateInspectionStatus">
+        UPDATE auction_item
+        <set>
+            inspection_status = #{newStatus},
+            <if test="newStatus.name() == 'PASSED' and quality != null">
+                quality = #{quality},
+            </if>
+        </set>
+        WHERE id = #{itemId}
+        <if test="currentStatus != null">
+            AND inspection_status = #{currentStatus}
+        </if>
+    </update>
 
 </mapper>

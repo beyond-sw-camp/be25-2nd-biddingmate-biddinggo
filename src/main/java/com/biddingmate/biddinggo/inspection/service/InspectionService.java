@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.inspection.service;
 
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionRequest;
+import com.biddingmate.biddinggo.inspection.dto.InspectionProcessRequest;
 import com.biddingmate.biddinggo.inspection.dto.UpdateInspectionShippingRequest;
 
 /**
@@ -16,4 +17,7 @@ public interface InspectionService {
      * 검수 배송 정보(택배사, 송장 번호)를 등록한다.
      */
     void updateShippingInfo(Long inspectionId, UpdateInspectionShippingRequest request);
+
+    // 관리자 검수 요청 처리(승인/반려)
+    void processInspection(Long inspectionId, InspectionProcessRequest request);
 }

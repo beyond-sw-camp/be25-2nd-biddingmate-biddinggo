@@ -3,12 +3,18 @@ package com.biddingmate.biddinggo.inspection.service;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.inspection.dto.CreateInspectionRequest;
+import com.biddingmate.biddinggo.inspection.dto.InspectionProcessRequest;
 import com.biddingmate.biddinggo.inspection.dto.UpdateInspectionShippingRequest;
 import com.biddingmate.biddinggo.inspection.mapper.InspectionMapper;
 import com.biddingmate.biddinggo.inspection.model.Inspection;
 import com.biddingmate.biddinggo.inspection.model.InspectionStatus;
+import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
+import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
+import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
+import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +26,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class InspectionServiceImpl implements InspectionService {
     private final InspectionMapper inspectionMapper;
+    private final AuctionItemMapper auctionItemMapper;
 
     @Override
     /**
@@ -83,5 +90,39 @@ public class InspectionServiceImpl implements InspectionService {
         if (updatedCount != 1) {
             throw new CustomException(ErrorType.INSPECTION_SHIPPING_UPDATE_FAILED);
         }
+    }
+
+    @Override
+    @Transactional
+    public void processInspection(Long inspectionId, InspectionProcessRequest request) {
+        // 검수 조회
+        Inspection inspection = inspectionMapper.findById(inspectionId);
+        if (inspection == null) {
+            throw new CustomException(ErrorType.INSPECTION_NOT_FOUND);
+        }
+
+        // 이미 처리된 검수인지 체크
+        if (!inspection.getStatus().equals(InspectionStatus.PENDING)) {
+            throw new CustomException(ErrorType.ALREADY_INSPECTION_STATUS);
+        }
+
+        boolean approved = request.isApproved();
+
+        // 검수 상태 결정
+        InspectionStatus status = approved
+                ? InspectionStatus.PASSED
+                : InspectionStatus.FAILED;
+
+        // 검수 상태 업데이트
+        inspectionMapper.updateStatus(inspectionId, status, InspectionStatus.PENDING, request.getFailureReason());
+
+        // 물품에 대한 복사본?
+        Long auctionItemId = inspection.getItemId();
+
+        ItemInspectionStatus itemStatus = approved
+                ? ItemInspectionStatus.PASSED
+                : ItemInspectionStatus.FAILED;
+
+        auctionItemMapper.updateInspectionStatus(auctionItemId, itemStatus, ItemInspectionStatus.PENDING, request.getQuality());
     }
 }
