@@ -15,5 +15,5 @@ public interface AdminAuthService {
 
     LoginResponse refreshAccessToken(String refreshToken);
 
-    void updateInfo(String username, String name, String nickname);
+    void updateInfo(String username, String name, String nickname, String imageUrl);
 }

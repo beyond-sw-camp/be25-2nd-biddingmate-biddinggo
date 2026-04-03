@@ -18,4 +18,5 @@ public class SocialInfoUpdateDto {
     private String name;
     private String nickname;
     private MemberStatus status;
+    private String imageUrl;
 }
