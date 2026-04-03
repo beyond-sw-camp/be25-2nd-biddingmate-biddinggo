@@ -154,7 +154,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
         // 엑세스토큰 발급
         String accessToken =
-                jwtProvider.createAccessToken(member.getUsername(), authorities);
+                jwtProvider.createAccessToken(member.getUsername(), authorities, member.getStatus().name());
 
 
         return LoginResponse.builder()

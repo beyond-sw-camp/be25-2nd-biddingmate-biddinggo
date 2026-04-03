@@ -50,7 +50,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .map(GrantedAuthority::getAuthority).toList();
 
         // provider를 통해 토큰 발생
-        Map<String, Object> tokens = jwtProvider.createTotalTokenResponse(username, authorities);
+        Map<String, Object> tokens = jwtProvider.createTotalTokenResponse(username, authorities, member.getStatus().name());
         LoginResponse loginResponse = (LoginResponse) tokens.get("loginResponse");
         String refreshToken = (String) tokens.get("refreshToken");
 
