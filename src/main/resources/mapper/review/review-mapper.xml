@@ -27,4 +27,23 @@
         WHERE deal_id = #{dealId} AND writer_id = #{writerId}
     </select>
 
+    <select id="findSellerReviewsBySellerId" resultType="SellerReviewResponse">
+        SELECT
+            m.nickname AS buyerNickname,
+            r.rating AS rating,
+            r.content AS reviewText,
+            r.created_at AS reviewDate
+        FROM review r 
+        INNER JOIN member m ON m.id = r.writer_id
+        WHERE r.target_id = #{sellerId}
+        ORDER BY r.created_at ${pageRequest.order}
+        LIMIT #{pageRequest.size}
+        OFFSET #{pageRequest.offset}
+    </select>
+    
+    <select id="countSellerReviewsBySellerId" parameterType="long" resultType="long">
+        SELECT COUNT(*)
+        FROM review r
+        WHERE r.target_id = #{sellerId}
+    </select>
 </mapper>
