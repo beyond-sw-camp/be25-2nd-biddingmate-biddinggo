@@ -25,7 +25,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final BidMapper bidMapper;
-    private final AuctionService auctionService;
 
     @Override
     public Bid createBid(Long memberId, Auction auction, CreateBidRequest request) {

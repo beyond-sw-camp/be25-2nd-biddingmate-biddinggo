@@ -7,6 +7,8 @@ import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.YesNo;
+import com.biddingmate.biddinggo.bid.model.Bid;
+import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
@@ -26,6 +28,7 @@ import java.util.List;
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionMapper auctionMapper;
     private final AuctionItemService auctionItemService;
+    private final BidQueryService bidQueryService;
 
     @Override
     @Transactional
@@ -106,6 +109,36 @@ public class AuctionServiceImpl implements AuctionService {
 
         // Auction 상태를 CANCELLED로 변경
         auctionMapper.updateAuctionStatus(auctionIds, AuctionStatus.CANCELLED);
+    }
+
+    @Override
+    @Transactional
+    public void recalculateVickreyPriceByBidder(Long memberId) {
+        // 비활성화된 사용자의 진행 중인 경매 조회
+        List<Long> auctionIds = bidQueryService.findOngoingAuctionIdsByMember(memberId);
+
+        for (Long auctionId : auctionIds) {
+            // 해당 경매에서 최고 입찰기록 조회
+            Long topBidderId = bidQueryService.findTopBidderId(auctionId);
+
+            if (!memberId.equals(topBidderId)) {
+                // 최고 입찰이 아닌 경우
+                continue;
+            }
+
+            // 활성화된 사용자들의 1~2위 입찰 금액 조회
+            List<Bid> topBids = bidQueryService.findTop2ActiveBids(auctionId);
+
+            if (topBids.size() < 2) {
+                // 입찰 1위를 제외(비활성화)하고 남은 활성화 사용자들의 입찰이 1명 이하인 경우
+                auctionMapper.resetVickreyPriceToStartPrice(auctionId);
+                continue;
+            }
+
+            Bid second = topBids.get(1); // 비크리 금액의 입찰자(차순위 입찰자)
+
+            auctionMapper.updateVickreyPrice(auctionId, second.getAmount());
+        }
     }
 
     @Override

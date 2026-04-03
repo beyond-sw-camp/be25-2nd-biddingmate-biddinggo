@@ -96,4 +96,33 @@
         WHERE b.bidder_id = #{memberId};
     </select>
 
+    <select id="findOngoingAuctionIdsByMember" parameterType="long" resultType="long">
+        SELECT DISTINCT b.auction_id
+        FROM bid b
+        JOIN auction a ON b.auction_id = a.id
+        WHERE b.bidder_id = #{memberId}
+          AND a.status = 'ON_GOING'
+    </select>
+
+    <select id="findTopBidderId" parameterType="long" resultType="long">
+        SELECT b.bidder_id
+        FROM bid b
+        WHERE b.auction_id = #{auctionId}
+        ORDER BY b.amount DESC
+        LIMIT 1
+    </select>
+
+    <select id="findTop2ActiveBids" parameterType="long" resultType="Bid">
+        SELECT b.id,
+               b.auction_id,
+               b.bidder_id,
+               b.amount
+        FROM bid b
+        JOIN member m ON b.bidder_id = m.id
+        WHERE b.auction_id = #{auctionId}
+          AND m.status = 'ACTIVE'
+        ORDER BY b.amount DESC
+        LIMIT 2
+    </select>
+
 </mapper>

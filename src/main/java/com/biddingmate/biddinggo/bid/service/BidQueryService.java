@@ -1,0 +1,11 @@
+package com.biddingmate.biddinggo.bid.service;
+
+import com.biddingmate.biddinggo.bid.model.Bid;
+
+import java.util.List;
+
+public interface BidQueryService {
+    List<Long> findOngoingAuctionIdsByMember(Long memberId);
+    Long findTopBidderId(Long auctionId);
+    List<Bid> findTop2ActiveBids(Long auctionId);
+}

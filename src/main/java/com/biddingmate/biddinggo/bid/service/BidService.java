@@ -9,6 +9,8 @@ import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 public interface BidService {
     /**
      * actionId에 해당하는 경매에 입찰 데이터를 저장한다.

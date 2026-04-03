@@ -28,4 +28,11 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
     List<AuctionDetailResponse> findBidAuctionsByMemberId(RowBounds rowBounds,
                                                           @Param("memberId") Long memberId,
                                                           @Param("order")String sortOrder);
+
+    // 특정 회원이 참여한 진행 중 경매 목록 조회
+    List<Long> findOngoingAuctionIdsByMember(@Param("memberId") Long memberId);
+    // 현재 최고 입찰자 조회 (전체 기준)
+    Long findTopBidderId(@Param("auctionId") Long auctionId);
+    // ACTIVE 회원 기준 상위 2개 입찰 조회 (비크리 핵심)
+    List<Bid> findTop2ActiveBids(@Param("auctionId") Long auctionId);
 }

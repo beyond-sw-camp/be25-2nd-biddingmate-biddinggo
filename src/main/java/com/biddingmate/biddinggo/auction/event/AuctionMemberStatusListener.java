@@ -24,11 +24,13 @@ public class AuctionMemberStatusListener {
         if (event.getStatus() == MemberStatus.INACTIVE) {
             Long memberId = event.getMemberId();
 
+            // 비활성화된 판매자의 경매 취소
             // 진행 중 경매 조회
             List<Long> auctionIds = auctionService.findActiveAuctionsBySeller(memberId);
-
-            // Item 도메인 서비스로 상태 변경 위임
             auctionService.cancelAuctionsAndItems(auctionIds);
+
+            // 최고 입찰자의 비활성화 -> 비크리 재계산
+            auctionService.recalculateVickreyPriceByBidder(memberId);
         }
     }
 }

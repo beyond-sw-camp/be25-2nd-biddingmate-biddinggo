@@ -269,4 +269,18 @@
             #{id}
         </foreach>
     </update>
+
+    <update id="resetVickreyPriceToStartPrice" parameterType="long">
+        UPDATE auction
+        SET vickrey_price = null
+        WHERE id = #{auctionId}
+    </update>
+
+    <update id="updateVickreyPrice" parameterType="map">
+        UPDATE auction
+        SET vickrey_price = #{amount}
+        WHERE id = #{auctionId}
+          AND vickrey_price != #{amount}
+    </update>
+
 </mapper>
