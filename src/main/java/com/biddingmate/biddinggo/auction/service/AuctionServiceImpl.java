@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.service;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
+import com.biddingmate.biddinggo.auction.event.AuctionCancelledEvent;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
@@ -13,6 +14,7 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionMapper auctionMapper;
     private final AuctionItemService auctionItemService;
     private final BidQueryService bidQueryService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -109,6 +112,10 @@ public class AuctionServiceImpl implements AuctionService {
 
         // Auction 상태를 CANCELLED로 변경
         auctionMapper.updateAuctionStatus(auctionIds, AuctionStatus.CANCELLED);
+
+        // 환불 이벤트 생성
+        eventPublisher.publishEvent(new AuctionCancelledEvent(auctionIds));
+
     }
 
     @Override

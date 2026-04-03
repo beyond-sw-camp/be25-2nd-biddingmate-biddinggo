@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.bid.mapper;
 
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.RefundDto;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
@@ -35,4 +36,7 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
     Long findTopBidderId(@Param("auctionId") Long auctionId);
     // ACTIVE 회원 기준 상위 2개 입찰 조회 (비크리 핵심)
     List<Bid> findTop2ActiveBids(@Param("auctionId") Long auctionId);
+
+    // 경매 id 목록으로 입찰내역 조회
+    List<RefundDto> findRefundTargets(@Param("auctionIds") List<Long> auctionIds);
 }

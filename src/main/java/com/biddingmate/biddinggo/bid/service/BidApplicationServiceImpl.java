@@ -9,9 +9,10 @@ import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
-import com.biddingmate.biddinggo.point.mapper.PointHistoryMapper;
+import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.point.model.PointHistory;
 import com.biddingmate.biddinggo.point.model.PointHistoryType;
+import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +28,8 @@ import java.time.LocalDateTime;
 public class BidApplicationServiceImpl implements BidApplicationService {
     private final AuctionMapper auctionMapper;
     private final MemberMapper memberMapper;
-    private final PointHistoryMapper pointHistoryMapper;
-
+    private final MemberService memberService;
+    private final PointService pointService;
     private final BidService bidService;
 
     @Override
@@ -65,8 +66,7 @@ public class BidApplicationServiceImpl implements BidApplicationService {
 
         // 3. 입찰자 포인트 차감
         // 추후 MemberService 구현 이후 변경
-        memberMapper.usePoint(memberId, additionalBidAmount);
-
+        memberService.deductPoint(memberId, additionalBidAmount);
 
         // 4. Auction 정보 갱신 : 경매 차순위 값 변경 + 입찰 수 증가
         // 추후 AuctionService 구현 이후 변경
@@ -85,7 +85,7 @@ public class BidApplicationServiceImpl implements BidApplicationService {
                 .amount(additionalBidAmount)
                 .createdAt(LocalDateTime.now())
                 .build();
-        int pointInsert = pointHistoryMapper.insert(pointHistory);
+        int pointInsert = pointService.addPointHistory(pointHistory);
 
         if (pointInsert != 1) {
             throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);

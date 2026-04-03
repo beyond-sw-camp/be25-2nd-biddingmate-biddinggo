@@ -1,6 +1,5 @@
 package com.biddingmate.biddinggo.member.service;
 
-import com.biddingmate.biddinggo.member.event.MemberStatusUpdateEvent;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
@@ -11,11 +10,12 @@ import com.biddingmate.biddinggo.member.dto.MemberListView;
 import com.biddingmate.biddinggo.member.dto.MemberListViewRequest;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
-import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.dto.UpdateMemberStatusRequest;
+import com.biddingmate.biddinggo.member.event.MemberStatusUpdateEvent;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
@@ -168,14 +168,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public void addPoint(Long memberId, Long amount) {
+        memberMapper.addPoint(memberId, amount);
+    }
+
+    @Override
     @Transactional
     public void deductPoint(Long memberId, Long amount) {
         memberMapper.usePoint(memberId, amount);
-
-        // 리펙터링 대상
-//        if (updated != 1) {
-//            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
-//        }
     }
 
     @Override

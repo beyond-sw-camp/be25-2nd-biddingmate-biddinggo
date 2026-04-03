@@ -4,7 +4,6 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
-import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryView;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.point.dto.ExchangePointRequest;
 import com.biddingmate.biddinggo.point.dto.MyPointResponse;
@@ -25,6 +24,11 @@ import java.util.List;
 public class PointServiceImpl implements PointService {
     private final MemberService memberService;
     private final PointHistoryMapper pointHistoryMapper;
+
+    @Override
+    public int addPointHistory(PointHistory pointHistory) {
+        return pointHistoryMapper.insert(pointHistory);
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -65,9 +69,27 @@ public class PointServiceImpl implements PointService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        int insert = pointHistoryMapper.insert(pointHistory);
+        int insert = this.addPointHistory(pointHistory);
 
         if (insert != 1) {
+            throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void refundBid(Long bidderId, Long amount) {
+        memberService.addPoint(bidderId, amount);
+
+        PointHistory pointHistory = PointHistory.builder()
+                .memberId(bidderId)
+                .type(PointHistoryType.REFUND)
+                .amount(amount)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        int refund = this.addPointHistory(pointHistory);
+        if (refund != 1) {
             throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
         }
     }
