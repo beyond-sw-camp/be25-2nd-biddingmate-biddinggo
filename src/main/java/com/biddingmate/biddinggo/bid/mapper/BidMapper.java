@@ -41,5 +41,5 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
     List<RefundDto> findRefundTargets(@Param("auctionIds") List<Long> auctionIds);
 
     Long findMaxBidAmountByAuctionAndBidder(@Param("auctionId") Long auctionId,
-                                            @Param("memberId") Long memberId);
+                                            @Param("bidderId") Long memberId);
 }
