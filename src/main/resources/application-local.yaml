@@ -73,3 +73,8 @@ cloudflare:
 jwt:
   issuer: bidding-mate
   secret: ${JWT_SECRET_KEY}
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
