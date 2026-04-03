@@ -40,4 +40,11 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
     Auction findByIdForUpdate(Long auctionId);
 
     void updateWishCount(@Param("id") Long id, @Param("wishCount") int wishCount);
+
+    List<Auction> findExpiredAuctions(@Param("now") LocalDateTime now,
+                                      @Param("status") AuctionStatus status);
+
+    int updateAuctionResult(Auction auction);
+
+    int updateAuctionStatus(Auction auction);
 }

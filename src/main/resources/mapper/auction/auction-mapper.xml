@@ -253,4 +253,23 @@
         SET wish_count = wish_count + #{wishCount}
         WHERE id = #{id}
     </update>
+
+    <select id="findExpiredAuctions" resultType="Auction">
+        SELECT * FROM auction
+        WHERE status = #{status}
+          AND end_date &lt;= #{now}
+    </select>
+
+    <update id="updateAuctionResult" parameterType="Auction">
+        UPDATE auction
+        SET status = #{status},
+            winner_id = #{winnerId},
+            winner_price = #{winnerPrice}
+        WHERE id = #{id}
+    </update>
+    <update id="updateAuctionStatus" parameterType="com.biddingmate.biddinggo.auction.model.Auction">
+        UPDATE auction
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
 </mapper>
