@@ -10,7 +10,9 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
-
+/*
+    경매 취소 시 환불 처리 이벤트 리스너
+ */
 @Component
 @RequiredArgsConstructor
 public class AuctionCancelRefundListener {

@@ -13,6 +13,7 @@ import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
+import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionMapper auctionMapper;
     private final AuctionItemService auctionItemService;
     private final BidQueryService bidQueryService;
+    private final PointService pointService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -129,9 +131,13 @@ public class AuctionServiceImpl implements AuctionService {
             Long topBidderId = bidQueryService.findTopBidderId(auctionId);
 
             if (!memberId.equals(topBidderId)) {
-                // 최고 입찰이 아닌 경우
+                // 비활성화 유저가 최고 입찰이 아닌 경우
                 continue;
             }
+
+            // 비활성화 시 최고 입찰자 환불
+            Long amount = bidQueryService.findMaxBidAmountByAuctionAndBidder(auctionId, memberId);
+            pointService.refundBid(memberId, amount);
 
             // 활성화된 사용자들의 1~2위 입찰 금액 조회
             List<Bid> topBids = bidQueryService.findTop2ActiveBids(auctionId);

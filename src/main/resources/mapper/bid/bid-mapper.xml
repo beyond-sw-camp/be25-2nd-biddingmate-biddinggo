@@ -136,4 +136,11 @@
         GROUP BY b.bidder_id
     </select>
 
+    <select id="findMaxBidAmountByAuctionAndBidder" parameterType="map" resultType="long">
+        SELECT MAX(amount)
+        FROM bid
+        WHERE auction_id = #{auctionId}
+          AND bidder_id = #{bidderId}
+    </select>
+
 </mapper>
