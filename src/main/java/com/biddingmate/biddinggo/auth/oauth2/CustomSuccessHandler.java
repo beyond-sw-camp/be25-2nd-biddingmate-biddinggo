@@ -71,7 +71,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 3. access 토큰은 쿠키가 아닌 리다이렉트 파라미터로 전달해서 프론트엔드가 헤더로 넣을 수있게
         String targetUrl;
         if (member != null && member.getStatus().equals(MemberStatus.PENDING)) {
-            targetUrl = "http://localhost:8080/register-info.html";
+            targetUrl = "http://localhost:8080/success.html";
         } else {
             targetUrl = "http://localhost:8080/success.html";
         }
