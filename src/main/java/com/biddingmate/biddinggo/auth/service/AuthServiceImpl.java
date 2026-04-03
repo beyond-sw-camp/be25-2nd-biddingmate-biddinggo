@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AdminAuthServiceImpl implements AdminAuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;

@@ -4,7 +4,7 @@ import com.biddingmate.biddinggo.auth.dto.AdminLoginRequestDto;
 import com.biddingmate.biddinggo.auth.dto.AdminSignupRequestDto;
 import com.biddingmate.biddinggo.auth.dto.LoginResponse;
 import com.biddingmate.biddinggo.auth.jwt.JwtCookieService;
-import com.biddingmate.biddinggo.auth.service.AdminAuthService;
+import com.biddingmate.biddinggo.auth.service.AuthService;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ import java.time.Duration;
 @Tag(name = "Auth-admin", description = "어드민 로그인")
 public class AdminAuthController {
 
-    private final AdminAuthService authService;
+    private final AuthService authService;
     private final JwtCookieService jwtCookieService;
 
     @Operation(summary = "로그인")

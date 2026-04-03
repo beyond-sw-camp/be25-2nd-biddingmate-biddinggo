@@ -3,7 +3,7 @@ package com.biddingmate.biddinggo.auth.controller;
 import com.biddingmate.biddinggo.auth.dto.LoginResponse;
 import com.biddingmate.biddinggo.auth.dto.RegisterUserInfoRequestDto;
 import com.biddingmate.biddinggo.auth.jwt.JwtCookieService;
-import com.biddingmate.biddinggo.auth.service.AdminAuthService;
+import com.biddingmate.biddinggo.auth.service.AuthService;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +32,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AdminAuthService authService;
+    private final AuthService authService;
     private final JwtCookieService jwtCookieService;
 
     @GetMapping("/check")
