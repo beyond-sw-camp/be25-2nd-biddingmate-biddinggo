@@ -9,11 +9,13 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
+import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,58 +32,58 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<MemberDashboardResponse>> getDashboard(@RequestParam Long memberId) {
-        MemberDashboardResponse result = memberService.getMyDashboard(memberId);
+    public ResponseEntity<ApiResponse<MemberDashboardResponse>> getDashboard(@AuthenticationPrincipal Member member) {
+        MemberDashboardResponse result = memberService.getMyDashboard(member.getId());
         return ApiResponse.of(HttpStatus.OK, null, "회원 마이페이지 조회 성공", result);
     }
 
     @GetMapping("/me/profile")
-    public ResponseEntity<ApiResponse<MemberProfileResponse>> getProfile(@RequestParam Long memberId) {
-        MemberProfileResponse result = memberService.getMyProfile(memberId);
+    public ResponseEntity<ApiResponse<MemberProfileResponse>> getProfile(@AuthenticationPrincipal Member member) {
+        MemberProfileResponse result = memberService.getMyProfile(member.getId());
         return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 조회 성공", result);
     }
 
     @PatchMapping("/me/profile")
     public ResponseEntity<ApiResponse<MemberProfileResponse>> updateMyProfile(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal Member member,
             @RequestBody MemberProfileUpdateRequest request
     ) {
-        MemberProfileResponse result = memberService.updateMyProfile(memberId, request);
+        MemberProfileResponse result = memberService.updateMyProfile(member.getId(), request);
         return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 수정 성공", result);
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<ApiResponse<Void>> deleteAccount(@RequestParam Long memberId) {
-        memberService.deleteMyAccount(memberId);
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(@AuthenticationPrincipal Member member) {
+        memberService.deleteMyAccount(member.getId());
         return ApiResponse.of(HttpStatus.OK, null, "회원 탈퇴 성공", null);
     }
 
     @GetMapping("/me/sales")
     public ResponseEntity<ApiResponse<PageResponse<MemberSalesItemResponse>>> getSales(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal Member member,
             @Valid BasePageRequest pageRequest
     ) {
-        PageResponse<MemberSalesItemResponse> result = memberService.getMySales(memberId, pageRequest);
+        PageResponse<MemberSalesItemResponse> result = memberService.getMySales(member.getId(), pageRequest);
         return ApiResponse.of(HttpStatus.OK, null, "판매 내역 조회 성공", result);
     }
 
     @GetMapping("/me/purchases")
     public ResponseEntity<ApiResponse<PageResponse<MemberPurchaseItemResponse>>> getPurchases(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal Member member,
             @Valid BasePageRequest pageRequest
     ) {
-        PageResponse<MemberPurchaseItemResponse> result = memberService.getMyPurchases(memberId, pageRequest);
+        PageResponse<MemberPurchaseItemResponse> result = memberService.getMyPurchases(member.getId(), pageRequest);
         return ApiResponse.of(HttpStatus.OK, null, "구매 내역 조회 성공", result);
     }
 
     @GetMapping("/me/auctions")
     public ResponseEntity<ApiResponse<PageResponse<MemberSellingItemResponse>>> getSellingItems(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal Member member,
             @RequestParam String status,
             @Valid BasePageRequest pageRequest
     ) {
         PageResponse<MemberSellingItemResponse> result =
-                memberService.getMySellingItems(memberId, status, pageRequest);
+                memberService.getMySellingItems(member.getId(), status, pageRequest);
 
         return ApiResponse.of(HttpStatus.OK, null, "판매 중인 상품 조회 성공", result);
     }
