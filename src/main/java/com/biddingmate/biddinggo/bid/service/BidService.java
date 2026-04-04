@@ -24,4 +24,6 @@ public interface BidService {
     PageResponse<BidResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId);
 
     PageResponse<AuctionDetailResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId);
+
+    void invalidateBidsByMember(Long memberId);
 }

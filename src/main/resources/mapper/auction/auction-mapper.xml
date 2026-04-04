@@ -270,12 +270,14 @@
         </foreach>
     </update>
 
+    <!-- 입찰 1위를 제외(비활성화)하고 남은 활성화 사용자들의 입찰이 1명 이하인 경우 -->
     <update id="resetVickreyPriceToStartPrice" parameterType="long">
         UPDATE auction
         SET vickrey_price = null
         WHERE id = #{auctionId}
     </update>
 
+    <!-- 비크리 차순위 승계 -->
     <update id="updateVickreyPrice" parameterType="map">
         UPDATE auction
         SET vickrey_price = #{amount}
@@ -289,6 +291,7 @@
                      COUNT(*) AS cnt
               FROM bid
               WHERE bidder_id = #{memberId}
+                AND status = 'INACTIVE'
               GROUP BY auction_id
         ) b ON a.id = b.auction_id
         SET a.bid_count = GREATEST(a.bid_count - b.cnt  , 0)

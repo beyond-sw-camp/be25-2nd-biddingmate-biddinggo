@@ -11,6 +11,7 @@ import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.bid.service.BidQueryService;
+import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
@@ -34,6 +35,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionMapper auctionMapper;
     private final AuctionItemService auctionItemService;
     private final BidQueryService bidQueryService;
+    private final BidService bidService;
     private final PointService pointService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -102,14 +104,17 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     @Transactional
     public void handleMemberDeactivation(Long memberId) {
-        // 1. 판매자 경매 취소
+        // 1. 입찰 무효화
+        invalidateBids(memberId);
+
+        // 2. 판매자 경매 취소
         List<Long> sellerAuctionIds = findActiveAuctionsBySeller(memberId);
         cancelAuctionsAndItems(sellerAuctionIds);
 
-        // 2. 입찰 참여수 감소
+        // 3. 입찰 참여수 감소
         decreaseBidCountByDeactiveMember(memberId);
 
-        // 3. 최고 입찰자의 비활성화 -> 비크리 재계산
+        // 4. 최고 입찰자의 비활성화 -> 비크리 재계산
         recalculateVickreyPriceByBidder(memberId);
     }
 
@@ -229,6 +234,11 @@ public class AuctionServiceImpl implements AuctionService {
                 && auction.getBidCount() == 0;
     }
 
+    // 입찰 무효화
+    private void invalidateBids(Long memberId) {
+        bidService.invalidateBidsByMember(memberId);
+    }
+
     // 진행 중 경매 조회
     private List<Long> findActiveAuctionsBySeller(Long memberId) {
         // auctionMapper에서 ON_AUCTION 상태인 경매 ID 조회
@@ -247,7 +257,6 @@ public class AuctionServiceImpl implements AuctionService {
 
         // 환불 이벤트 생성
         eventPublisher.publishEvent(new AuctionCancelledEvent(auctionIds));
-
     }
 
     // 비활성화 유저의 경매 입찰 수 차감
@@ -261,19 +270,11 @@ public class AuctionServiceImpl implements AuctionService {
         List<Long> auctionIds = bidQueryService.findOngoingAuctionIdsByMember(memberId);
 
         for (Long auctionId : auctionIds) {
-            // 해당 경매에서 최고 입찰기록 조회
-            Long topBidderId = bidQueryService.findTopBidderId(auctionId);
-
-            if (!memberId.equals(topBidderId)) {
-                // 비활성화 유저가 최고 입찰이 아닌 경우
-                continue;
-            }
-
-            // 비활성화 시 최고 입찰자 환불
+            // 비활성화 된 사용자의 최고 입찰 금액 환불
             Long amount = bidQueryService.findMaxBidAmountByAuctionAndBidder(auctionId, memberId);
             pointService.refundBid(memberId, amount);
 
-            // 활성화된 사용자들의 1~2위 입찰 금액 조회
+            // 활성화 중인 상위 2개 입찰 조회 (비크리 핵심)
             List<Bid> topBids = bidQueryService.findTop2ActiveBids(auctionId);
 
             if (topBids.size() < 2) {
@@ -284,6 +285,7 @@ public class AuctionServiceImpl implements AuctionService {
 
             Bid second = topBids.get(1); // 비크리 금액의 입찰자(차순위 입찰자)
 
+            // 비크리 차순위 승계
             auctionMapper.updateVickreyPrice(auctionId, second.getAmount());
         }
     }

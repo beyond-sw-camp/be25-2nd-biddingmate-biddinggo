@@ -122,4 +122,10 @@ public class BidServiceImpl implements BidService {
 
         return PageResponse.of(auctions, request.getPage(), request.getSize(), bidCount);
     }
+
+    @Override
+    @Transactional
+    public void invalidateBidsByMember(Long memberId) {
+        bidMapper.invalidateBidsByMember(memberId);
+    }
 }

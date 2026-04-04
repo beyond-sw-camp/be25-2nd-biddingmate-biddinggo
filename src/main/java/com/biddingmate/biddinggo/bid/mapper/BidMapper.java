@@ -33,14 +33,20 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
 
     // 특정 회원이 참여한 진행 중 경매 목록 조회
     List<Long> findOngoingAuctionIdsByMember(@Param("memberId") Long memberId);
-    // 현재 최고 입찰자 조회 (전체 기준)
+
+    // 활성화 중인 최고 입찰자 조회
     Long findTopBidderId(@Param("auctionId") Long auctionId);
-    // ACTIVE 회원 기준 상위 2개 입찰 조회 (비크리 핵심)
+
+    // 활성화 중인 상위 2개 입찰 조회 (비크리 핵심)
     List<Bid> findTop2ActiveBids(@Param("auctionId") Long auctionId);
 
     // 경매 id 목록으로 입찰내역 조회
     List<RefundDto> findRefundTargets(@Param("auctionIds") List<Long> auctionIds);
 
+    // 비활성화 된 사용자의 최고 입찰 조회
     Long findMaxBidAmountByAuctionAndBidder(@Param("auctionId") Long auctionId,
                                             @Param("bidderId") Long memberId);
+
+    // 비활성화 시 입찰 무효화
+    void invalidateBidsByMember(@Param("memberId") Long memberId);
 }
