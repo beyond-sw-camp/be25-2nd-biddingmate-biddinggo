@@ -51,4 +51,6 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
 
     void updateVickreyPrice(@Param("auctionId") Long auctionId,
                             @Param("amount") Long amount);
+
+    void decreaseBidCountByDeactiveMember(@Param("memberId") Long memberId);
 }

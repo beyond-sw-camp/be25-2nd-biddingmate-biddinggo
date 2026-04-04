@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.auction.service;
 
+import com.biddingmate.biddinggo.auction.dto.BidCountDto;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
@@ -13,6 +14,7 @@ import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -98,60 +100,17 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Long> findActiveAuctionsBySeller(Long memberId) {
-        // auctionMapper에서 ON_AUCTION 상태인 경매 ID 조회
-        return auctionMapper.findActiveAuctionIdsBySeller(memberId);
-    }
-
-    @Override
     @Transactional
-    public void cancelAuctionsAndItems(List<Long> auctionIds) {
-        if (auctionIds == null || auctionIds.isEmpty()) return;
+    public void handleMemberDeactivation(Long memberId) {
+        // 1. 판매자 경매 취소
+        List<Long> sellerAuctionIds = findActiveAuctionsBySeller(memberId);
+        cancelAuctionsAndItems(sellerAuctionIds);
 
-        // Item 상태를 CANCELLED로 변경 (ItemService 호출
-        auctionItemService.cancelItemsByAuctionIds(auctionIds);
+        // 2. 입찰 참여수 감소
+        decreaseBidCountByDeactiveMember(memberId);
 
-        // Auction 상태를 CANCELLED로 변경
-        auctionMapper.updateAuctionStatus(auctionIds, AuctionStatus.CANCELLED);
-
-        // 환불 이벤트 생성
-        eventPublisher.publishEvent(new AuctionCancelledEvent(auctionIds));
-
-    }
-
-    @Override
-    @Transactional
-    public void recalculateVickreyPriceByBidder(Long memberId) {
-        // 비활성화된 사용자의 진행 중인 경매 조회
-        List<Long> auctionIds = bidQueryService.findOngoingAuctionIdsByMember(memberId);
-
-        for (Long auctionId : auctionIds) {
-            // 해당 경매에서 최고 입찰기록 조회
-            Long topBidderId = bidQueryService.findTopBidderId(auctionId);
-
-            if (!memberId.equals(topBidderId)) {
-                // 비활성화 유저가 최고 입찰이 아닌 경우
-                continue;
-            }
-
-            // 비활성화 시 최고 입찰자 환불
-            Long amount = bidQueryService.findMaxBidAmountByAuctionAndBidder(auctionId, memberId);
-            pointService.refundBid(memberId, amount);
-
-            // 활성화된 사용자들의 1~2위 입찰 금액 조회
-            List<Bid> topBids = bidQueryService.findTop2ActiveBids(auctionId);
-
-            if (topBids.size() < 2) {
-                // 입찰 1위를 제외(비활성화)하고 남은 활성화 사용자들의 입찰이 1명 이하인 경우
-                auctionMapper.resetVickreyPriceToStartPrice(auctionId);
-                continue;
-            }
-
-            Bid second = topBids.get(1); // 비크리 금액의 입찰자(차순위 입찰자)
-
-            auctionMapper.updateVickreyPrice(auctionId, second.getAmount());
-        }
+        // 3. 최고 입찰자의 비활성화 -> 비크리 재계산
+        recalculateVickreyPriceByBidder(memberId);
     }
 
     @Override
@@ -268,5 +227,64 @@ public class AuctionServiceImpl implements AuctionService {
         return auction.getStatus() == AuctionStatus.ON_GOING
                 && auction.getBidCount() != null
                 && auction.getBidCount() == 0;
+    }
+
+    // 진행 중 경매 조회
+    private List<Long> findActiveAuctionsBySeller(Long memberId) {
+        // auctionMapper에서 ON_AUCTION 상태인 경매 ID 조회
+        return auctionMapper.findActiveAuctionIdsBySeller(memberId);
+    }
+
+    // 진행 중 경매들 강제 취소
+    private void cancelAuctionsAndItems(List<Long> auctionIds) {
+        if (auctionIds == null || auctionIds.isEmpty()) return;
+
+        // Item 상태를 CANCELLED로 변경 (ItemService 호출
+        auctionItemService.cancelItemsByAuctionIds(auctionIds);
+
+        // Auction 상태를 CANCELLED로 변경
+        auctionMapper.updateAuctionStatus(auctionIds, AuctionStatus.CANCELLED);
+
+        // 환불 이벤트 생성
+        eventPublisher.publishEvent(new AuctionCancelledEvent(auctionIds));
+
+    }
+
+    // 비활성화 유저의 경매 입찰 수 차감
+    private void decreaseBidCountByDeactiveMember(Long memberId) {
+        auctionMapper.decreaseBidCountByDeactiveMember(memberId);
+    }
+
+    // 비크리 입찰가 재계산
+    private void recalculateVickreyPriceByBidder(Long memberId) {
+        // 비활성화된 사용자의 진행 중인 경매 조회
+        List<Long> auctionIds = bidQueryService.findOngoingAuctionIdsByMember(memberId);
+
+        for (Long auctionId : auctionIds) {
+            // 해당 경매에서 최고 입찰기록 조회
+            Long topBidderId = bidQueryService.findTopBidderId(auctionId);
+
+            if (!memberId.equals(topBidderId)) {
+                // 비활성화 유저가 최고 입찰이 아닌 경우
+                continue;
+            }
+
+            // 비활성화 시 최고 입찰자 환불
+            Long amount = bidQueryService.findMaxBidAmountByAuctionAndBidder(auctionId, memberId);
+            pointService.refundBid(memberId, amount);
+
+            // 활성화된 사용자들의 1~2위 입찰 금액 조회
+            List<Bid> topBids = bidQueryService.findTop2ActiveBids(auctionId);
+
+            if (topBids.size() < 2) {
+                // 입찰 1위를 제외(비활성화)하고 남은 활성화 사용자들의 입찰이 1명 이하인 경우
+                auctionMapper.resetVickreyPriceToStartPrice(auctionId);
+                continue;
+            }
+
+            Bid second = topBids.get(1); // 비크리 금액의 입찰자(차순위 입찰자)
+
+            auctionMapper.updateVickreyPrice(auctionId, second.getAmount());
+        }
     }
 }

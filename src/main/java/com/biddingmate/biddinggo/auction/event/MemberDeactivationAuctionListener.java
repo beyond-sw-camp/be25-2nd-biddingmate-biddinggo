@@ -14,23 +14,17 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Order(1)
-public class AuctionMemberStatusListener {
+public class MemberDeactivationAuctionListener {
 
     private final AuctionService auctionService;
 
     @EventListener
     @Transactional
-    public void handleMemberStatusUpdated(MemberStatusUpdateEvent event) {
+    public void handle(MemberStatusUpdateEvent event) {
         if (event.getStatus() == MemberStatus.INACTIVE) {
-            Long memberId = event.getMemberId();
-
-            // 비활성화된 판매자의 경매 취소
-            // 진행 중 경매 조회
-            List<Long> auctionIds = auctionService.findActiveAuctionsBySeller(memberId);
-            auctionService.cancelAuctionsAndItems(auctionIds);
-
-            // 최고 입찰자의 비활성화 -> 비크리 재계산
-            auctionService.recalculateVickreyPriceByBidder(memberId);
+            if (event.getStatus() == MemberStatus.INACTIVE) {
+                auctionService.handleMemberDeactivation(event.getMemberId());
+            }
         }
     }
 }

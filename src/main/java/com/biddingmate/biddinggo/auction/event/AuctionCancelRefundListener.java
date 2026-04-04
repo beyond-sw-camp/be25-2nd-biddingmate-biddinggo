@@ -16,19 +16,11 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class AuctionCancelRefundListener {
-    private final BidQueryService bidQueryService;
     private final PointService pointService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleAuctionCancelled(AuctionCancelledEvent event) {
         List<Long> auctionIds = event.getAuctionIds();
-
-        // 1. 해당 경매들 입찰 전체 조회
-        List<RefundDto> refunds = bidQueryService.findByAuctionIds(auctionIds);
-
-        // 2. 환불 처리
-        for (RefundDto refund : refunds) {
-            pointService.refundBid(refund.getBidderId(), refund.getAmount());
-        }
+        pointService.refundBidsByAuctionIds(auctionIds);
     }
 }

@@ -30,12 +30,6 @@ public interface AuctionService {
      */
     void cancelAuction(Long auctionId, Long sellerId);
 
-    // 진행 중 경매 조회
-    List<Long> findActiveAuctionsBySeller(Long memberId);
-
-    // 진행 중 경매들 강제 취소
-    void cancelAuctionsAndItems(List<Long> auctionIds);
-
-    // 비크리 입찰가 재계산
-    void recalculateVickreyPriceByBidder(Long memberId);
+    // 유저 비활성화 이벤트
+    void handleMemberDeactivation(Long memberId);
 }

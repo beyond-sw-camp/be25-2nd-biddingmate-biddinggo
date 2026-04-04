@@ -283,4 +283,16 @@
           AND vickrey_price != #{amount}
     </update>
 
+    <update id="decreaseBidCountByDeactiveMember" parameterType="long">
+        UPDATE auction a
+        JOIN (SELECT auction_id,
+                     COUNT(*) AS cnt
+              FROM bid
+              WHERE bidder_id = #{memberId}
+              GROUP BY auction_id
+        ) b ON a.id = b.auction_id
+        SET a.bid_count = GREATEST(a.bid_count - b.cnt  , 0)
+        WHERE a.status = 'ON_GOING'
+    </update>
+
 </mapper>

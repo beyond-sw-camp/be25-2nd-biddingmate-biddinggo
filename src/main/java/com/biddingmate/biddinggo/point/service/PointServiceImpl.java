@@ -1,5 +1,7 @@
 package com.biddingmate.biddinggo.point.service;
 
+import com.biddingmate.biddinggo.auction.dto.RefundDto;
+import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
@@ -23,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PointServiceImpl implements PointService {
     private final MemberService memberService;
+    private final BidQueryService bidQueryService;
     private final PointHistoryMapper pointHistoryMapper;
 
     @Override
@@ -91,6 +94,18 @@ public class PointServiceImpl implements PointService {
         int refund = this.addPointHistory(pointHistory);
         if (refund != 1) {
             throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void refundBidsByAuctionIds(List<Long> auctionIds) {
+        // 1. 해당 경매들 입찰 전체 조회
+        List<RefundDto> refunds = bidQueryService.findByAuctionIds(auctionIds);
+
+        // 2. 환불 처리
+        for (RefundDto refund : refunds) {
+            refundBid(refund.getBidderId(), refund.getAmount());
         }
     }
 }

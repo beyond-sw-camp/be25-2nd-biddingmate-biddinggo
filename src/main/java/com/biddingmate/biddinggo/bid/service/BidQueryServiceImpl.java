@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.bid.service;
 
+import com.biddingmate.biddinggo.auction.dto.BidCountDto;
 import com.biddingmate.biddinggo.auction.dto.RefundDto;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
 import com.biddingmate.biddinggo.bid.model.Bid;
