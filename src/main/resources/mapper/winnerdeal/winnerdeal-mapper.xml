@@ -2,8 +2,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper">
-
-    <select id="findByAuctionId" resultType="com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal">
+    <insert id="insert" parameterType="WinnerDeal"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO winner_deal (
+            auction_id,
+            winner_id,
+            seller_id,
+            winner_price,
+            status,
+            delivery_status,
+            created_at
+        ) VALUES (
+                     #{auctionId},
+                     #{winnerId},
+                     #{sellerId},
+                     #{winnerPrice},
+                     #{status},
+                     #{deliveryStatus},
+                     #{createdAt}
+                 )
+    </insert>
+    <select id="findByAuctionId" resultType="WinnerDeal">
         SELECT
             id,
             auction_id AS auctionId,

@@ -4,15 +4,25 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class WinnerDeal {
-    private Long id;              // 낙찰 PK
-    private Long auctionId;       // 옥션 FK (3번)
-    private Long winnerId;        // 낙찰자(구매자) ID
-    private Long sellerId;        // 판매자 ID
-    private Long winnerPrice;     // 낙찰가
-    private String status;        // 상태 (PAID 등)
+    private Long id;
+    private Long auctionId;
+    private Long winnerId;
+    private Long sellerId;
+    private Long winnerPrice;
+    private String status;          // 기본값 'PAID'
+    private String deliveryStatus;  // 추가: 기본값 'SHIPPED'
+    private LocalDateTime confirmedAt;
+    private String zipcode;
+    private String address;
+    private String detailAddress;
+    private String tel;
+    private String recipient;
+    private String carrier;
+    private String trackingNumber;
     private LocalDateTime createdAt;
 }
