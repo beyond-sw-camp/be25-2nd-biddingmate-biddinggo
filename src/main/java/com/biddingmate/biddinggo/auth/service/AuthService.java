@@ -3,7 +3,7 @@ package com.biddingmate.biddinggo.auth.service;
 import com.biddingmate.biddinggo.auth.dto.AdminSignupRequestDto;
 import com.biddingmate.biddinggo.auth.dto.LoginResponse;
 
-public interface AdminAuthService {
+public interface AuthService {
 
     LoginResponse login(String username, String password);
 
@@ -15,5 +15,5 @@ public interface AdminAuthService {
 
     LoginResponse refreshAccessToken(String refreshToken);
 
-    void updateInfo(String username, String name, String nickname);
+    void updateInfo(String username, String name, String nickname, String imageUrl);
 }

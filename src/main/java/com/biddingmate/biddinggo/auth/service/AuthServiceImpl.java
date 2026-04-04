@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AdminAuthServiceImpl implements AdminAuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
@@ -121,24 +121,33 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public void updateInfo(String username, String name, String nickname) {
+    public void updateInfo(String username, String name, String nickname, String imageUrl) {
 
         Member member = memberMapper.selectMemberByUsername(username);
+        // 맴버 중복 체크
         if (member == null) {
 
             throw new CustomException(ErrorType.USER_NOT_FOUND);
         }
 
+        // 닉네임 중복 체크
         if (memberMapper.selectMemberByNickname(nickname) != null) {
 
             throw new CustomException(ErrorType.DUPLICATE_NICKNAME);
 
         }
 
+        // 유저가 PENDING인지 체크
+        if (member.getStatus() != MemberStatus.PENDING) {
+
+            throw new CustomException(ErrorType.ALREADY_REGISTERED_USER);
+        }
+
         SocialInfoUpdateDto updateDto = SocialInfoUpdateDto.builder()
                 .username(username)
                 .name(name)
                 .nickname(nickname)
+                .imageUrl(imageUrl)
                 .status(MemberStatus.ACTIVE)
                 .build();
 
@@ -154,7 +163,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
         // 엑세스토큰 발급
         String accessToken =
-                jwtProvider.createAccessToken(member.getUsername(), authorities);
+                jwtProvider.createAccessToken(member.getUsername(), authorities, member.getStatus().name());
 
 
         return LoginResponse.builder()
