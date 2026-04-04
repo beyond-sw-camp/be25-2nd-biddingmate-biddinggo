@@ -78,3 +78,7 @@ springdoc:
   swagger-ui:
     tags-sorter: alpha
     operations-sorter: alpha
+
+app:
+  frontend:
+    redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:5173/oauth/callback}
