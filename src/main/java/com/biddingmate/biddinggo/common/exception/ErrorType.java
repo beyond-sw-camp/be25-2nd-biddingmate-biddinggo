@@ -32,7 +32,7 @@ public enum ErrorType {
     REFRESH_TOKEN_INVALID("auth-009","리프레쉬 토큰이 유효하지 않습니다.",HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND("auth-010","필수 정보를 입력할 사용자를 찾지 못했습니다.",HttpStatus.NOT_FOUND),
     REDIS_UNAVAILABLE("auth-011", "인증 저장소 연결에 실패했습니다. 잠시 후 다시 시도해주세요.", HttpStatus.SERVICE_UNAVAILABLE),
-
+    ALREADY_REGISTERED_USER("auth-012", "이미 필수 정보 등록이 완료된 사용자입니다.", HttpStatus.BAD_REQUEST),
 
 
     // 결제
@@ -141,7 +141,6 @@ public enum ErrorType {
     NOTICE_UPDATE_FAIL("notice-003", "공지사항 수정을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOTICE_DELETE_FAIL("notice-004", "공지사항 삭제를 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_NOTICE_REQUEST("notice-005", "제목 또는 내용의 형식 오류입니다.", HttpStatus.BAD_REQUEST);
-
 
     private final String errorCode;
     private final String message;

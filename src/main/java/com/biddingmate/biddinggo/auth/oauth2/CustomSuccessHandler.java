@@ -4,8 +4,11 @@ import com.biddingmate.biddinggo.auth.dto.LoginResponse;
 import com.biddingmate.biddinggo.auth.jwt.JwtCookieService;
 import com.biddingmate.biddinggo.auth.dto.CustomOAuth2Member;
 import com.biddingmate.biddinggo.auth.jwt.JwtProvider;
+import com.biddingmate.biddinggo.common.exception.CustomException;
+import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,7 +53,12 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .map(GrantedAuthority::getAuthority).toList();
 
         // provider를 통해 토큰 발생
-        Map<String, Object> tokens = jwtProvider.createTotalTokenResponse(username, authorities);
+
+        if (member == null) {
+            throw new CustomException(ErrorType.USER_NOT_FOUND);
+        }
+
+        Map<String, Object> tokens = jwtProvider.createTotalTokenResponse(username, authorities, member.getStatus().name());
         LoginResponse loginResponse = (LoginResponse) tokens.get("loginResponse");
         String refreshToken = (String) tokens.get("refreshToken");
 
@@ -62,8 +70,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // 3. access 토큰은 쿠키가 아닌 리다이렉트 파라미터로 전달해서 프론트엔드가 헤더로 넣을 수있게
         String targetUrl;
-        if (member != null && "PENDING".equals(member.getStatus())) {
-            targetUrl = "http://localhost:8080/register-info.html";
+        if (member != null && member.getStatus().equals(MemberStatus.PENDING)) {
+            targetUrl = "http://localhost:8080/success.html";
         } else {
             targetUrl = "http://localhost:8080/success.html";
         }
@@ -75,7 +83,5 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         getRedirectStrategy().sendRedirect(request, response, finalUrl);
 
-
     }
-
 }

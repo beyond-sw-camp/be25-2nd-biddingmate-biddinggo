@@ -262,6 +262,7 @@
         UPDATE MEMBER
         SET name = #{name},
             nickname = #{nickname},
+            image_url = #{imageUrl},
             status = #{status}
         WHERE username = #{username}
     </update>

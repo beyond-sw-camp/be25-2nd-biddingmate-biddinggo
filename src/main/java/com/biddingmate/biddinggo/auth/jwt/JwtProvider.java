@@ -26,11 +26,14 @@ public class JwtProvider {
     private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 30; // 30분
     private static final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60L * 24L; // 1일
 
-    public String createAccessToken(String username, List<String> authorities) {
+    public String createAccessToken(String username, List<String> authorities, String status) {
 
 
         Map<String, Object> claims =
-                Map.of("username", username, "authorities", authorities, "token_type", "access");
+                Map.of("username", username,
+                        "authorities", authorities,
+                        "status", status,
+                        "token_type", "access");
 
 
         return jwtUtil.createJwtToken(claims, ACCESS_TOKEN_EXPIRATION);
@@ -123,10 +126,10 @@ public class JwtProvider {
     }
 
     // Oauth2 리펙터링
-    public Map<String, Object> createTotalTokenResponse(String username, List<String> authorities) {
+    public Map<String, Object> createTotalTokenResponse(String username, List<String> authorities, String status) {
 
         // access token 생성
-        String accessToken = createAccessToken(username, authorities);
+        String accessToken = createAccessToken(username, authorities, status);
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
