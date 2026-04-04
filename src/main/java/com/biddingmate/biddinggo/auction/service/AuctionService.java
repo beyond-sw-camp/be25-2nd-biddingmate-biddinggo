@@ -4,8 +4,6 @@ import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequ
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
 
-import java.util.List;
-
 /**
  * auction 테이블 저장 책임을 담당하는 서비스.
  */
@@ -31,5 +29,5 @@ public interface AuctionService {
     void cancelAuction(Long auctionId, Long sellerId);
 
     // 유저 비활성화 이벤트
-    void handleMemberDeactivation(Long memberId);
+    void handleMemberDeactivationBeforeWinning(Long memberId);
 }

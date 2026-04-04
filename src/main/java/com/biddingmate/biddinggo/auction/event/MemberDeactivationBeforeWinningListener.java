@@ -9,12 +9,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 @Order(1)
-public class MemberDeactivationAuctionListener {
+public class MemberDeactivationBeforeWinningListener {
 
     private final AuctionService auctionService;
 
@@ -23,7 +21,7 @@ public class MemberDeactivationAuctionListener {
     public void handle(MemberStatusUpdateEvent event) {
         if (event.getStatus() == MemberStatus.INACTIVE) {
             if (event.getStatus() == MemberStatus.INACTIVE) {
-                auctionService.handleMemberDeactivation(event.getMemberId());
+                auctionService.handleMemberDeactivationBeforeWinning(event.getMemberId());
             }
         }
     }

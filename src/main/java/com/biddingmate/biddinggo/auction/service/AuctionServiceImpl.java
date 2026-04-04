@@ -103,7 +103,7 @@ public class AuctionServiceImpl implements AuctionService {
 
     @Override
     @Transactional
-    public void handleMemberDeactivation(Long memberId) {
+    public void handleMemberDeactivationBeforeWinning(Long memberId) {
         // 1. 입찰 무효화
         invalidateBids(memberId);
 
