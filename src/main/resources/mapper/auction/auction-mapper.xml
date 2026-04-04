@@ -267,9 +267,5 @@
             winner_price = #{winnerPrice}
         WHERE id = #{id}
     </update>
-    <update id="updateAuctionStatus" parameterType="com.biddingmate.biddinggo.auction.model.Auction">
-        UPDATE auction
-        SET status = #{status}
-        WHERE id = #{id}
-    </update>
+
 </mapper>

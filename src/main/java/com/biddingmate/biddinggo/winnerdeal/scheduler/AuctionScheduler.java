@@ -21,7 +21,7 @@ public class AuctionScheduler {
     private final AuctionMapper auctionMapper;
     private final WinnerDealService winnerDealService;
 
-    @Scheduled(cron = "0 * * * * *") // 1분 주기 설정
+    @Scheduled(cron = "*/5 * * * * *") // 5초 주기 설정
     public void executeClosing() {
         log.info("경매 마감 스케줄러 가동: {}", LocalDateTime.now());
 

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper">
-    <insert id="insert" parameterType="com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal"
+    <insert id="insert" parameterType="WinnerDeal"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO winner_deal (
             auction_id,
@@ -22,7 +22,7 @@
                      #{createdAt}
                  )
     </insert>
-    <select id="findByAuctionId" resultType="com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal">
+    <select id="findByAuctionId" resultType="WinnerDeal">
         SELECT
             id,
             auction_id AS auctionId,

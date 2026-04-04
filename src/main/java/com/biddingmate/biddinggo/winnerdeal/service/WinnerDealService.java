@@ -5,6 +5,8 @@ import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
+import com.biddingmate.biddinggo.common.exception.CustomException;
+import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
@@ -62,7 +64,11 @@ public class WinnerDealService {
             auction.setStatus(AuctionStatus.ENDED);
             auction.setWinnerId(winnerBid.getBidderId());
             auction.setWinnerPrice(finalPrice);
-            auctionMapper.updateAuctionResult(auction);
+
+            int updatedRows = auctionMapper.updateAuctionResult(auction);
+            if (updatedRows != 1) {
+                throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+            }
 
             auctionItemMapper.updateStatus(
                     auction.getItemId(),
@@ -76,7 +82,12 @@ public class WinnerDealService {
         } else {
             // 유찰
             auction.setStatus(AuctionStatus.ENDED);
-            auctionMapper.updateAuctionResult(auction);
+
+            int updatedRows = auctionMapper.updateAuctionResult(auction);
+            if (updatedRows != 1) {
+                throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+            }
+
             auctionItemMapper.updateStatus(
                     auction.getItemId(),
                     AuctionItemStatus.UNSOLD,

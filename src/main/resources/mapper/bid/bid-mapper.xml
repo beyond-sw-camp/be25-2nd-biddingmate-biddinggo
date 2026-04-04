@@ -67,7 +67,7 @@
                created_at AS createdAt
         FROM bid
         WHERE auction_id = #{auctionId}
-        ORDER BY created_at ${order}
+        ORDER BY amount DESC, created_at ASC
     </select>
 
     <select id="findBidAuctionsByMemberId" parameterType="map" resultType="Auction">

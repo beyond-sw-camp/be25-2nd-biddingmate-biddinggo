@@ -46,5 +46,4 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
 
     int updateAuctionResult(Auction auction);
 
-    int updateAuctionStatus(Auction auction);
 }
