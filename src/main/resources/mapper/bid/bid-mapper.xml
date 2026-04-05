@@ -29,6 +29,7 @@
         FROM bid
         WHERE auction_id = #{auctionId}
           AND bidder_id = #{bidderId}
+          AND status = 'ACTIVE'
         ORDER BY created_at DESC
         LIMIT 1
     </select>
@@ -72,30 +73,34 @@
         ORDER BY amount DESC, created_at ASC
     </select>
 
-    <select id="findBidAuctionsByMemberId" parameterType="map" resultType="Auction">
-        SELECT DISTINCT
-            a.id AS id,
-            a.item_id AS itemId,
-            a.winner_id AS winnerId,
-            a.seller_id AS sellerId,
-            a.type AS type,
-            a.inspection_yn AS inspectionYn,
-            a.status AS status,
+    <select id="findBidAuctionsByMemberId" parameterType="map" resultType="BidListResponse">
+        SELECT
+            b.id AS id,
+            a.id AS auction_id,
+            a.status,
             a.start_price AS startPrice,
-            a.bid_unit AS bidUnit,
             a.vickrey_price AS vickreyPrice,
             a.bid_count AS bidCount,
-            a.buy_now_price AS buyNowPrice,
             a.wish_count AS wishCount,
             a.start_date AS startDate,
             a.end_date AS endDate,
             a.cancel_date AS cancelDate,
-            a.winner_price AS winnerPrice,
-            a.created_at AS createdAt
+            ai.name,
+            ii.url AS representative_image_url,
+            b.amount AS amount,
+            b.created_at AS createdAt
+
         FROM auction a
-                 INNER JOIN bid b
-                            ON a.id = b.auction_id
-        WHERE b.bidder_id = #{memberId};
+            INNER JOIN bid b ON a.id = b.auction_id
+            INNER JOIN auction_item ai ON a.item_id = ai.id
+            LEFT JOIN item_image ii ON ii.item_id = ai.id
+                AND ii.display_order = (
+                    SELECT MIN(ii2.display_order)
+                    FROM item_image ii2
+                    WHERE ii2.item_id = ai.id
+                )
+        WHERE b.bidder_id = #{memberId}
+          AND b.status = 'ACTIVE'
     </select>
 
     <select id="findOngoingAuctionIdsByMember" parameterType="long" resultType="long">
@@ -104,6 +109,7 @@
         JOIN auction a ON b.auction_id = a.id
         WHERE b.bidder_id = #{memberId}
           AND a.status = 'ON_GOING'
+          AND status = 'ACTIVE'
     </select>
 
     <!-- 활성화 중인 최고 입찰자 조회 (전체 기준) -->

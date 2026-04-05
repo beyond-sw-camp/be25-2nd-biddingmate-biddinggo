@@ -1,15 +1,13 @@
 package com.biddingmate.biddinggo.bid.service;
 
-import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.model.Auction;
+import com.biddingmate.biddinggo.bid.dto.BidListResponse;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import jakarta.validation.Valid;
-
-import java.util.List;
 
 public interface BidService {
     /**
@@ -23,7 +21,7 @@ public interface BidService {
 
     PageResponse<BidResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId);
 
-    PageResponse<AuctionDetailResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId);
+    PageResponse<BidListResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId);
 
     void invalidateBidsByMember(Long memberId);
 }

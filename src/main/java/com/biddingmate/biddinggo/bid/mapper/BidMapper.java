@@ -1,8 +1,7 @@
 package com.biddingmate.biddinggo.bid.mapper;
 
-import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
-import com.biddingmate.biddinggo.auction.dto.BidCountDto;
 import com.biddingmate.biddinggo.auction.dto.RefundDto;
+import com.biddingmate.biddinggo.bid.dto.BidListResponse;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
@@ -27,9 +26,9 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
                                          @Param("auctionId") Long auctionId,
                                          @Param("order") String sortOrder);
 
-    List<AuctionDetailResponse> findBidAuctionsByMemberId(RowBounds rowBounds,
-                                                          @Param("memberId") Long memberId,
-                                                          @Param("order")String sortOrder);
+    List<BidListResponse> findBidAuctionsByMemberId(RowBounds rowBounds,
+                                                    @Param("memberId") Long memberId,
+                                                    @Param("order")String sortOrder);
 
     // 특정 회원이 참여한 진행 중 경매 목록 조회
     List<Long> findOngoingAuctionIdsByMember(@Param("memberId") Long memberId);
