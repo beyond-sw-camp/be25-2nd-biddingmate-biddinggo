@@ -7,6 +7,9 @@ import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountResponse;
 import com.biddingmate.biddinggo.payment.dto.GetVirtualAccountResponse;
 import com.biddingmate.biddinggo.payment.dto.TossDepositWebhook;
 import com.biddingmate.biddinggo.payment.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +25,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
+@Tag(name = "Payment", description = "결제 API")
 public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/virtual-accounts")
+    @Operation(summary = "가상계좌 발급", description = "가상계좌를 발급합니다.")
     public ResponseEntity<ApiResponse<CreateVirtualAccountResponse>> createVirtualAccount(
             @RequestBody CreateVirtualAccountRequest request,
-            @AuthenticationPrincipal Member member) {
+            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
 
         CreateVirtualAccountResponse result = paymentService.createVirtualAccount(request, member.getId());
 
@@ -36,13 +41,16 @@ public class PaymentController {
     }
 
     @GetMapping("/virtual-accounts")
-    public ResponseEntity<ApiResponse<List<GetVirtualAccountResponse>>> getVirtualAccount(@AuthenticationPrincipal Member member) {
+    @Operation(summary = "가상계좌 조회", description = "회원의 가상계좌 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<List<GetVirtualAccountResponse>>> getVirtualAccount(
+            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         List<GetVirtualAccountResponse> result = paymentService.getVirtualAccount(member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "가상계좌 조회 성공", result);
     }
 
     @PostMapping("/virtual-accounts/deposit")
+    @Operation(summary = "가상계좌 입금 웹훅", description = "토스 가상계좌 입금 웹훅을 처리합니다.")
     public ResponseEntity<ApiResponse<Void>> handleTossDepositWebhook(@RequestBody TossDepositWebhook request) {
         // 1. 로그로 데이터 확인 (가장 중요!)
         System.out.println("토스 웹훅 도착!: \n" + request);
