@@ -45,7 +45,7 @@ public class AdminDirectInquiryController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "관리자용 1대1 문의 답변 등록", description = "관리자가 1대1 문의에 답변을 등록합니다.")
     public ResponseEntity<ApiResponse<AnswerDirectInquiryResponse>> answerDirectInquiry(@Parameter(description = "문의 ID", example = "1") @PathVariable Long inquiryId,
-                                                                                        @Valid @RequestBody AnswerDirectInquiryRequest request,
+                                                                                        @RequestBody @Valid AnswerDirectInquiryRequest request,
                                                                                         @Parameter(hidden = true) @AuthenticationPrincipal Member admin) {
         AnswerDirectInquiryResponse result = directInquiryService.answerDirectInquiry(inquiryId, request, admin.getId());
 

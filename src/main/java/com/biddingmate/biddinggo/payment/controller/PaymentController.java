@@ -31,10 +31,8 @@ public class PaymentController {
 
     @PostMapping("/virtual-accounts")
     @Operation(summary = "가상계좌 발급", description = "가상계좌를 발급합니다.")
-    public ResponseEntity<ApiResponse<CreateVirtualAccountResponse>> createVirtualAccount(
-            @RequestBody CreateVirtualAccountRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
-
+    public ResponseEntity<ApiResponse<CreateVirtualAccountResponse>> createVirtualAccount(@RequestBody CreateVirtualAccountRequest request,
+                                                                                          @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         CreateVirtualAccountResponse result = paymentService.createVirtualAccount(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "가상계좌 발급 성공", result);
@@ -42,8 +40,7 @@ public class PaymentController {
 
     @GetMapping("/virtual-accounts")
     @Operation(summary = "가상계좌 조회", description = "회원의 가상계좌 목록을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<GetVirtualAccountResponse>>> getVirtualAccount(
-            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
+    public ResponseEntity<ApiResponse<List<GetVirtualAccountResponse>>> getVirtualAccount(@Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         List<GetVirtualAccountResponse> result = paymentService.getVirtualAccount(member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "가상계좌 조회 성공", result);

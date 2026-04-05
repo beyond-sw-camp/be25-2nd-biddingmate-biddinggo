@@ -34,9 +34,8 @@ public class AddressController {
 
     @PostMapping("")
     @Operation(summary = "배송지 등록", description = "새 배송지를 등록합니다.")
-    public ResponseEntity<ApiResponse<CreateAddressResponse>> createAddress(
-            @Valid @RequestBody CreateAddressRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
+    public ResponseEntity<ApiResponse<CreateAddressResponse>> createAddress(@RequestBody @Valid CreateAddressRequest request,
+                                                                            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         CreateAddressResponse result = addressService.createAddress(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "배송지 등록 성공", result);
@@ -44,8 +43,7 @@ public class AddressController {
 
     @GetMapping("")
     @Operation(summary = "배송지 목록 조회", description = "배송지 목록을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<AddressListResponse>>> findAllAddress(
-            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
+    public ResponseEntity<ApiResponse<List<AddressListResponse>>> findAllAddress(@Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         List<AddressListResponse> result = addressService.findAllAddress(member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "배송지 조회 성공", result);
@@ -53,9 +51,8 @@ public class AddressController {
 
     @PatchMapping("/{addressId}")
     @Operation(summary = "기본 배송지 변경", description = "기본 배송지로 변경합니다.")
-    public ResponseEntity<ApiResponse<Void>> updateDefault(
-            @Parameter(description = "배송지 ID", example = "1") @PathVariable Long addressId,
-            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
+    public ResponseEntity<ApiResponse<Void>> updateDefault(@Parameter(description = "배송지 ID", example = "1") @PathVariable Long addressId,
+                                                           @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         addressService.updateDefaultAddress(addressId, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "기본 배송지 변경에 성공했습니다.", null);
@@ -63,9 +60,8 @@ public class AddressController {
 
     @DeleteMapping("/{addressId}")
     @Operation(summary = "배송지 삭제", description = "배송지를 삭제합니다.")
-    public ResponseEntity<ApiResponse<Void>> deleteAddress(
-            @Parameter(description = "배송지 ID", example = "1") @PathVariable Long addressId,
-            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
+    public ResponseEntity<ApiResponse<Void>> deleteAddress(@Parameter(description = "배송지 ID", example = "1") @PathVariable Long addressId,
+                                                           @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         addressService.deleteAddress(addressId, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "배송지 삭제를 성공했습니다.", null);

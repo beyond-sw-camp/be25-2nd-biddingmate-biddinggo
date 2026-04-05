@@ -31,10 +31,8 @@ public class DirectInquiryController {
 
     @PostMapping("")
     @Operation(summary = "1대1 문의 등록", description = "1대1 문의를 등록합니다.")
-    public ResponseEntity<ApiResponse<CreateDirectInquiryResponse>> createDirectInquiry(
-            @RequestBody CreateDirectInquiryRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal Member member
-    ) {
+    public ResponseEntity<ApiResponse<CreateDirectInquiryResponse>> createDirectInquiry(@RequestBody @Valid CreateDirectInquiryRequest request,
+                                                                                        @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         CreateDirectInquiryResponse result = directInquiryService.createDirectInquiry(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "1대1 문의 성공", result);

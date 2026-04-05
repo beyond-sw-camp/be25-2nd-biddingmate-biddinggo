@@ -33,8 +33,7 @@ public class AdminInspectionController {
     @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "관리자용 검수 신청 목록 조회", description = "관리자는 모든 검수 신청 목록을 조건별로 조회합니다.")
-    public ResponseEntity<ApiResponse<PageResponse<AdminInspectionListResponse>>> findAllInspection(
-            AdminInspectionListRequest request) {
+    public ResponseEntity<ApiResponse<PageResponse<AdminInspectionListResponse>>> findAllInspection(AdminInspectionListRequest request) {
         PageResponse<AdminInspectionListResponse> result = inspectionQueryService.findAllWithFilter(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "관리자 검수 요청 물품 조회 성공", result);

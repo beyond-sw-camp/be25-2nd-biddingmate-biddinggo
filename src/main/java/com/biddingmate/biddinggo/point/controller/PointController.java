@@ -38,7 +38,7 @@ public class PointController {
 
     @PostMapping("/exchanges")
     @Operation(summary = "포인트 환전", description = "보유 포인트를 환전합니다.")
-    public ResponseEntity<ApiResponse<Void>> exchangePoint(@Valid @RequestBody ExchangePointRequest request,
+    public ResponseEntity<ApiResponse<Void>> exchangePoint(@RequestBody @Valid ExchangePointRequest request,
                                                            @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         pointService.exchangePoint(request, member.getId());
 
