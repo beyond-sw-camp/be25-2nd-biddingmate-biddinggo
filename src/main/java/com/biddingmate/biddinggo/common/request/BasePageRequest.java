@@ -29,20 +29,17 @@ public class BasePageRequest {
     private static final int MAX_SIZE = 100;
 
     @Schema(description = "1부터 시작하는 페이지 번호", example = "1", defaultValue = "1")
-    @NotNull(message = "페이지 번호는 필수입니다.")
     @Min(value = 1, message = "페이지 번호는 1 이상이어야 합니다.")
     @Builder.Default
     protected Integer page = 1;
 
-    @Schema(description = "페이지 크기", example = "20", defaultValue = "20")
-    @NotNull(message = "페이지 크기는 필수입니다.")
+    @Schema(description = "페이지 크기", example = "10", defaultValue = "10")
     @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.")
     @Max(value = MAX_SIZE, message = "페이지 크기는 100 이하여야 합니다.")
     @Builder.Default
     protected Integer size = 10;
 
     @Schema(description = "정렬 방향", example = "ASC", defaultValue = "ASC")
-    @NotNull(message = "정렬 방향은 필수입니다.")
     @Builder.Default
     protected String order = "ASC";
 
