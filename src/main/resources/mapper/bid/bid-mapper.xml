@@ -60,7 +60,7 @@
         </choose>
     </select>
 
-    <select id="getBidsByAuctionId" parameterType="map" resultType="Bid">
+    <select id="getBidsByAuctionId" parameterType="map" resultType="BidResponse">
         SELECT id,
                auction_id AS auctionId,
                bidder_id AS bidderId,
@@ -69,7 +69,7 @@
         FROM bid
         WHERE auction_id = #{auctionId}
           AND status = 'ACTIVE'
-        ORDER BY created_at ${order}
+        ORDER BY amount DESC, created_at ASC
     </select>
 
     <select id="findBidAuctionsByMemberId" parameterType="map" resultType="Auction">

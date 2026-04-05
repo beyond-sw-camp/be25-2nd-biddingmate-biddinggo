@@ -4,9 +4,13 @@ import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
+import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.review.dto.CreateReviewRequest;
 import com.biddingmate.biddinggo.review.dto.CreateReviewResponse;
+import com.biddingmate.biddinggo.review.dto.SellerReviewResponse;
 import com.biddingmate.biddinggo.review.mapper.ReviewMapper;
 import com.biddingmate.biddinggo.review.model.Review;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +28,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewMapper reviewMapper;
     private final AuctionMapper auctionMapper;
     private final WinnerDealMapper winnerDealMapper;
+    private final MemberMapper memberMapper;
 
     @Override
     @Transactional
@@ -70,5 +76,56 @@ public class ReviewServiceImpl implements ReviewService {
                 .content(review.getContent())
                 .createdAt(review.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public PageResponse<SellerReviewResponse> getSellerReviews(Long sellerId, BasePageRequest pageRequest) {
+
+        // 판매자 존재 여부 체크
+        getMember(sellerId);
+
+        // ASC DESC 유효한 정렬값인지 체크
+        validateOrder(pageRequest);
+
+        // 리뷰 목록 조회
+        List<SellerReviewResponse> content = reviewMapper.findSellerReviewsBySellerId(sellerId, pageRequest);
+
+        // 전체 개수 조회
+        long totalElements = reviewMapper.countSellerReviewsBySellerId(sellerId);
+
+        return PageResponse.of(
+                content,
+                pageRequest.getPage(),
+                pageRequest.getSize(),
+                totalElements
+        );
+
+    }
+
+    private void getMember(Long sellerId) {
+        Member member = memberMapper.findById(sellerId);
+
+        if (member == null) {
+            throw new CustomException(ErrorType.MEMBER_NOT_FOUND);
+        }
+    }
+
+    private void validateOrder(BasePageRequest pageRequest) {
+
+        // null 또는 빈값이면 DESC 정렬
+        if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
+            pageRequest.setOrder("DESC");
+            return;
+        }
+
+        String order = pageRequest.getOrder().toUpperCase();
+
+        // ASC 또는 DESC만 받기
+        if (!order.equals("ASC") && !order.equals("DESC")) {
+            pageRequest.setOrder("DESC");
+            return;
+        }
+
+        pageRequest.setOrder(order);
     }
 }

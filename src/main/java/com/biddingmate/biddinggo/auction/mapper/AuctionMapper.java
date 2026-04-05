@@ -55,4 +55,9 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
                             @Param("amount") Long amount);
 
     void decreaseBidCountByDeactiveMember(@Param("memberId") Long memberId);
+  
+    List<Auction> findExpiredAuctions(@Param("now") LocalDateTime now,
+                                      @Param("status") AuctionStatus status);
+
+    int updateAuctionResult(Auction auction);
 }

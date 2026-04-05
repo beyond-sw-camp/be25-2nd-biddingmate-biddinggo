@@ -297,5 +297,19 @@
         SET a.bid_count = GREATEST(a.bid_count - b.cnt  , 0)
         WHERE a.status = 'ON_GOING'
     </update>
+  
+    <select id="findExpiredAuctions" resultType="Auction">
+        SELECT * FROM auction
+        WHERE status = #{status}
+          AND end_date &lt;= #{now}
+    </select>
+
+    <update id="updateAuctionResult" parameterType="Auction">
+        UPDATE auction
+        SET status = #{status},
+            winner_id = #{winnerId},
+            winner_price = #{winnerPrice}
+        WHERE id = #{id}
+    </update>
 
 </mapper>

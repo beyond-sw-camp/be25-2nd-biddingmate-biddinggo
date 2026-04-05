@@ -32,7 +32,7 @@ public enum ErrorType {
     REFRESH_TOKEN_INVALID("auth-009","리프레쉬 토큰이 유효하지 않습니다.",HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND("auth-010","필수 정보를 입력할 사용자를 찾지 못했습니다.",HttpStatus.NOT_FOUND),
     REDIS_UNAVAILABLE("auth-011", "인증 저장소 연결에 실패했습니다. 잠시 후 다시 시도해주세요.", HttpStatus.SERVICE_UNAVAILABLE),
-
+    ALREADY_REGISTERED_USER("auth-012", "이미 필수 정보 등록이 완료된 사용자입니다.", HttpStatus.BAD_REQUEST),
 
 
     // 결제
@@ -127,13 +127,22 @@ public enum ErrorType {
 
     // 낙찰
     DEAL_NOT_FOUND("review-007", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     ALREADY_REVIEWED("review-002", "이미 해당 거래에 대한 리뷰를 작성했습니다.", HttpStatus.BAD_REQUEST),
     REVIEW_NOT_FOUND("review-003", "해당 리뷰가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     REVIEW_DELETE_FAIL("review-004", "리뷰 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_THE_WINNER("review-005", "낙찰자만 해당 경매의 리뷰를 남길 수 있습니다.", HttpStatus.FORBIDDEN),
-    SELLER_NOT_FOUND("review-006", "해당 경매의 판매자 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    SELLER_NOT_FOUND("review-006", "해당 경매의 판매자 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+    // 공지사항
+    NOTICE_NOT_FOUND("notice-001", "해당 공지사항을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    NOTICE_CREATE_FAIL("notice-002", "공지사항 등록을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    NOTICE_UPDATE_FAIL("notice-003", "공지사항 수정을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    NOTICE_DELETE_FAIL("notice-004", "공지사항 삭제를 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_NOTICE_REQUEST("notice-005", "제목 또는 내용의 형식 오류입니다.", HttpStatus.BAD_REQUEST);
+
     private final String errorCode;
     private final String message;
     private final HttpStatus httpStatus;
