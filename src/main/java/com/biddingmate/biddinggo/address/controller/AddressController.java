@@ -6,6 +6,8 @@ import com.biddingmate.biddinggo.address.dto.CreateAddressResponse;
 import com.biddingmate.biddinggo.address.service.AddressService;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.member.model.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/addresses")
+@Tag(name = "Address", description = "배송지 관리 API")
 public class AddressController {
     private final AddressService addressService;
 
     @PostMapping("")
+    @Operation(summary = "배송지 등록", description = "새로운 배송지를 등록합니다.")
     public ResponseEntity<ApiResponse<CreateAddressResponse>> createAddress(@Valid @RequestBody CreateAddressRequest request,
                                                                             @AuthenticationPrincipal Member member) {
         CreateAddressResponse result = addressService.createAddress(request, member.getId());
@@ -37,6 +41,7 @@ public class AddressController {
     }
 
     @GetMapping("")
+    @Operation(summary = "배송지 목록 조회", description = "사용자의 배송지 목록을 조회합니다.")
     public ResponseEntity<ApiResponse<List<AddressListResponse>>> findAllAddress(@AuthenticationPrincipal Member member) {
         List<AddressListResponse> result = addressService.findAllAddress(member.getId());
 
@@ -44,6 +49,7 @@ public class AddressController {
     }
 
     @PatchMapping("/{addressId}")
+    @Operation(summary = "기본 배송지 변경", description = "선택한 배송지를 기본 배송지로 변경합니다.")
     public ResponseEntity<ApiResponse<Void>> updateDefault(@PathVariable Long addressId,
                                                            @AuthenticationPrincipal Member member) {
         addressService.updateDefaultAddress(addressId, member.getId());
@@ -52,6 +58,7 @@ public class AddressController {
     }
 
     @DeleteMapping("/{addressId}")
+    @Operation(summary = "배송지 삭제", description = "선택한 배송지를 삭제합니다.")
     public ResponseEntity<ApiResponse<Void>> deleteAddress(@PathVariable Long addressId,
                                                            @AuthenticationPrincipal Member member) {
         addressService.deleteAddress(addressId, member.getId());
