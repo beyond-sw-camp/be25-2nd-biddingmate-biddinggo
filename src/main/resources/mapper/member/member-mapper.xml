@@ -456,4 +456,9 @@
         </where>
     </select>
 
+    <update id="updateMemberStatus" parameterType="map">
+        UPDATE member
+        SET status = #{status}
+        WHERE id = #{memberId}
+    </update>
 </mapper>

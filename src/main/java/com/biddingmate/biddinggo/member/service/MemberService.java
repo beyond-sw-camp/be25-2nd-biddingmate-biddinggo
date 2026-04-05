@@ -7,9 +7,10 @@ import com.biddingmate.biddinggo.member.dto.MemberListView;
 import com.biddingmate.biddinggo.member.dto.MemberListViewRequest;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
-import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
+import com.biddingmate.biddinggo.member.dto.UpdateMemberStatusRequest;
 import jakarta.validation.Valid;
 
 public interface MemberService {
@@ -26,10 +27,11 @@ public interface MemberService {
     PageResponse<MemberPurchaseItemResponse> getMyPurchases(Long memberId, BasePageRequest pageRequest);
 
     long getCurrentPoint(Long memberId);
-
+    void addPoint(Long memberId, Long amount);
     void deductPoint(Long memberId, Long amount);
 
     PageResponse<MemberSellingItemResponse> getMySellingItems(Long memberId, String status, BasePageRequest pageRequest);
 
     PageResponse<MemberListView> findAllMemberWithFilter(@Valid MemberListViewRequest request);
+    void updateMemberStatus(Long memberId, @Valid UpdateMemberStatusRequest request);
 }

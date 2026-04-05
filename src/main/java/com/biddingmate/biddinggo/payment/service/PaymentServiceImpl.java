@@ -3,7 +3,7 @@ package com.biddingmate.biddinggo.payment.service;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.util.DateTimeUtils;
-import com.biddingmate.biddinggo.member.mapper.MemberMapper;
+import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountRequest;
 import com.biddingmate.biddinggo.payment.dto.CreateVirtualAccountResponse;
 import com.biddingmate.biddinggo.payment.dto.GetVirtualAccountResponse;
@@ -19,6 +19,7 @@ import com.biddingmate.biddinggo.payment.model.VirtualAccount;
 import com.biddingmate.biddinggo.point.mapper.PointHistoryMapper;
 import com.biddingmate.biddinggo.point.model.PointHistory;
 import com.biddingmate.biddinggo.point.model.PointHistoryType;
+import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -41,9 +42,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final WebClient webClient;
     private final PaymentMapper paymentMapper;
     private final VirtualAccountMapper virtualAccountMapper;
-    private final MemberMapper memberMapper;
+    private final MemberService memberService;
     private final PointHistoryMapper pointHistoryMapper;
-    // private final PointMybatisMapper pointMybatisMapper;
+    private final PointService pointService;
 
     @Override
     @Transactional
@@ -158,9 +159,8 @@ public class PaymentServiceImpl implements PaymentService {
             throw new CustomException(ErrorType.PAYMENT_NOT_FOUND);
         }
 
-
         // 결제 대상자 포인트 충전
-        memberMapper.addPoint(payment.getMemberId(), payment.getAmount());
+        memberService.addPoint(payment.getMemberId(), payment.getAmount());
 
         // 포인트 히스토리 생성
         PointHistory pointHistory = PointHistory.builder()
@@ -170,8 +170,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(payment.getAmount())
                 .createdAt(LocalDateTime.now())
                 .build();
-        int pointInsert = pointHistoryMapper.insert(pointHistory);
 
+        int pointInsert = pointService.addPointHistory(pointHistory);
         if (pointInsert <= 0) {
             throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
         }

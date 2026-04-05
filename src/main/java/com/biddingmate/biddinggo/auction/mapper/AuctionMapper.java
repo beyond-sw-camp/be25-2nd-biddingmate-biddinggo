@@ -41,9 +41,23 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
 
     void updateWishCount(@Param("id") Long id, @Param("wishCount") int wishCount);
 
+    List<Long> findActiveAuctionIdsBySeller(@Param("sellerId") Long memberId);
+
+
+    void updateAuctionStatus(@Param("auctionIds") List<Long> auctionIds,
+                             @Param("status") AuctionStatus status);
+
+    // 입찰 1위를 제외(비활성화)하고 남은 활성화 사용자들의 입찰이 1명 이하인 경우
+    void resetVickreyPriceToStartPrice(@Param("auctionId") Long auctionId);
+
+    // 비크리 차순위 승계
+    void updateVickreyPrice(@Param("auctionId") Long auctionId,
+                            @Param("amount") Long amount);
+
+    void decreaseBidCountByDeactiveMember(@Param("memberId") Long memberId);
+  
     List<Auction> findExpiredAuctions(@Param("now") LocalDateTime now,
                                       @Param("status") AuctionStatus status);
 
     int updateAuctionResult(Auction auction);
-
 }

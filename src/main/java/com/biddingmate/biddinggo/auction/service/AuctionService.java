@@ -27,4 +27,7 @@ public interface AuctionService {
      * 경매를 취소 처리한다.
      */
     void cancelAuction(Long auctionId, Long sellerId);
+
+    // 유저 비활성화 이벤트
+    void handleMemberDeactivationBeforeWinning(Long memberId);
 }

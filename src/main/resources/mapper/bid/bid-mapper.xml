@@ -41,6 +41,7 @@
                created_at
         FROM bid
         WHERE auction_id = #{auctionId}
+          AND status = 'ACTIVE'
         ORDER BY amount DESC, created_at
         LIMIT 1 OFFSET 1
     </select>
@@ -48,10 +49,10 @@
     <select id="getBidCount" parameterType="map" resultType="int">
         <choose>
             <when test="auctionId != null">
-                SELECT COUNT(*) FROM bid WHERE auction_id = #{auctionId}
+                SELECT COUNT(*) FROM bid WHERE auction_id = #{auctionId} AND status = 'ACTIVE'
             </when>
             <when test="bidderId != null">
-                SELECT COUNT(DISTINCT auction_id) FROM bid WHERE bidder_id = #{bidderId}
+                SELECT COUNT(DISTINCT auction_id) FROM bid WHERE bidder_id = #{bidderId} AND status = 'ACTIVE'
             </when>
             <otherwise>
                 SELECT 0
@@ -67,6 +68,7 @@
                created_at AS createdAt
         FROM bid
         WHERE auction_id = #{auctionId}
+          AND status = 'ACTIVE'
         ORDER BY amount DESC, created_at ASC
     </select>
 
@@ -95,5 +97,65 @@
                             ON a.id = b.auction_id
         WHERE b.bidder_id = #{memberId};
     </select>
+
+    <select id="findOngoingAuctionIdsByMember" parameterType="long" resultType="long">
+        SELECT DISTINCT b.auction_id
+        FROM bid b
+        JOIN auction a ON b.auction_id = a.id
+        WHERE b.bidder_id = #{memberId}
+          AND a.status = 'ON_GOING'
+    </select>
+
+    <!-- 활성화 중인 최고 입찰자 조회 (전체 기준) -->
+    <select id="findTopBidderId" parameterType="long" resultType="long">
+        SELECT b.bidder_id
+        FROM bid b
+        WHERE b.auction_id = #{auctionId}
+          AND b.status = 'ACTIVE'
+        ORDER BY b.amount DESC
+        LIMIT 1
+    </select>
+
+    <!-- 활성화 중인 상위 2개 입찰 조회 (비크리 핵심) -->
+    <select id="findTop2ActiveBids" parameterType="long" resultType="Bid">
+        SELECT b.id,
+               b.auction_id,
+               b.bidder_id,
+               b.amount
+        FROM bid b
+        WHERE b.auction_id = #{auctionId}
+          AND b.status = 'ACTIVE'
+        ORDER BY b.amount DESC
+        LIMIT 2
+    </select>
+
+    <select id="findRefundTargets" resultType="RefundDto">
+        SELECT b.bidder_id AS bidderId,
+               MAX(b.amount) AS amount
+        FROM bid b
+        WHERE b.auction_id IN
+        <foreach collection="auctionIds" item="auctionId" open="(" separator="," close=")">
+            #{auctionId}
+        </foreach>
+        AND b.status = 'ACTIVE'
+        GROUP BY b.bidder_id
+    </select>
+
+    <!-- 비활성화 된 사용자의 최고 입찰 조회 -->
+    <select id="findMaxBidAmountByAuctionAndBidder" parameterType="map" resultType="long">
+        SELECT MAX(amount)
+        FROM bid
+        WHERE auction_id = #{auctionId}
+          AND bidder_id = #{bidderId}
+          AND status = 'INACTIVE'
+    </select>
+
+    <!-- 비활성화 시 입찰 무효화 -->
+    <update id="invalidateBidsByMember" parameterType="long">
+        UPDATE bid
+        SET status = 'INACTIVE'
+        WHERE bidder_id = #{memberId}
+          AND status = 'ACTIVE'
+    </update>
 
 </mapper>

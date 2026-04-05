@@ -1,19 +1,29 @@
 package com.biddingmate.biddinggo.auction.service;
 
+import com.biddingmate.biddinggo.auction.dto.BidCountDto;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
+import com.biddingmate.biddinggo.auction.event.AuctionCancelledEvent;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.YesNo;
+import com.biddingmate.biddinggo.bid.model.Bid;
+import com.biddingmate.biddinggo.bid.service.BidQueryService;
+import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
+import com.biddingmate.biddinggo.item.service.AuctionItemService;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
+import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * auction 엔티티 생성만 담당하는 서비스 구현체.
@@ -23,6 +33,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionMapper auctionMapper;
+    private final AuctionItemService auctionItemService;
+    private final BidQueryService bidQueryService;
+    private final BidService bidService;
+    private final PointService pointService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -84,6 +99,23 @@ public class AuctionServiceImpl implements AuctionService {
         if (updatedCount != 1) {
             throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
         }
+    }
+
+    @Override
+    @Transactional
+    public void handleMemberDeactivationBeforeWinning(Long memberId) {
+        // 1. 입찰 무효화
+        invalidateBids(memberId);
+
+        // 2. 판매자 경매 취소
+        List<Long> sellerAuctionIds = findActiveAuctionsBySeller(memberId);
+        cancelAuctionsAndItems(sellerAuctionIds);
+
+        // 3. 입찰 참여수 감소
+        decreaseBidCountByDeactiveMember(memberId);
+
+        // 4. 최고 입찰자의 비활성화 -> 비크리 재계산
+        recalculateVickreyPriceByBidder(memberId);
     }
 
     @Override
@@ -200,5 +232,61 @@ public class AuctionServiceImpl implements AuctionService {
         return auction.getStatus() == AuctionStatus.ON_GOING
                 && auction.getBidCount() != null
                 && auction.getBidCount() == 0;
+    }
+
+    // 입찰 무효화
+    private void invalidateBids(Long memberId) {
+        bidService.invalidateBidsByMember(memberId);
+    }
+
+    // 진행 중 경매 조회
+    private List<Long> findActiveAuctionsBySeller(Long memberId) {
+        // auctionMapper에서 ON_AUCTION 상태인 경매 ID 조회
+        return auctionMapper.findActiveAuctionIdsBySeller(memberId);
+    }
+
+    // 진행 중 경매들 강제 취소
+    private void cancelAuctionsAndItems(List<Long> auctionIds) {
+        if (auctionIds == null || auctionIds.isEmpty()) return;
+
+        // Item 상태를 CANCELLED로 변경 (ItemService 호출
+        auctionItemService.cancelItemsByAuctionIds(auctionIds);
+
+        // Auction 상태를 CANCELLED로 변경
+        auctionMapper.updateAuctionStatus(auctionIds, AuctionStatus.CANCELLED);
+
+        // 환불 이벤트 생성
+        eventPublisher.publishEvent(new AuctionCancelledEvent(auctionIds));
+    }
+
+    // 비활성화 유저의 경매 입찰 수 차감
+    private void decreaseBidCountByDeactiveMember(Long memberId) {
+        auctionMapper.decreaseBidCountByDeactiveMember(memberId);
+    }
+
+    // 비크리 입찰가 재계산
+    private void recalculateVickreyPriceByBidder(Long memberId) {
+        // 비활성화된 사용자의 진행 중인 경매 조회
+        List<Long> auctionIds = bidQueryService.findOngoingAuctionIdsByMember(memberId);
+
+        for (Long auctionId : auctionIds) {
+            // 비활성화 된 사용자의 최고 입찰 금액 환불
+            Long amount = bidQueryService.findMaxBidAmountByAuctionAndBidder(auctionId, memberId);
+            pointService.refundBid(memberId, amount);
+
+            // 활성화 중인 상위 2개 입찰 조회 (비크리 핵심)
+            List<Bid> topBids = bidQueryService.findTop2ActiveBids(auctionId);
+
+            if (topBids.size() < 2) {
+                // 입찰 1위를 제외(비활성화)하고 남은 활성화 사용자들의 입찰이 1명 이하인 경우
+                auctionMapper.resetVickreyPriceToStartPrice(auctionId);
+                continue;
+            }
+
+            Bid second = topBids.get(1); // 비크리 금액의 입찰자(차순위 입찰자)
+
+            // 비크리 차순위 승계
+            auctionMapper.updateVickreyPrice(auctionId, second.getAmount());
+        }
     }
 }

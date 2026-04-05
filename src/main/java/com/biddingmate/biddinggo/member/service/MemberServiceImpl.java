@@ -4,21 +4,24 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
-import com.biddingmate.biddinggo.directinquiry.dto.DirectInquiryView;
 import com.biddingmate.biddinggo.member.dto.MemberBiddingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberListView;
 import com.biddingmate.biddinggo.member.dto.MemberListViewRequest;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
-import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
+import com.biddingmate.biddinggo.member.dto.UpdateMemberStatusRequest;
+import com.biddingmate.biddinggo.member.event.MemberStatusUpdateEvent;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +32,10 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-
     private final MemberMapper memberMapper;
+    private final ApplicationEventPublisher eventPublisher;
+
+
     @Override
     public MemberDashboardResponse getMyDashboard(Long memberId) {
 
@@ -163,14 +168,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public void addPoint(Long memberId, Long amount) {
+        memberMapper.addPoint(memberId, amount);
+    }
+
+    @Override
     @Transactional
     public void deductPoint(Long memberId, Long amount) {
         memberMapper.usePoint(memberId, amount);
-
-        // 리펙터링 대상
-//        if (updated != 1) {
-//            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
-//        }
     }
 
     @Override
@@ -206,6 +211,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<MemberListView> findAllMemberWithFilter(MemberListViewRequest request) {
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
@@ -222,6 +228,21 @@ public class MemberServiceImpl implements MemberService {
         count = memberMapper.countTotalMember(request.getKeyword(), request.getStatus());
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    @Override
+    @Transactional
+    public void updateMemberStatus(Long memberId, UpdateMemberStatusRequest request) {
+        MemberStatus status = request.getStatus();
+
+        if (status != MemberStatus.ACTIVE && status != MemberStatus.INACTIVE) {
+            throw new CustomException(ErrorType.INVALID_ENUM_TYPE);
+        }
+
+        memberMapper.updateMemberStatus(memberId, status);
+
+        // 이벤트 발행
+        eventPublisher.publishEvent(new MemberStatusUpdateEvent(memberId, status));
     }
 
     // 회원 존재 여부 확인
@@ -275,5 +296,4 @@ public class MemberServiceImpl implements MemberService {
 
         return member;
     }
-
 }
