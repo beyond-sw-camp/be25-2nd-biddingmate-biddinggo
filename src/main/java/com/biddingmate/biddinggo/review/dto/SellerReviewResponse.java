@@ -17,7 +17,7 @@ public class SellerReviewResponse {
     private String buyerNickname;
 
     // 별점
-    private Integer rating;
+    private Double rating;
 
     // 리뷰 내용
     private String reviewText;
