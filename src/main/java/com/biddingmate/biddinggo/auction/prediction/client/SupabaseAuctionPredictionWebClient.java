@@ -15,6 +15,10 @@ import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -104,8 +108,8 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
                 .embeddingModel(row.embeddingModel())
                 .embeddingDimension(row.embeddingDimension())
                 .embeddingText(row.embeddingText())
-                .createdAt(row.createdAt())
-                .updatedAt(row.updatedAt())
+                .createdAt(parseSupabaseDateTime(row.createdAt()))
+                .updatedAt(parseSupabaseDateTime(row.updatedAt()))
                 .build();
     }
 
@@ -129,7 +133,7 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
         requestBody.put("p_embedding_model", auctionPriceReference.getEmbeddingModel());
         requestBody.put("p_embedding_dimension", auctionPriceReference.getEmbeddingDimension());
         requestBody.put("p_embedding_text", auctionPriceReference.getEmbeddingText());
-        requestBody.put("p_completed_at", auctionPriceReference.getCompletedAt());
+        requestBody.put("p_completed_at", formatSupabaseTimestamp(auctionPriceReference.getCompletedAt()));
 
         invokeRpc("upsert_auction_price_reference", requestBody);
     }
@@ -260,6 +264,26 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
                 .toList();
     }
 
+    private LocalDateTime parseSupabaseDateTime(String value) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+
+        try {
+            return OffsetDateTime.parse(value).toLocalDateTime();
+        } catch (DateTimeParseException exception) {
+            return LocalDateTime.parse(value);
+        }
+    }
+
+    private String formatSupabaseTimestamp(LocalDateTime value) {
+        if (value == null) {
+            return null;
+        }
+
+        return value.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
     /**
      * base URL 마지막 슬래시를 제거해 경로 조합을 안정화한다.
      */
@@ -281,8 +305,8 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
             @JsonAlias("embedding_model") String embeddingModel,
             @JsonAlias("embedding_dimension") Integer embeddingDimension,
             @JsonAlias("embedding_text") String embeddingText,
-            @JsonAlias("created_at") LocalDateTime createdAt,
-            @JsonAlias("updated_at") LocalDateTime updatedAt
+            @JsonAlias("created_at") String createdAt,
+            @JsonAlias("updated_at") String updatedAt
     ) {
     }
 
