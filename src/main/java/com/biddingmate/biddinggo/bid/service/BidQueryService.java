@@ -14,4 +14,6 @@ public interface BidQueryService {
     List<RefundDto> findByAuctionIds(List<Long> auctionIds);
 
     Long findMaxBidAmountByAuctionAndBidder(Long auctionId, Long memberId);
+
+    List<RefundDto> findRefundTargetsExcludingWinner(Long auctionId, Long winnerId);
 }
