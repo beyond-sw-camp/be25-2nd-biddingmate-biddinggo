@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.dto;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.AuctionType;
 import com.biddingmate.biddinggo.auction.model.YesNo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,6 +68,10 @@ public class AuctionDetailResponse {
 
     @Schema(description = "상품 정보")
     private Item item;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Schema(description = "경매 예측가 정보", nullable = true)
+    private AuctionPricePredictionResponse pricePrediction;
 
     @Getter
     @Setter
