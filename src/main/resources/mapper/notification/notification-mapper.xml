@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.biddingmate.biddinggo.notification.mapper.NotificationMapper">
+
+    <insert id="insert" parameterType="Notification" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO notification (
+            receiver_id,
+            type,
+            content,
+            url,
+            read_at,
+            created_at
+        ) VALUES (
+                     #{receiverId},
+                     #{type},
+                     #{content},
+                     #{url},
+                     #{readAt},
+                     #{createdAt}
+                 )
+    </insert>
+
+    <select id="countUnreadByReceiverId" resultType="_int">
+        SELECT COUNT(*)
+        FROM notification
+        WHERE receiver_id = #{receiverId}
+          AND read_at IS NULL
+    </select>
+
+</mapper>
