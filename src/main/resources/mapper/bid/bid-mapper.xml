@@ -109,7 +109,7 @@
         JOIN auction a ON b.auction_id = a.id
         WHERE b.bidder_id = #{memberId}
           AND a.status = 'ON_GOING'
-          AND status = 'ACTIVE'
+          AND b.status = 'ACTIVE'
     </select>
 
     <!-- 활성화 중인 최고 입찰자 조회 (전체 기준) -->
