@@ -1,10 +1,12 @@
 package com.biddingmate.biddinggo.winnerdeal.service;
 
+import com.biddingmate.biddinggo.auction.dto.RefundDto;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
+import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
@@ -28,6 +30,7 @@ import java.util.List;
 public class WinnerDealServiceImpl implements WinnerDealService {
     private final AuctionMapper auctionMapper;
     private final BidMapper bidMapper;
+    private final BidQueryService bidQueryService;
     private final WinnerDealMapper winnerDealMapper;
     private final WinnerDealQueryService winnerDealQueryService;
     private final AuctionItemMapper auctionItemMapper;
@@ -83,6 +86,14 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
             log.info("낙찰 처리 성공 - Auction ID: {}, Winner: {}, Price: {}",
                     auction.getId(), winnerBid.getBidderId(), finalPrice);
+
+            List<RefundDto> refunds =
+                    bidQueryService.findRefundTargetsExcludingWinner(auction.getId(), winnerBid.getBidderId());
+
+            for (RefundDto refund : refunds) {
+                pointService.refundBid(refund.getBidderId(), refund.getAmount());
+            }
+
         } else {
             // 유찰
             auction.setStatus(AuctionStatus.ENDED);
@@ -116,7 +127,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                         winnerDeal.getId(), winnerDeal.getAuctionId());
                 return;
             }
-
+            // 비활성화 시 낙찰 취소 및 낙찰자의 예치금 환불
             refundAndCancelWinnerDeal(winnerDeal);
         }
 

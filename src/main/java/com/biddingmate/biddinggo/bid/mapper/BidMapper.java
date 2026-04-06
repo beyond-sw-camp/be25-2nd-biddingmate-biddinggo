@@ -48,4 +48,8 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
 
     // 비활성화 시 입찰 무효화
     void invalidateBidsByMember(@Param("memberId") Long memberId);
+
+    // 낙찰자 제외 입찰자 환불 대상 조회
+    List<RefundDto> findRefundTargetsExcludingWinner(@Param("auctionId") Long auctionId,
+                                                     @Param("winnerId") Long winnerId);
 }
