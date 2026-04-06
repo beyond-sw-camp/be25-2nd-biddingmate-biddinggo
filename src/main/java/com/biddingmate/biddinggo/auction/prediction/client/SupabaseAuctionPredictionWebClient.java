@@ -133,7 +133,6 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
         requestBody.put("p_embedding_model", auctionPriceReference.getEmbeddingModel());
         requestBody.put("p_embedding_dimension", auctionPriceReference.getEmbeddingDimension());
         requestBody.put("p_embedding_text", auctionPriceReference.getEmbeddingText());
-        requestBody.put("p_completed_at", formatSupabaseTimestamp(auctionPriceReference.getCompletedAt()));
 
         invokeRpc("upsert_auction_price_reference", requestBody);
     }
