@@ -69,6 +69,9 @@ public class BidApplicationServiceImpl implements BidApplicationService {
                 log.info("경매 ID {} : 종료 임박 입찰로 인해 시간이 3분 연장되었습니다.", auctionId);
                 auction.setEndDate(auction.getEndDate().plusMinutes(3));
                 auction.setExtensionYn(YesNo.YES);
+            }else {
+                // 동시성 이슈로 인한 연장 실패 시 입찰 취소 처리
+                throw new CustomException(ErrorType.AUCTION_ALREADY_FINISHED);
             }
         }
 
