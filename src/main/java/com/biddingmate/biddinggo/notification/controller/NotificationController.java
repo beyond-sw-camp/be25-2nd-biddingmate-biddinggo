@@ -8,11 +8,13 @@ import com.biddingmate.biddinggo.notification.dto.CreateNotificationRequest;
 import com.biddingmate.biddinggo.notification.dto.CreateNotificationResponse;
 import com.biddingmate.biddinggo.notification.dto.NotificationResponse;
 import com.biddingmate.biddinggo.notification.service.NotificationService;
+import com.biddingmate.biddinggo.notification.service.NotificationSseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final NotificationSseService notificationSseService;
 
     /*
         추후 알림 발생되는 곳에
@@ -78,5 +82,13 @@ public class NotificationController {
         notificationService.markAsRead(id, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "단건 알림 읽음 처리", null);
+    }
+
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "알림 구독", description = "SSE를 통해 실시간 알림을 구독합니다.")
+    public SseEmitter subscribe(
+            @AuthenticationPrincipal Member member
+    ) {
+        return notificationSseService.subscribe(member.getId());
     }
 }
