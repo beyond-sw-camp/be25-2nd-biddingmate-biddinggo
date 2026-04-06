@@ -1,9 +1,7 @@
 package com.biddingmate.biddinggo.bid.service;
 
-import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
-import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
-import com.biddingmate.biddinggo.auction.service.AuctionService;
+import com.biddingmate.biddinggo.bid.dto.BidListResponse;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
@@ -108,7 +106,7 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public PageResponse<AuctionDetailResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId) {
+    public PageResponse<BidListResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId) {
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
 
@@ -117,10 +115,10 @@ public class BidServiceImpl implements BidService {
         }
         String sortOrder = order.toUpperCase();
 
-        List<AuctionDetailResponse> auctions = bidMapper.findBidAuctionsByMemberId(rowBounds, memberId, sortOrder);
+        List<BidListResponse> bidList = bidMapper.findBidAuctionsByMemberId(rowBounds, memberId, sortOrder);
         int bidCount = bidMapper.getBidCount(Map.of("bidderId", memberId));
 
-        return PageResponse.of(auctions, request.getPage(), request.getSize(), bidCount);
+        return PageResponse.of(bidList, request.getPage(), request.getSize(), bidCount);
     }
 
     @Override
