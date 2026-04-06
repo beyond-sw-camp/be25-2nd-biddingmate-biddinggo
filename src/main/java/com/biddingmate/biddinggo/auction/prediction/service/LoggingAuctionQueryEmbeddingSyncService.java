@@ -2,14 +2,12 @@ package com.biddingmate.biddinggo.auction.prediction.service;
 
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionQueryEmbeddingSyncCommand;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 /**
  * 3단계에서 사용하는 임시 구현체.
  * 실제 Supabase 저장 대신, 어떤 payload가 준비되는지만 로그로 남겨 연결 지점을 검증한다.
  */
 @Slf4j
-@Service
 public class LoggingAuctionQueryEmbeddingSyncService implements AuctionQueryEmbeddingSyncService {
     @Override
     /**
