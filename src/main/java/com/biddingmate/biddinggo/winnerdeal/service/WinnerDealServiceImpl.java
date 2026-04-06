@@ -36,6 +36,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     @Override
     @Transactional
     public void processClosing(Auction auction) {
+        // 최고 입찰자 1명 조회
         List<BidResponse> topBids = bidMapper.getBidsByAuctionId(
                 new RowBounds(0, 1),
                 auction.getId(),
@@ -43,8 +44,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         );
 
         if (topBids != null && !topBids.isEmpty()) {
+            // 낙찰
             BidResponse winnerBid = topBids.get(0);
 
+            // 낙찰가 결정: 비크리 가격이 있으면 사용, 없으면 경매 시작가 사용
             Long finalPrice = (auction.getVickreyPrice() != null)
                     ? auction.getVickreyPrice()
                     : auction.getStartPrice();
@@ -61,6 +64,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
             winnerDealMapper.insert(winnerDeal);
 
+            // Auction 테이블 상태 및 결과 업데이트
             auction.setStatus(AuctionStatus.ENDED);
             auction.setWinnerId(winnerBid.getBidderId());
             auction.setWinnerPrice(finalPrice);
@@ -79,25 +83,25 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
             log.info("낙찰 처리 성공 - Auction ID: {}, Winner: {}, Price: {}",
                     auction.getId(), winnerBid.getBidderId(), finalPrice);
-            return;
+        } else {
+            // 유찰
+            auction.setStatus(AuctionStatus.ENDED);
+
+            int updatedRows = auctionMapper.updateAuctionResult(auction);
+            if (updatedRows != 1) {
+                throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+            }
+
+            auctionItemMapper.updateStatus(
+                    auction.getItemId(),
+                    AuctionItemStatus.UNSOLD,
+                    AuctionItemStatus.ON_AUCTION,
+                    null
+            );
+            log.info("유찰 처리 완료 - Auction ID: {}", auction.getId());
         }
-
-        auction.setStatus(AuctionStatus.ENDED);
-
-        int updatedRows = auctionMapper.updateAuctionResult(auction);
-        if (updatedRows != 1) {
-            throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
-        }
-
-        auctionItemMapper.updateStatus(
-                auction.getItemId(),
-                AuctionItemStatus.UNSOLD,
-                AuctionItemStatus.ON_AUCTION,
-                null
-        );
-
-        log.info("유찰 처리 완료 - Auction ID: {}", auction.getId());
     }
+
 
     @Override
     @Transactional
