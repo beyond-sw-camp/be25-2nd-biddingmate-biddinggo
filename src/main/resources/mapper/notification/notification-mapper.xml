@@ -18,4 +18,22 @@
                      #{createdAt}
                  )
     </insert>
+
+    <select id="getNotificationsByMemberId">
+        SELECT id,
+               receiver_id AS receiverId,
+               type,
+               content,
+               url,
+               read_at AS readAt,
+               created_at AS createdAt
+        FROM notification
+        WHERE receiver_id = #{receiverId}
+    </select>
+
+    <select id="getNotificationCount">
+        SELECT COUNT(*)
+        FROM notification
+        WHERE receiver_id = #{receiverId}
+    </select>
 </mapper>

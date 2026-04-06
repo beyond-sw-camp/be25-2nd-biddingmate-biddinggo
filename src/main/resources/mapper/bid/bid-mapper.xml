@@ -53,7 +53,7 @@
                 SELECT COUNT(*) FROM bid WHERE auction_id = #{auctionId} AND status = 'ACTIVE'
             </when>
             <when test="bidderId != null">
-                SELECT COUNT(DISTINCT auction_id) FROM bid WHERE bidder_id = #{bidderId} AND status = 'ACTIVE'
+                SELECT COUNT(*) FROM bid WHERE bidder_id = #{bidderId} AND status = 'ACTIVE'
             </when>
             <otherwise>
                 SELECT 0

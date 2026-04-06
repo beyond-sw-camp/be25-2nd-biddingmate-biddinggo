@@ -19,5 +19,6 @@ public class Notification {
     private NotificationType type;
     private String content;
     private String url;
+    private LocalDateTime readAt;
     private LocalDateTime createdAt;
 }
