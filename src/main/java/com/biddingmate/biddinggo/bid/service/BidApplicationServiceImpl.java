@@ -44,6 +44,10 @@ public class BidApplicationServiceImpl implements BidApplicationService {
             throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
         }
 
+        if(auction.getSellerId().equals(memberId)){
+            throw new CustomException(ErrorType.CANNOT_BID_ON_OWN_AUCTION);
+        }
+
         LocalDateTime now = LocalDateTime.now();
 
         if (auction.getStatus() != AuctionStatus.ON_GOING ||
