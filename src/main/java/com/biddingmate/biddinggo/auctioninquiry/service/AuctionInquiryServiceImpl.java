@@ -7,6 +7,7 @@ import com.biddingmate.biddinggo.auctioninquiry.dto.AnswerAuctionInquiryResponse
 import com.biddingmate.biddinggo.auctioninquiry.dto.AuctionInquiryView;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryRequest;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse;
+import com.biddingmate.biddinggo.auctioninquiry.dto.MemberAuctionInquiryResponse;
 import com.biddingmate.biddinggo.auctioninquiry.mapper.AuctionInquiryMapper;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiry;
 import com.biddingmate.biddinggo.auctioninquiry.model.AuctionInquiryStatus;
@@ -170,5 +171,52 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
             throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
         }
         return auction;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<MemberAuctionInquiryResponse> getMyAuctionInquiries(Long memberId, String type, BasePageRequest request) {
+
+        validateInquiryType(type);
+        validateOrder(request);
+
+        String normalizedType = type.toUpperCase();
+
+        List<MemberAuctionInquiryResponse> content =
+                auctionInquiryMapper.findMyAuctionInquiries(memberId, normalizedType, request);
+
+        long totalElements =
+                auctionInquiryMapper.countMyAuctionInquiries(memberId, normalizedType);
+
+        return PageResponse.of(content, request.getPage(), request.getSize(), totalElements);
+    }
+
+    private void validateInquiryType(String type) {
+        if (type == null || type.isBlank()) {
+            throw new CustomException(ErrorType.BAD_REQUEST);
+        }
+
+        String normalizedType = type.toUpperCase();
+
+        if (!normalizedType.equals("ALL")
+                && !normalizedType.equals("PURCHASE") && !normalizedType.equals("SALES")) {
+            throw new CustomException(ErrorType.BAD_REQUEST);
+        }
+    }
+
+    private void validateOrder(BasePageRequest request) {
+        if (request.getOrder() == null || request.getOrder().isBlank()) {
+            request.setOrder("DESC");
+            return;
+        }
+
+        String order = request.getOrder().toUpperCase();
+
+        if (!order.equals("ASC") && !order.equals("DESC")) {
+            request.setOrder("DESC");
+            return;
+        }
+
+        request.setOrder(order);
     }
 }
