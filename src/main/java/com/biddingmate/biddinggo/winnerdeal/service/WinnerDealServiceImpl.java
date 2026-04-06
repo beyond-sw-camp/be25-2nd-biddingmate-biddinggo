@@ -30,7 +30,6 @@ import java.util.List;
 public class WinnerDealServiceImpl implements WinnerDealService {
     private final AuctionMapper auctionMapper;
     private final BidMapper bidMapper;
-    private final BidQueryService bidQueryService;
     private final WinnerDealMapper winnerDealMapper;
     private final WinnerDealQueryService winnerDealQueryService;
     private final AuctionItemMapper auctionItemMapper;
