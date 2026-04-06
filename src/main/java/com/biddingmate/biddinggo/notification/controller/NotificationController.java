@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,12 +59,24 @@ public class NotificationController {
         return ApiResponse.of(HttpStatus.OK, null, "알림 조회 성공", result);
     }
 
-//    @PatchMapping("/read-all")
-//    @Operation(summary = "전체 알림 읽음 처리", description = "모든 알림을 읽음 처리합니다.")
-//    public ResponseEntity<ApiResponse<NotificationReadResponse>> readAllNotification(
-//            @AuthenticationPrincipal Member member
-//    ){
-//
-//        return ApiResponse.of(HttpStatus.OK, null, "전체 알림 읽음 처리", result);
-//    }
+    @PatchMapping("/read-all")
+    @Operation(summary = "전체 알림 읽음 처리", description = "모든 알림을 읽음 처리합니다.")
+    public ResponseEntity<ApiResponse<Void>> readAllNotification(
+            @AuthenticationPrincipal Member member
+    ){
+        notificationService.markAllAsRead(member.getId());
+
+        return ApiResponse.of(HttpStatus.OK, null, "전체 알림 읽음 처리", null);
+    }
+
+    @PatchMapping("/{id}/read")
+    @Operation(summary = "단건 알림 읽음 처리", description = "단건 알림을 읽음 처리합니다.")
+    public ResponseEntity<ApiResponse<Void>> readAllNotification(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Member member
+    ){
+        notificationService.markAsRead(id, member.getId());
+
+        return ApiResponse.of(HttpStatus.OK, null, "단건 알림 읽음 처리", null);
+    }
 }

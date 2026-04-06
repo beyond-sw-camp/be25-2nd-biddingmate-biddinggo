@@ -11,4 +11,8 @@ public interface NotificationService{
     CreateNotificationResponse createNotification(@Valid CreateNotificationRequest request);
 
     PageResponse<NotificationResponse> getNotificationsByMemberId(BasePageRequest request, Long receiverId);
+
+    void markAllAsRead(Long receiverId);
+
+    void markAsRead(Long id, Long receiverId);
 }

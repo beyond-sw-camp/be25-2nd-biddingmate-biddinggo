@@ -67,4 +67,14 @@ public class NotificationServiceImpl implements NotificationService {
         return PageResponse.of(notifications, request.getPage(), request.getSize(), bidCount);
 
     }
+
+    @Override
+    public void markAllAsRead(Long receiverId) {
+        notificationMapper.updateReadAtByMemberId(receiverId);
+    }
+
+    @Override
+    public void markAsRead(Long id, Long receiverId) {
+        notificationMapper.updateReadAtById(id, receiverId);
+    }
 }

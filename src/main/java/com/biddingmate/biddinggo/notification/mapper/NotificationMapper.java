@@ -17,4 +17,8 @@ public interface NotificationMapper extends IMybatisCRUD<Notification> {
                                                           @Param("order") String sortOrder);
 
     int getNotificationCount(Map<String, Long> params);
+
+    void updateReadAtByMemberId(@Param("receiverId") Long receiverId);
+
+    void updateReadAtById(@Param("id") Long id, @Param("receiverId") Long receiverId);
 }

@@ -36,4 +36,19 @@
         FROM notification
         WHERE receiver_id = #{receiverId}
     </select>
+
+    <update id="updateReadAtByMemberId">
+        UPDATE notification
+        SET read_at = NOW()
+        WHERE receiver_id = #{receiverId}
+          AND ISNULL(read_at)
+    </update>
+
+    <update id="updateReadAtById">
+        UPDATE notification
+        SET read_at = NOW()
+        WHERE id = #{id}
+          AND receiver_id = #{receiverId}
+    </update>
+
 </mapper>
