@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.bid.service;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.dto.CreateBidResponse;
 import com.biddingmate.biddinggo.bid.model.Bid;
@@ -14,6 +15,7 @@ import com.biddingmate.biddinggo.point.model.PointHistory;
 import com.biddingmate.biddinggo.point.model.PointHistoryType;
 import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ import java.time.LocalDateTime;
     입찰 전체 흐름을 조율하는 애플리케이션 서비스.
     트랜잭션 경계는 이 클래스에서만 관리한다.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BidApplicationServiceImpl implements BidApplicationService {
@@ -54,6 +57,19 @@ public class BidApplicationServiceImpl implements BidApplicationService {
                 now.isBefore(auction.getStartDate()) ||
                 now.isAfter(auction.getEndDate())) {
             throw new CustomException(ErrorType.AUCTION_NOT_BIDDABLE);
+        }
+
+        if (auction.getExtensionYn() == YesNo.NO &&
+                !now.isBefore(auction.getEndDate().minusMinutes(1)) &&
+                now.isBefore(auction.getEndDate())) {
+
+            int updated = auctionMapper.extendAuctionTime(auctionId);
+
+            if (updated == 1) {
+                log.info("경매 ID {} : 종료 임박 입찰로 인해 시간이 3분 연장되었습니다.", auctionId);
+                auction.setEndDate(auction.getEndDate().plusMinutes(3));
+                auction.setExtensionYn(YesNo.YES);
+            }
         }
 
         Long lastBidAmount = bidService.getLastBidAmount(memberId, auctionId);

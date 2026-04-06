@@ -183,6 +183,7 @@
                seller_id AS sellerId,
                type,
                inspection_yn AS inspectionYn,
+               extension_yn AS extensionYn,
                status,
                start_price AS startPrice,
                bid_unit AS bidUnit,
@@ -206,6 +207,7 @@
                seller_id AS sellerId,
                type,
                inspection_yn AS inspectionYn,
+               extension_yn AS extensionYn,
                status,
                start_price AS startPrice,
                bid_unit AS bidUnit,
@@ -311,5 +313,12 @@
             winner_price = #{winnerPrice}
         WHERE id = #{id}
     </update>
-
+    <update id="extendAuctionTime">
+        UPDATE auction
+        SET end_date = DATE_ADD(end_date, INTERVAL 3 MINUTE),
+            extension_yn = 'YES'
+        WHERE id = #{id}
+          AND extension_yn = 'NO'
+          AND status = 'ON_GOING'
+    </update>
 </mapper>
