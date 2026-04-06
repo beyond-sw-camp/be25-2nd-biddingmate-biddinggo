@@ -10,6 +10,7 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
+import com.biddingmate.biddinggo.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         log.info("[Adminlogin] username : {}", username);
+
 
         // 3. LoginResponse 객체를 생성해서 반환
         return createLoginResponse(member);

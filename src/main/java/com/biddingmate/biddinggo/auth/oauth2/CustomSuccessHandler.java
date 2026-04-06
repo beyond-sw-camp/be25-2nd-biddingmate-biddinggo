@@ -8,6 +8,8 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
+import com.biddingmate.biddinggo.notification.model.NotificationType;
+import com.biddingmate.biddinggo.notification.service.NotificationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +33,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtProvider jwtProvider;
     private final JwtCookieService jwtCookieService;
     private final MemberMapper memberMapper;
+    private final NotificationService notificationService; // for notify (test)
+
     @Value("${FRONTEND_REDIRECT_URI:http://localhost:5173/oauth/callback}")
     private String frontendRedirectUri;
     @Value("${FRONTEND_REGISTER_REDIRECT_URI:http://localhost:5173/register-info}")
@@ -53,6 +57,17 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         if (member == null) {
             throw new CustomException(ErrorType.USER_NOT_FOUND);
+        }
+
+        try {
+            notificationService.notify(
+                    member.getId(),
+                    NotificationType.SOCIAL_LOGIN,
+                    "소셜 로그인 되었습니다.",
+                    "/"
+            );
+        } catch (Exception e) {
+            log.warn("[oauth-login-notification-failed] memberId={}", member.getId(), e);
         }
 
         String refreshToken = jwtProvider.createRefreshToken(username);

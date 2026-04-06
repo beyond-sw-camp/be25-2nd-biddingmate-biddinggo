@@ -84,7 +84,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .url(notification.getUrl())
                 .read(false)
                 .readAt(null)
-                .createAt(notification.getCreatedAt())
+                .createdAt(notification.getCreatedAt())
                 .build();
 
         sendToConnectedClients(receiverId, payload);

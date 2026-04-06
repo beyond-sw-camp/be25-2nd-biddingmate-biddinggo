@@ -21,5 +21,5 @@ public class NotificationResponse {
     private String url;
     private boolean read;
     private LocalDateTime readAt;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 }
