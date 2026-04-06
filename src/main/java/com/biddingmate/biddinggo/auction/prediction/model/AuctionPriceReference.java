@@ -9,6 +9,10 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Supabase의 과거 낙찰 reference 레코드를 애플리케이션에서 다루기 위한 모델.
+ * 예측 계산 시 비교 대상이 되는 낙찰 완료 데이터의 핵심 속성을 담는다.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

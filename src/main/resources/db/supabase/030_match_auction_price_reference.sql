@@ -1,4 +1,7 @@
 -- Adjust vector dimension if your embedding model is not 1536.
+-- 예측 계산용 유사 낙찰 reference 검색 함수.
+-- category_id는 필수 필터로 적용하고, condition_score는 후보군 제한용으로 사용한다.
+-- 실제 정렬과 최종 유사도 계산의 중심은 embedding cosine similarity다.
 create or replace function public.match_auction_price_reference(
     query_embedding vector(1536),
     filter_category_id bigint,
@@ -20,6 +23,8 @@ returns table (
 language sql
 stable
 as $$
+    -- similarity는 1 - cosine distance 로 계산한다.
+    -- exclude_auction_id는 자기 자신이 reference 후보로 들어가는 것을 막기 위한 옵션이다.
     select
         apr.id as reference_id,
         apr.auction_id,
