@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper">
@@ -30,10 +30,47 @@
             seller_id AS sellerId,
             winner_price AS winnerPrice,
             status,
+            delivery_status AS deliveryStatus,
+            confirmed_at AS confirmedAt,
+            zipcode,
+            address,
+            detail_address AS detailAddress,
+            tel,
+            recipient,
+            carrier,
+            tracking_number AS trackingNumber,
             created_at AS createdAt
         FROM winner_deal
         WHERE auction_id = #{auctionId}
             LIMIT 1
     </select>
+
+    <select id="findByMemberId" resultType="WinnerDeal">
+        SELECT id,
+               auction_id AS auctionId,
+               winner_id AS winnerId,
+               seller_id AS sellerId,
+               winner_price AS winnerPrice,
+               status,
+               delivery_status AS deliveryStatus,
+               confirmed_at AS confirmedAt,
+               zipcode,
+               address,
+               detail_address AS detailAddress,
+               tel,
+               recipient,
+               carrier,
+               tracking_number AS trackingNumber,
+               created_at AS createdAt
+        FROM winner_deal
+        WHERE seller_id = #{memberId}
+           OR winner_id = #{memberId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE winner_deal
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
 
 </mapper>
