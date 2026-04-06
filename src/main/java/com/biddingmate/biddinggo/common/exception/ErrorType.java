@@ -128,6 +128,8 @@ public enum ErrorType {
 
     // 낙찰
     DEAL_NOT_FOUND("review-007", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    WINNER_DEAL_ALREADY_CANCELLED("winner-deal-001", "이미 취소된 낙찰 거래입니다.", HttpStatus.CONFLICT),
+    WINNER_DEAL_UPDATE_FAILED("winner-deal-002", "낙찰 거래 상태 변경에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
