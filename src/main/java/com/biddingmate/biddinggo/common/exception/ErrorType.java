@@ -118,6 +118,7 @@ public enum ErrorType {
     BID_AMOUNT_NOT_HIGHER_THAN_PREVIOUS("bid-004", "이전 입찰 기록보다 높게 설정해주세요.", HttpStatus.BAD_REQUEST),
     AUCTION_NOT_BIDDABLE("bid-005", "진행중인 경매에만 입찰을 등록할 수 있습니다.", HttpStatus.BAD_REQUEST),
     NOT_ENOUGH_POINT("bid-006", "보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST),
+    CANNOT_BID_ON_OWN_AUCTION("bid-007", "자신의 경매에 입찰할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
     // 관심 경매
     WISHLIST_SAVE_FAIL("wishlist-001", "관심 경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
