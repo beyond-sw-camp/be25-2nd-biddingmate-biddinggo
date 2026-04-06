@@ -66,5 +66,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
 
+
     }
 }
