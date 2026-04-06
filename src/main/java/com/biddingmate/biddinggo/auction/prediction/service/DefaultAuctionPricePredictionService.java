@@ -10,10 +10,13 @@ import com.biddingmate.biddinggo.auction.prediction.policy.ConditionScorePolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +43,7 @@ public class DefaultAuctionPricePredictionService implements AuctionPricePredict
         }
 
         if (!auctionPredictionSupabaseClient.isEnabled()) {
-            return unavailable(AuctionPricePredictionReasonCode.SUPABASE_UNAVAILABLE, false, null);
+            return unavailable(AuctionPricePredictionReasonCode.SUPABASE_UNAVAILABLE, true, null);
         }
 
         Double conditionScore = conditionScorePolicy.resolve(query.getQuality());
@@ -92,7 +95,11 @@ public class DefaultAuctionPricePredictionService implements AuctionPricePredict
                     .build();
         } catch (RuntimeException exception) {
             log.error("Failed to predict auction price. auctionId={}, categoryId={}", query.getAuctionId(), query.getCategoryId(), exception);
-            return unavailable(AuctionPricePredictionReasonCode.SUPABASE_UNAVAILABLE, false, null);
+            if (isTimeout(exception)) {
+                return unavailable(AuctionPricePredictionReasonCode.SUPABASE_TIMEOUT, true, null);
+            }
+
+            return unavailable(AuctionPricePredictionReasonCode.SUPABASE_UNAVAILABLE, true, null);
         }
     }
 
@@ -170,5 +177,25 @@ public class DefaultAuctionPricePredictionService implements AuctionPricePredict
 
     private double roundToTwoDecimals(double value) {
         return Math.round(value * 100d) / 100d;
+    }
+
+    private boolean isTimeout(Throwable throwable) {
+        return hasCause(throwable, TimeoutException.class)
+                || hasCause(throwable, SocketTimeoutException.class)
+                || hasCause(throwable, WebClientRequestException.class);
+    }
+
+    private boolean hasCause(Throwable throwable, Class<? extends Throwable> targetType) {
+        Throwable current = throwable;
+
+        while (current != null) {
+            if (targetType.isInstance(current)) {
+                return true;
+            }
+
+            current = current.getCause();
+        }
+
+        return false;
     }
 }
