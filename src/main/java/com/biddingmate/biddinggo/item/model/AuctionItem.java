@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.item.model;
 
+import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuctionItem {
+public class AuctionItem implements AuctionItemCreateSource {
     private Long id;
     private Long sellerId;
     private Long categoryId;

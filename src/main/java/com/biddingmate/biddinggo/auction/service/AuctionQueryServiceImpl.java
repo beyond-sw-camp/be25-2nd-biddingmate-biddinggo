@@ -5,6 +5,8 @@ import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
 import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionPricePredictionQuery;
+import com.biddingmate.biddinggo.auction.prediction.service.AuctionPricePredictionService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.response.PageResponse;
@@ -28,6 +30,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
 
     private final AuctionMapper auctionMapper;
     private final ItemImageMapper itemImageMapper;
+    private final AuctionPricePredictionService auctionPricePredictionService;
 
     @Override
     @Transactional(readOnly = true)
@@ -89,6 +92,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
      * 1) 경매/상품/카테고리 본문 조회
      * 2) item_image 목록 조회
      * 3) 이미지 목록을 응답 객체에 조합
+     * 4) 저장된 query embedding과 낙찰 reference를 바탕으로 예측가를 계산해 응답에 주입
      */
     public AuctionDetailResponse getAuctionDetail(Long auctionId) {
         if (auctionId == null || auctionId <= 0) {
@@ -106,6 +110,22 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         List<AuctionDetailResponse.Image> images = itemImageMapper.findDetailImagesByItemId(detail.getItem().getItemId());
         detail.getItem().setImages(images);
 
+        detail.setPricePrediction(auctionPricePredictionService.predict(
+                AuctionPricePredictionQuery.builder()
+                        .auctionId(detail.getAuctionId())
+                        .categoryId(extractCategoryId(detail))
+                        .quality(detail.getItem() != null ? detail.getItem().getQuality() : null)
+                        .build()
+        ));
+
         return detail;
+    }
+
+    private Long extractCategoryId(AuctionDetailResponse detail) {
+        if (detail == null || detail.getItem() == null || detail.getItem().getCategory() == null) {
+            return null;
+        }
+
+        return detail.getItem().getCategory().getId();
     }
 }

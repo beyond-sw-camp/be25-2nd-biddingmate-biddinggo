@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.dto;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.AuctionType;
 import com.biddingmate.biddinggo.auction.model.YesNo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,24 @@ public class AuctionDetailResponse {
 
     @Schema(description = "판매자 ID", example = "1")
     private Long sellerId;
+
+    @Schema(description = "판매자 닉네임", example = "bidding_seller")
+    private String sellerNickname;
+
+    @Schema(description = "판매자 프로필 이미지 URL")
+    private String sellerImageUrl;
+
+    @Schema(description = "판매자 등급", example = "GOLD")
+    private String sellerGrade;
+
+    @Schema(description = "판매자 가입일시")
+    private LocalDateTime sellerCreatedAt;
+
+    @Schema(description = "판매자 평균 리뷰 평점", example = "4.8")
+    private Double sellerRating;
+
+    @Schema(description = "판매자 리뷰 수", example = "12")
+    private Long sellerReviewCount;
 
     @Schema(description = "경매 상태", example = "ON_GOING")
     private AuctionStatus status;
@@ -67,6 +86,10 @@ public class AuctionDetailResponse {
 
     @Schema(description = "상품 정보")
     private Item item;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Schema(description = "경매 예측가 정보", nullable = true)
+    private AuctionPricePredictionResponse pricePrediction;
 
     @Getter
     @Setter

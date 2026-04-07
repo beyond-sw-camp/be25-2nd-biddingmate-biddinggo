@@ -73,4 +73,102 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 구매/판매 내역 조회 시 필터링 조각 -->
+    <sql id="winnerDealHistoryStatusFilter">
+        <if test="request.status != null">
+            <choose>
+                <when test="request.status.name() == 'PAID'">
+                    AND wd.status = 'PAID'
+                    AND wd.delivery_status = 'SHIPPED'
+                    AND wd.tracking_number IS NULL
+                </when>
+                <when test="request.status.name() == 'SHIPPED'">
+                    AND wd.status = 'PAID'
+                    AND wd.delivery_status = 'SHIPPED'
+                    AND wd.tracking_number IS NOT NULL
+                </when>
+                <when test="request.status.name() == 'DELIVERED'">
+                    AND wd.status = 'PAID'
+                    AND wd.delivery_status = 'DELIVERED'
+                </when>
+                <when test="request.status.name() == 'CONFIRMED'">
+                    AND wd.status = 'CONFIRMED'
+                </when>
+                <when test="request.status.name() == 'CANCELLED'">
+                    AND wd.status = 'CANCELLED'
+                </when>
+            </choose>
+        </if>
+    </sql>
+
+    <!-- 구매내역 조회 -->
+    <select id="findPurchaseHistory" resultType="WinnerDealHistoryResponse">
+        SELECT wd.id AS winnerDealId,
+               wd.auction_id AS auctionId,
+               ai.id AS itemId,
+               ai.name AS itemName,
+               ii.url AS imageUrl,
+               CASE
+                   WHEN wd.status = 'CANCELLED' THEN 'CANCELLED'
+                   WHEN wd.status = 'CONFIRMED' THEN 'CONFIRMED'
+                   WHEN wd.delivery_status = 'DELIVERED' THEN 'DELIVERED'
+                   WHEN wd.tracking_number IS NOT NULL THEN 'SHIPPED'
+                   ELSE 'PAID'
+               END AS status,
+               wd.winner_price AS winnerPrice,
+               wd.confirmed_at AS confirmedAt,
+               wd.created_at AS createdAt
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id AND ii.display_order = 1
+        WHERE wd.winner_id = #{memberId}
+        <include refid="winnerDealHistoryStatusFilter"/>
+        ORDER BY wd.created_at DESC
+    </select>
+
+    <select id="countPurchaseHistory" resultType="long">
+        SELECT COUNT(*)
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        WHERE wd.winner_id = #{memberId}
+        <include refid="winnerDealHistoryStatusFilter"/>
+    </select>
+
+    <!-- 판매내역 조회 -->
+    <select id="findSaleHistory" resultType="WinnerDealHistoryResponse">
+        SELECT wd.id AS winnerDealId,
+               wd.auction_id AS auctionId,
+               ai.id AS itemId,
+               ai.name AS itemName,
+               ii.url AS imageUrl,
+               CASE
+                   WHEN wd.status = 'CANCELLED' THEN 'CANCELLED'
+                   WHEN wd.status = 'CONFIRMED' THEN 'CONFIRMED'
+                   WHEN wd.delivery_status = 'DELIVERED' THEN 'DELIVERED'
+                   WHEN wd.tracking_number IS NOT NULL THEN 'SHIPPED'
+                   ELSE 'PAID'
+               END AS status,
+               wd.winner_price AS winnerPrice,
+               wd.confirmed_at AS confirmedAt,
+               wd.created_at AS createdAt
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id AND ii.display_order = 1
+        WHERE wd.seller_id = #{memberId}
+        <include refid="winnerDealHistoryStatusFilter"/>
+        ORDER BY wd.created_at DESC
+    </select>
+
+    <select id="countSaleHistory" resultType="long">
+        SELECT COUNT(*)
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        WHERE wd.seller_id = #{memberId}
+        <include refid="winnerDealHistoryStatusFilter"/>
+    </select>
+
 </mapper>

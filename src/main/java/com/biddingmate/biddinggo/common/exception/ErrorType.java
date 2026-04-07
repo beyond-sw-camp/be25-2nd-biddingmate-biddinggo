@@ -119,6 +119,7 @@ public enum ErrorType {
     AUCTION_NOT_BIDDABLE("bid-005", "진행중인 경매에만 입찰을 등록할 수 있습니다.", HttpStatus.BAD_REQUEST),
     NOT_ENOUGH_POINT("bid-006", "보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST),
     CANNOT_BID_ON_OWN_AUCTION("bid-007", "자신의 경매에 입찰할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    AUCTION_ALREADY_FINISHED("bid-008", "이미 종료된 경매이거나 연장할 수 없는 상태입니다.", HttpStatus.CONFLICT),
 
     // 관심 경매
     WISHLIST_SAVE_FAIL("wishlist-001", "관심 경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -138,6 +139,9 @@ public enum ErrorType {
     REVIEW_DELETE_FAIL("review-004", "리뷰 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_THE_WINNER("review-005", "낙찰자만 해당 경매의 리뷰를 남길 수 있습니다.", HttpStatus.FORBIDDEN),
     SELLER_NOT_FOUND("review-006", "해당 경매의 판매자 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+    // 알림
+    NOTIFICATOIN_SAVE_FAILED("notification-001", "알림 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 공지사항
     NOTICE_NOT_FOUND("notice-001", "해당 공지사항을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),

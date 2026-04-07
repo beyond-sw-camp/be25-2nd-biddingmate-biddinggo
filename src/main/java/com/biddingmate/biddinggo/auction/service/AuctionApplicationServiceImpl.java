@@ -2,12 +2,17 @@ package com.biddingmate.biddinggo.auction.service;
 
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
+import com.biddingmate.biddinggo.auction.prediction.event.AuctionQueryEmbeddingSyncRequestedEvent;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionEmbeddingSyncTrigger;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.file.service.FileService;
+import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
+import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import com.biddingmate.biddinggo.item.service.ItemImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +30,7 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
     private final ItemImageService itemImageService;
     private final AuctionService auctionService;
     private final FileService fileService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -46,7 +52,9 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
             itemImageService.createItemImages(itemId, request.getItem().getImages());
 
             // 3. 생성된 itemId로 auction을 생성한다.
-            return auctionService.createAuction(request, itemId, memberId);
+            Long auctionId = auctionService.createAuction(request, itemId, memberId);
+            publishAuctionQueryEmbeddingSyncRequestedEvent(auctionId, itemId, request.getItem(), AuctionEmbeddingSyncTrigger.CREATED);
+            return auctionId;
         } catch (RuntimeException exception) {
             fileService.deleteFiles(uploadedFileKeys);
             throw exception;
@@ -63,15 +71,29 @@ public class AuctionApplicationServiceImpl implements AuctionApplicationService 
         validateRequest(request);
 
         // 1. 기존 상품을 조회하고, 실제 경매 등록 가능한 상태인지 검증한다.
-        auctionItemService.getAuctionableInspectionItem(request.getItemId(), memberId);
+        AuctionItem auctionItem = auctionItemService.getAuctionableInspectionItem(request.getItemId(), memberId);
 
         // 2. 검증이 끝난 기존 itemId로 auction만 생성한다.
         Long auctionId = auctionService.createAuction(request, memberId);
 
         // 3. 경매 생성이 완료되면 상품 상태를 경매 진행 중으로 전이한다.
         auctionItemService.markAsOnAuction(request.getItemId());
+        publishAuctionQueryEmbeddingSyncRequestedEvent(auctionId, request.getItemId(), auctionItem, AuctionEmbeddingSyncTrigger.CREATED);
 
         return auctionId;
+    }
+
+    private void publishAuctionQueryEmbeddingSyncRequestedEvent(Long auctionId, Long itemId, AuctionItemCreateSource item, AuctionEmbeddingSyncTrigger trigger) {
+        eventPublisher.publishEvent(AuctionQueryEmbeddingSyncRequestedEvent.builder()
+                .auctionId(auctionId)
+                .itemId(itemId)
+                .categoryId(item.getCategoryId())
+                .brand(item.getBrand())
+                .name(item.getName())
+                .quality(item.getQuality())
+                .description(item.getDescription())
+                .trigger(trigger)
+                .build());
     }
 
     /**
