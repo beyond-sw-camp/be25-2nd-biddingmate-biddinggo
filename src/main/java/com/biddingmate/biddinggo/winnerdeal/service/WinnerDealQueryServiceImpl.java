@@ -1,14 +1,21 @@
 package com.biddingmate.biddinggo.winnerdeal.service;
 
+import com.biddingmate.biddinggo.common.exception.CustomException;
+import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.review.mapper.ReviewMapper;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailQueryResult;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
+import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -16,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
     private final WinnerDealMapper winnerDealMapper;
+    private final ReviewMapper reviewMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,5 +57,88 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
                 winnerDealMapper.countSaleHistory(request, memberId);
 
         return PageResponse.of(content, request.getPage(), request.getSize(), totalElements);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public WinnerDealDetailResponse findWinnerDealDetail(Long winnerDealId, Long memberId) {
+        WinnerDealDetailQueryResult detail = winnerDealMapper.findWinnerDealDetail(winnerDealId);
+        if (detail == null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        boolean isBuyer = detail.getWinnerId().equals(memberId);
+        boolean isSeller = detail.getSellerId().equals(memberId);
+
+        // 구매자 또는 판매자 구별
+        if (!isBuyer && !isSeller) {
+            throw new CustomException(ErrorType.WINNER_DEAL_ACCESS_DENIED);
+        }
+
+        WinnerDealStatus status = resolveStatus(detail);
+
+        // 배송지 등록 여부
+        boolean shippingAddressRegistered = isShippingAddressRegistered(detail);
+
+        // 운송장 등록 여부
+        boolean trackingNumberRegistered = isTrackingNumberRegistered(detail);
+
+        // 구매자가 해당 낙찰 거래에 리뷰를 이미 작성했는지 확인
+        boolean reviewWritten = reviewMapper.countByDealIdAndWriterId(detail.getWinnerDealId(), memberId) > 0;
+
+        return WinnerDealDetailResponse.builder()
+                .winnerDealId(detail.getWinnerDealId())
+                .auctionId(detail.getAuctionId())
+                .itemId(detail.getItemId())
+                .viewerRole(isBuyer ? "BUYER" : "SELLER")
+                .itemName(detail.getItemName())
+                .itemImageUrl(detail.getItemImageUrl())
+                .status(status)
+                .winnerPrice(detail.getWinnerPrice())
+                .sellerName(detail.getSellerName())
+                .winnerName(detail.getWinnerName())
+                .recipient(detail.getRecipient())
+                .tel(detail.getTel())
+                .zipcode(detail.getZipcode())
+                .address(detail.getAddress())
+                .detailAddress(detail.getDetailAddress())
+                .carrier(detail.getCarrier())
+                .trackingNumber(detail.getTrackingNumber())
+                .canRegisterShippingAddress(isBuyer && !shippingAddressRegistered && status == WinnerDealStatus.PAID)
+                .canRegisterTrackingNumber(isSeller && shippingAddressRegistered && !trackingNumberRegistered && status == WinnerDealStatus.PAID)
+                .canConfirmPurchase(isBuyer && status == WinnerDealStatus.DELIVERED && detail.getConfirmedAt() == null)
+                .canWriteReview(isBuyer && status == WinnerDealStatus.CONFIRMED && !reviewWritten)
+                .confirmedAt(detail.getConfirmedAt())
+                .createdAt(detail.getCreatedAt())
+                .build();
+    }
+
+    private WinnerDealStatus resolveStatus(WinnerDealDetailQueryResult detail) {
+        if ("CANCELLED".equals(detail.getStatus())) {
+            return WinnerDealStatus.CANCELLED;
+        }
+        if ("CONFIRMED".equals(detail.getStatus())) {
+            return WinnerDealStatus.CONFIRMED;
+        }
+        if ("DELIVERED".equals(detail.getDeliveryStatus())) {
+            return WinnerDealStatus.DELIVERED;
+        }
+        if (StringUtils.hasText(detail.getTrackingNumber())) {
+            return WinnerDealStatus.SHIPPED;
+        }
+        return WinnerDealStatus.PAID;
+    }
+
+    private boolean isShippingAddressRegistered(WinnerDealDetailQueryResult detail) {
+        return StringUtils.hasText(detail.getRecipient())
+                && StringUtils.hasText(detail.getTel())
+                && StringUtils.hasText(detail.getZipcode())
+                && StringUtils.hasText(detail.getAddress())
+                && StringUtils.hasText(detail.getDetailAddress());
+    }
+
+    private boolean isTrackingNumberRegistered(WinnerDealDetailQueryResult detail) {
+        return StringUtils.hasText(detail.getCarrier())
+                && StringUtils.hasText(detail.getTrackingNumber());
     }
 }
