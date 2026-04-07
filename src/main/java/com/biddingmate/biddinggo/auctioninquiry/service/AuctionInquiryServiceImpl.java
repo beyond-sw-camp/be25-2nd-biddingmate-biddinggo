@@ -14,7 +14,6 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
-import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
     private final AuctionInquiryMapper auctionInquiryMapper;
     private final AuctionMapper auctionMapper;
-    private final WinnerDealMapper winnerDealMapper;
 
     @Override
     @Transactional
@@ -37,16 +35,6 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
         // 경매 존재 여부 검증
         Auction auction = validateAndGetAuction(auctionId);
-
-        var deal = winnerDealMapper.findByAuctionId(auctionId);
-        if (deal == null) {
-            // 아직 낙찰되지 않은 경매는 문의 불가
-            throw new CustomException(ErrorType.DEAL_NOT_FOUND);
-        }
-        if (!auction.getWinnerId().equals(writerId)) {
-            // 낙찰자가 아니면 문의 불가
-            throw new CustomException(ErrorType.INQUIRY_ONLY_FOR_WINNER);
-        }
 
         // 본인 경매 문의 제한
         if (auction.getSellerId().equals(writerId)) {
