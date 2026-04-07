@@ -58,6 +58,7 @@
             ai.content,
             m.nickname AS writerName,
             ai.answer,
+            ai.answered_at AS answeredAt,
             ai.secret_yn AS secretYn,
             ai.status,
             ai.created_at AS createdAt

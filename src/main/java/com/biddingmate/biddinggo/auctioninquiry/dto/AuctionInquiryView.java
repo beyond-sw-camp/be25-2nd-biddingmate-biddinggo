@@ -17,6 +17,7 @@ public class AuctionInquiryView {
     private final String content;
     private final String writerName;
     private final String answer;
+    private final LocalDateTime answeredAt;
     private final boolean secretYn;
     private final AuctionInquiryStatus status;
 
