@@ -5,6 +5,7 @@ import com.biddingmate.biddinggo.auth.dto.RegisterUserInfoRequestDto;
 import com.biddingmate.biddinggo.auth.jwt.JwtCookieService;
 import com.biddingmate.biddinggo.auth.service.AuthService;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
+import com.biddingmate.biddinggo.member.model.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,6 +48,9 @@ public class AuthController {
         // 2. 인증 객체에서 유저 정보 추출
         // authentication.getName()은 우리가 토큰을 만들 때 넣었던 username(google1133...)을 반환합니다.
         Map<String, Object> userInfo = new HashMap<>();
+        if (authentication.getPrincipal() instanceof Member member) {
+            userInfo.put("memberId", member.getId());
+        }
         userInfo.put("username", authentication.getName());
         userInfo.put("role", authentication.getAuthorities());
 
@@ -80,7 +84,7 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(summary = "로그아웃")
     public ResponseEntity<Void> logout(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String bearerToken
     ) {
 
         authService.logout(bearerToken);

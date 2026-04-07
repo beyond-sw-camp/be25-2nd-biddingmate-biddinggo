@@ -72,6 +72,17 @@ public class AuctionItemServiceImpl implements AuctionItemService {
     }
 
     @Override
+    public AuctionItem getAuctionItem(Long itemId) {
+        AuctionItem auctionItem = auctionItemMapper.findById(itemId);
+
+        if (auctionItem == null) {
+            throw new CustomException(ErrorType.AUCTION_ITEM_NOT_FOUND);
+        }
+
+        return auctionItem;
+    }
+
+    @Override
     /**
      * 상품 상태를 조건부로 변경한다.
      * 현재 상품 상태나 검수 상태가 기대값과 다르면 변경되지 않는다.

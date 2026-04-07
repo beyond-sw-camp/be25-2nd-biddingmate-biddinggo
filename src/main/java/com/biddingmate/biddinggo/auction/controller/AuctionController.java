@@ -48,7 +48,7 @@ public class AuctionController {
     }
 
     @GetMapping("/{auctionId}")
-    @Operation(summary = "경매 상세 조회", description = "경매 기본 정보, 상품 정보, 카테고리, 이미지 목록을 조회합니다.")
+    @Operation(summary = "경매 상세 조회", description = "경매 기본 정보, 상품 정보, 카테고리, 이미지 목록과 예측가 정보를 조회합니다.")
     public ResponseEntity<ApiResponse<AuctionDetailResponse>> getAuctionDetail(
             @PathVariable Long auctionId) {
 
