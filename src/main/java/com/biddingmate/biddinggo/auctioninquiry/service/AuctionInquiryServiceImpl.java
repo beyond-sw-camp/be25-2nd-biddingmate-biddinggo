@@ -177,34 +177,51 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
     @Transactional(readOnly = true)
     public PageResponse<MemberAuctionInquiryResponse> getMyAuctionInquiries(Long memberId, String type, BasePageRequest request) {
 
+        // 조회 타입 유효성 검증 (ALL 구매,판매 모두 / PURCHASE 구매 / SALES 판매)
         validateInquiryType(type);
+
+        // 정렬값 유효성 검증 (ASC / DESC, 기본값 DESC)
         validateOrder(request);
 
+        // type 값을 대문자로 통일해서 mapper에서 일관되게 사용
         String normalizedType = type.toUpperCase();
 
+        // 회원의 문의 내역 조회
+        // type에 따라 전체 / 구매 / 판매 문의 필터링
         List<MemberAuctionInquiryResponse> content =
                 auctionInquiryMapper.findMyAuctionInquiries(memberId, normalizedType, request);
 
+        // 전체 문의 개수 조회
         long totalElements =
                 auctionInquiryMapper.countMyAuctionInquiries(memberId, normalizedType);
 
         return PageResponse.of(content, request.getPage(), request.getSize(), totalElements);
     }
 
+    // 문의 조회 타입 검증
+    // 허용 값: ALL(전체), PURCHASE(구매 문의), SALES(판매 문의)
     private void validateInquiryType(String type) {
+
+        // null 또는 공백 값 방지
         if (type == null || type.isBlank()) {
             throw new CustomException(ErrorType.BAD_REQUEST);
         }
 
         String normalizedType = type.toUpperCase();
 
+        // 허용된 타입이 아닐 경우 예외 발생
         if (!normalizedType.equals("ALL")
                 && !normalizedType.equals("PURCHASE") && !normalizedType.equals("SALES")) {
             throw new CustomException(ErrorType.BAD_REQUEST);
         }
     }
 
+    // 정렬 조건 검증
+    // 허용 값: ASC, DESC
+    // 기본값: DESC (최신순)
     private void validateOrder(BasePageRequest request) {
+
+        // 정렬 값이 없으면 기본값 DESC 설정
         if (request.getOrder() == null || request.getOrder().isBlank()) {
             request.setOrder("DESC");
             return;
@@ -212,11 +229,13 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
         String order = request.getOrder().toUpperCase();
 
+        // ASC, DESC 외 값이면 DESC으로 설정
         if (!order.equals("ASC") && !order.equals("DESC")) {
             request.setOrder("DESC");
             return;
         }
 
+        // 정상 값이면 대문자로 통일해서 정렬 값 설정
         request.setOrder(order);
     }
 }
