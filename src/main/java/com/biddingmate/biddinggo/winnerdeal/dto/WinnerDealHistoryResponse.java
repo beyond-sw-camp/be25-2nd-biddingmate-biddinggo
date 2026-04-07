@@ -33,6 +33,9 @@ public class WinnerDealHistoryResponse {
     @Schema(description = "거래 금액", example = "950000")
     private Long winnerPrice;
 
+    @Schema(description = "구매 확정일", example = "2026-03-05T18:30:00")
+    private LocalDateTime confirmedAt;
+
     @Schema(description = "거래 일시", example = "2026-03-03T14:00:00")
     private LocalDateTime createdAt;
 }
