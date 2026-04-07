@@ -139,6 +139,9 @@ public enum ErrorType {
     NOT_THE_WINNER("review-005", "낙찰자만 해당 경매의 리뷰를 남길 수 있습니다.", HttpStatus.FORBIDDEN),
     SELLER_NOT_FOUND("review-006", "해당 경매의 판매자 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
+    // 알림
+    NOTIFICATOIN_SAVE_FAILED("notification-001", "알림 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
     // 공지사항
     NOTICE_NOT_FOUND("notice-001", "해당 공지사항을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     NOTICE_CREATE_FAIL("notice-002", "공지사항 등록을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
