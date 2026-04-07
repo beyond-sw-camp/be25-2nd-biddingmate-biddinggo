@@ -7,7 +7,9 @@ import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
 import com.biddingmate.biddinggo.winnerdeal.service.WinnerDealQueryService;
 import com.biddingmate.biddinggo.winnerdeal.service.WinnerDealService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/winner-deals")
+@Tag(name = "Winner-Deal", description = "낙찰 거래 관리 API")
 public class WinnerDealController {
     private final WinnerDealService winnerDealService;
     private final WinnerDealQueryService winnerDealQueryService;
 
+    @Operation(summary = "구매 내역 조회", description = "로그인한 사용자의 낙찰 거래 구매 내역을 상태별 필터와 함께 조회합니다.")
     @GetMapping("/purchases")
     public ResponseEntity<ApiResponse<PageResponse<WinnerDealHistoryResponse>>> findPurchaseHistory(
             @Valid WinnerDealHistoryRequest request,
@@ -35,6 +39,7 @@ public class WinnerDealController {
         return ApiResponse.of(HttpStatus.OK, null, "구매 내역 조회에 성공했습니다.", result);
     }
 
+    @Operation(summary = "판매 내역 조회", description = "로그인한 사용자의 낙찰 거래 판매 내역을 상태별 필터와 함께 조회합니다.")
     @GetMapping("/sales")
     public ResponseEntity<ApiResponse<PageResponse<WinnerDealHistoryResponse>>> findSaleHistory(
             @Valid WinnerDealHistoryRequest request,
