@@ -49,7 +49,6 @@ public class NotificationServiceImpl implements NotificationService {
 
         NotificationResponse response = NotificationResponse.builder()
                 .id(notification.getId())
-                .receiverId(notification.getReceiverId())
                 .type(notification.getType())
                 .content(notification.getContent())
                 .url(notification.getUrl())
