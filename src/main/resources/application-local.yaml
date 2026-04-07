@@ -84,18 +84,18 @@ auction:
       outlier-multiplier: ${AUCTION_PREDICTION_OUTLIER_MULTIPLIER:1.5}
       min-weight: ${AUCTION_PREDICTION_MIN_WEIGHT:0.000001}
     embedding:
-      enabled: ${OPENAI_EMBEDDING_ENABLED:${AUCTION_PREDICTION_EMBEDDING_ENABLED:false}}
-      base-url: ${OPENAI_BASE_URL:${AUCTION_PREDICTION_EMBEDDING_BASE_URL:https://api.openai.com/v1}}
-      api-key: ${OPENAI_API_KEY:${AUCTION_PREDICTION_EMBEDDING_API_KEY:}}
-      model: ${OPENAI_EMBEDDING_MODEL:${AUCTION_PREDICTION_EMBEDDING_MODEL:text-embedding-3-small}}
-      dimensions: ${OPENAI_EMBEDDING_DIMENSIONS:${AUCTION_PREDICTION_EMBEDDING_DIMENSIONS:}}
-      timeout-millis: ${OPENAI_TIMEOUT_MILLIS:${AUCTION_PREDICTION_EMBEDDING_TIMEOUT_MILLIS:5000}}
+      enabled: ${OPENAI_EMBEDDING_ENABLED:false}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      api-key: ${OPENAI_API_KEY}
+      model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+      dimensions: ${OPENAI_EMBEDDING_DIMENSIONS:1536}
+      timeout-millis: ${OPENAI_TIMEOUT_MILLIS:5000}
     supabase:
-      enabled: ${SUPABASE_ENABLED:${AUCTION_PREDICTION_SUPABASE_ENABLED:false}}
-      url: ${SUPABASE_URL:${AUCTION_PREDICTION_SUPABASE_URL:}}
-      service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:${AUCTION_PREDICTION_SUPABASE_SERVICE_ROLE_KEY:}}
-      schema: ${SUPABASE_SCHEMA:${AUCTION_PREDICTION_SUPABASE_SCHEMA:public}}
-      timeout-millis: ${SUPABASE_TIMEOUT_MILLIS:${AUCTION_PREDICTION_SUPABASE_TIMEOUT_MILLIS:5000}}
+      enabled: ${SUPABASE_ENABLED:false}
+      url: ${SUPABASE_URL}
+      service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+      schema: ${SUPABASE_SCHEMA:public}
+      timeout-millis: ${SUPABASE_TIMEOUT_MILLIS:5000}
 
 springdoc:
   swagger-ui:
