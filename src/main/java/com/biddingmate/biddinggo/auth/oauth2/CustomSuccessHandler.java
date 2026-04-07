@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
+import com.biddingmate.biddinggo.notification.dto.CreateNotificationRequest;
 import com.biddingmate.biddinggo.notification.model.NotificationType;
 import com.biddingmate.biddinggo.notification.service.NotificationService;
 import jakarta.servlet.ServletException;
@@ -60,12 +61,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         try {
-            notificationService.notify(
-                    member.getId(),
-                    NotificationType.SOCIAL_LOGIN,
-                    "소셜 로그인 되었습니다.",
-                    "/"
+            notificationService.createNotification(
+                    CreateNotificationRequest.builder()
+                            .receiverId(member.getId())
+                            .type(NotificationType.SOCIAL_LOGIN)
+                            .content("소셜 로그인 되었습니다.")
+                            .build()
             );
+
         } catch (Exception e) {
             log.warn("[oauth-login-notification-failed] memberId={}", member.getId(), e);
         }

@@ -21,5 +21,4 @@ public class Notification {
     private String url;
     private LocalDateTime readAt;
     private LocalDateTime createdAt;
-
 }

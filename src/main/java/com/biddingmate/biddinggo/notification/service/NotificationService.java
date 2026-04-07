@@ -1,13 +1,20 @@
 package com.biddingmate.biddinggo.notification.service;
 
-import com.biddingmate.biddinggo.notification.model.NotificationType;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import com.biddingmate.biddinggo.common.request.BasePageRequest;
+import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.notification.dto.CreateNotificationRequest;
+import com.biddingmate.biddinggo.notification.dto.CreateNotificationResponse;
+import com.biddingmate.biddinggo.notification.dto.NotificationResponse;
+import jakarta.validation.Valid;
 
-public interface NotificationService {
+public interface NotificationService{
+    CreateNotificationResponse createNotification(@Valid CreateNotificationRequest request);
 
-    SseEmitter subscribe(Long memberId);
+    PageResponse<NotificationResponse> getNotificationsByMemberId(BasePageRequest request, Long receiverId);
+
+    void markAllAsRead(Long receiverId);
+
+    void markAsRead(Long id, Long receiverId);
 
     int countUnread(Long memberId);
-
-    void notify(Long receiverId, NotificationType type, String content, String url);
 }
