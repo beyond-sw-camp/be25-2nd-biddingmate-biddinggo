@@ -160,7 +160,6 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
         }
         return auction;
     }
-<<<<<<< feat/member-inquiry-history-c
 
     @Override
     @Transactional(readOnly = true)
@@ -228,6 +227,3 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
         request.setOrder(order);
     }
 }
-=======
-}
->>>>>>> dev
