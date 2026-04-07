@@ -144,7 +144,12 @@ public enum ErrorType {
     NOTICE_CREATE_FAIL("notice-002", "공지사항 등록을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOTICE_UPDATE_FAIL("notice-003", "공지사항 수정을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOTICE_DELETE_FAIL("notice-004", "공지사항 삭제를 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_NOTICE_REQUEST("notice-005", "제목 또는 내용의 형식 오류입니다.", HttpStatus.BAD_REQUEST);
+    INVALID_NOTICE_REQUEST("notice-005", "제목 또는 내용의 형식 오류입니다.", HttpStatus.BAD_REQUEST),
+
+    // 회원 탈퇴
+    CANNOT_DELETE_MEMBER_WITH_ONGOING_SALES("account-001","판매 중인 경매가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
+    CANNOT_DELETE_MEMBER_WITH_ONGOING_BIDS("account-002","입찰 중인 경매가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
+    CANNOT_DELETE_MEMBER_WITH_INCOMPLETE_DEALS("account-003","진행 중인 거래가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
 
     private final String errorCode;
     private final String message;
