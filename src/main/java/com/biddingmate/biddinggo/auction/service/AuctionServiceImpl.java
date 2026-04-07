@@ -5,6 +5,8 @@ import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequ
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
 import com.biddingmate.biddinggo.auction.event.AuctionCancelledEvent;
+import com.biddingmate.biddinggo.auction.prediction.event.AuctionQueryEmbeddingSyncRequestedEvent;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionEmbeddingSyncTrigger;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
@@ -15,6 +17,7 @@ import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
+import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +75,18 @@ public class AuctionServiceImpl implements AuctionService {
         if (updatedCount != 1) {
             throw new CustomException(ErrorType.AUCTION_UPDATE_NOT_ALLOWED);
         }
+
+        AuctionItem auctionItem = auctionItemService.getAuctionItem(auction.getItemId());
+        eventPublisher.publishEvent(AuctionQueryEmbeddingSyncRequestedEvent.builder()
+                .auctionId(auctionId)
+                .itemId(auctionItem.getId())
+                .categoryId(auctionItem.getCategoryId())
+                .brand(auctionItem.getBrand())
+                .name(auctionItem.getName())
+                .quality(auctionItem.getQuality())
+                .description(auctionItem.getDescription())
+                .trigger(AuctionEmbeddingSyncTrigger.UPDATED)
+                .build());
     }
 
     @Override

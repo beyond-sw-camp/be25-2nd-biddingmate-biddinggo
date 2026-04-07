@@ -34,6 +34,11 @@ public interface AuctionItemService {
     AuctionItem getAuctionableInspectionItem(Long itemId, Long sellerId);
 
     /**
+     * itemId를 기준으로 상품 정보를 조회한다.
+     */
+    AuctionItem getAuctionItem(Long itemId);
+
+    /**
      * 상품 상태를 조건부로 변경한다.
      *
      * <p>범용 상태 변경 도구이며,

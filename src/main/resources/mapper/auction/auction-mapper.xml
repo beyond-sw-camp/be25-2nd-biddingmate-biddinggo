@@ -21,6 +21,12 @@
     <resultMap id="auctionDetailResultMap" type="com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse">
         <id property="auctionId" column="auction_id"/>
         <result property="sellerId" column="seller_id"/>
+        <result property="sellerNickname" column="seller_nickname"/>
+        <result property="sellerImageUrl" column="seller_image_url"/>
+        <result property="sellerGrade" column="seller_grade"/>
+        <result property="sellerCreatedAt" column="seller_created_at"/>
+        <result property="sellerRating" column="seller_rating"/>
+        <result property="sellerReviewCount" column="seller_review_count"/>
         <result property="status" column="status"/>
         <result property="type" column="type"/>
         <result property="inspectionYn" column="inspection_yn"/>
@@ -94,6 +100,12 @@
         SELECT
             a.id AS auction_id,
             a.seller_id,
+            m.nickname AS seller_nickname,
+            m.image_url AS seller_image_url,
+            m.grade AS seller_grade,
+            m.created_at AS seller_created_at,
+            COALESCE(sr.seller_rating, 0) AS seller_rating,
+            COALESCE(sr.seller_review_count, 0) AS seller_review_count,
             a.type,
             a.inspection_yn,
             a.status,
@@ -118,6 +130,15 @@
         FROM auction a
         INNER JOIN auction_item ai ON a.item_id = ai.id
         INNER JOIN category c3 ON ai.category_id = c3.id
+        INNER JOIN member m ON a.seller_id = m.id
+        LEFT JOIN (
+            SELECT
+                target_id,
+                AVG(rating) AS seller_rating,
+                COUNT(*) AS seller_review_count
+            FROM review
+            GROUP BY target_id
+        ) sr ON sr.target_id = a.seller_id
         WHERE a.id = #{auctionId}
     </select>
 
@@ -183,6 +204,7 @@
                seller_id AS sellerId,
                type,
                inspection_yn AS inspectionYn,
+               extension_yn AS extensionYn,
                status,
                start_price AS startPrice,
                bid_unit AS bidUnit,
@@ -206,6 +228,7 @@
                seller_id AS sellerId,
                type,
                inspection_yn AS inspectionYn,
+               extension_yn AS extensionYn,
                status,
                start_price AS startPrice,
                bid_unit AS bidUnit,
@@ -311,5 +334,12 @@
             winner_price = #{winnerPrice}
         WHERE id = #{id}
     </update>
-
+    <update id="extendAuctionTime">
+        UPDATE auction
+        SET end_date = DATE_ADD(end_date, INTERVAL 3 MINUTE),
+            extension_yn = 'YES'
+        WHERE id = #{id}
+          AND extension_yn = 'NO'
+          AND status = 'ON_GOING'
+    </update>
 </mapper>

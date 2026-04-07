@@ -60,4 +60,6 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
                                       @Param("status") AuctionStatus status);
 
     int updateAuctionResult(Auction auction);
+
+    int extendAuctionTime(@Param("id") Long id);
 }

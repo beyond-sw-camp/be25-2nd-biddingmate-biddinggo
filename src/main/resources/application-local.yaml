@@ -74,6 +74,29 @@ jwt:
   issuer: bidding-mate
   secret: ${JWT_SECRET_KEY}
 
+auction:
+  prediction:
+    price:
+      min-reference-count: ${AUCTION_PREDICTION_MIN_REFERENCE_COUNT:1}
+      top-k: ${AUCTION_PREDICTION_TOP_K:20}
+      min-similarity: ${AUCTION_PREDICTION_MIN_SIMILARITY:0.55}
+      condition-score-tolerance: ${AUCTION_PREDICTION_CONDITION_SCORE_TOLERANCE:0.20}
+      outlier-multiplier: ${AUCTION_PREDICTION_OUTLIER_MULTIPLIER:1.5}
+      min-weight: ${AUCTION_PREDICTION_MIN_WEIGHT:0.000001}
+    embedding:
+      enabled: ${OPENAI_EMBEDDING_ENABLED:false}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      api-key: ${OPENAI_API_KEY}
+      model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+      dimensions: ${OPENAI_EMBEDDING_DIMENSIONS:1536}
+      timeout-millis: ${OPENAI_TIMEOUT_MILLIS:5000}
+    supabase:
+      enabled: ${SUPABASE_ENABLED:false}
+      url: ${SUPABASE_URL}
+      service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
+      schema: ${SUPABASE_SCHEMA:public}
+      timeout-millis: ${SUPABASE_TIMEOUT_MILLIS:5000}
+
 springdoc:
   swagger-ui:
     tags-sorter: alpha
