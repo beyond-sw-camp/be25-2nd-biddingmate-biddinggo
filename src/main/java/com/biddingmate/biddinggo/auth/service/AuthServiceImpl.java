@@ -86,12 +86,20 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String bearerToken) {
         String accessToken = jwtProvider.resolveToken(bearerToken);
 
-        jwtProvider.addBlacklist(accessToken);
-        jwtProvider.deleteRefreshToken(accessToken);
+        if (accessToken == null || accessToken.isBlank()) {
+            log.info("[logout] access token not provided");
+            return;
+        }
 
-        String username = jwtUtil.getUsername(accessToken);
-        log.info("[logout] username : {}", username);
+        try {
+            jwtProvider.addBlacklist(accessToken);
+            jwtProvider.deleteRefreshToken(accessToken);
 
+            String username = jwtUtil.getUsername(accessToken);
+            log.info("[logout] username : {}", username);
+        } catch (RuntimeException e) {
+            log.warn("[logout] access token cleanup skipped: {}", e.getMessage());
+        }
 
     }
 

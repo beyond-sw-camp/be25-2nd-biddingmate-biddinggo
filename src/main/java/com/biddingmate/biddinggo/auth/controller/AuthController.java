@@ -84,7 +84,7 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(summary = "로그아웃")
     public ResponseEntity<Void> logout(
-            @Parameter(hidden = true) @RequestHeader("Authorization") String bearerToken
+            @Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String bearerToken
     ) {
 
         authService.logout(bearerToken);
