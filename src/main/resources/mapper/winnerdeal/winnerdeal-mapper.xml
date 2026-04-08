@@ -236,4 +236,12 @@
         WHERE id = #{winnerDealId}
     </update>
 
+    <!-- 판매자의 운송장 등록 -->
+    <update id="updateTrackingNumber">
+        UPDATE winner_deal
+        SET carrier = #{request.carrier},
+            tracking_number = #{request.trackingNumber}
+        WHERE id = #{winnerDealId}
+    </update>
+
 </mapper>
