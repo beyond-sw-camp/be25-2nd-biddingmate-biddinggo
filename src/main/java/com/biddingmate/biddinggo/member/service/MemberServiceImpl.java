@@ -105,6 +105,21 @@ public class MemberServiceImpl implements MemberService {
             throw new CustomException(ErrorType.ALREADY_DELETED_MEMBER);
         }
 
+        // 판매중인 경매가 있는 경우 탈퇴 불가
+        if (memberMapper.existsOngoingSales(memberId)) {
+            throw new CustomException(ErrorType.CANNOT_DELETE_MEMBER_WITH_ONGOING_SALES);
+        }
+
+        // 입찰중인 경매가 있는 경우 탈퇴 불가
+        if (memberMapper.existsOngoingBids(memberId)) {
+            throw new CustomException(ErrorType.CANNOT_DELETE_MEMBER_WITH_ONGOING_BIDS);
+        }
+
+        // 거래 미완료 건이 있는 경우 탈퇴 불가
+        if (memberMapper.existsIncompleteDeals(memberId)) {
+            throw new CustomException(ErrorType.CANNOT_DELETE_MEMBER_WITH_INCOMPLETE_DEALS);
+        }
+
         // 탈퇴 처리 (soft delete)
         memberMapper.deleteMember(memberId);
     }
