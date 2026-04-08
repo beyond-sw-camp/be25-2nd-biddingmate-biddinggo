@@ -201,6 +201,62 @@
         </if>
     </select>
 
+    <select id="findAuctionListByAuctionIds" parameterType="map" resultMap="auctionListResultMap">
+        <!--
+            Supabase semantic search가 뽑은 후보 auction_id 집합을 실제 경매 목록으로 변환한다.
+            최종 노출 조건은 진행 중 경매만 허용하고, 정렬은 기존 목록 조회 규칙을 재사용한다.
+        -->
+        SELECT
+            a.id AS auction_id,
+            ai.id AS item_id,
+            ai.brand,
+            ai.name,
+            a.status,
+            a.type,
+            a.start_price,
+            a.buy_now_price,
+            a.bid_count,
+            a.wish_count,
+            a.end_date,
+            ii.url AS representative_image_url,
+            a.created_at
+        FROM auction a
+        INNER JOIN auction_item ai ON a.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id
+            AND ii.display_order = (
+                SELECT MIN(ii2.display_order)
+                FROM item_image ii2
+                WHERE ii2.item_id = ai.id
+            )
+        WHERE a.id IN
+        <foreach collection="auctionIds" item="auctionId" open="(" separator="," close=")">
+            #{auctionId}
+        </foreach>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        ORDER BY
+        <choose>
+            <when test='sortBy == "PRICE"'>COALESCE(a.vickrey_price, a.start_price) ${order}, a.created_at DESC</when>
+            <when test='sortBy == "POPULARITY"'>(a.bid_count + a.wish_count) ${order}, a.created_at DESC</when>
+            <when test='sortBy == "WISH_COUNT"'>a.wish_count ${order}, a.created_at DESC</when>
+            <otherwise>a.created_at ${order}</otherwise>
+        </choose>
+    </select>
+
+    <select id="countAuctionListByAuctionIds" parameterType="map" resultType="_int">
+        <!-- semantic search 후보 집합 중 실제로 노출 가능한 경매 수를 센다. -->
+        SELECT COUNT(*)
+        FROM auction a
+        WHERE a.id IN
+        <foreach collection="auctionIds" item="auctionId" open="(" separator="," close=")">
+            #{auctionId}
+        </foreach>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+    </select>
+
     <select id="findById" parameterType="long" resultType="com.biddingmate.biddinggo.auction.model.Auction">
         SELECT id,
                item_id AS itemId,

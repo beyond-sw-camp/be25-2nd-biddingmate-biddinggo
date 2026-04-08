@@ -461,7 +461,6 @@
         SET status = #{status}
         WHERE id = #{memberId}
     </update>
-</mapper>
 
     <!-- 판매중인 경매 존재 여부 -->
     <select id="existsOngoingSales" parameterType="long" resultType="boolean">

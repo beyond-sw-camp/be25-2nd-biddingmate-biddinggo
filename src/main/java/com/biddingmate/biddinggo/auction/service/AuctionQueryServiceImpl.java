@@ -3,9 +3,14 @@ package com.biddingmate.biddinggo.auction.service;
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
 import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionSemanticSearchRequest;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
+import com.biddingmate.biddinggo.auction.prediction.client.AuctionEmbeddingClient;
+import com.biddingmate.biddinggo.auction.prediction.client.AuctionPredictionSupabaseClient;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionEmbeddingResult;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionPricePredictionQuery;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionQueryEmbeddingMatch;
 import com.biddingmate.biddinggo.auction.prediction.service.AuctionPricePredictionService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
@@ -29,19 +34,21 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
     private static final String SORT_BY_WISH_COUNT = "WISH_COUNT";
     private static final String SORT_BY_POPULARITY = "POPULARITY";
     private static final String SORT_BY_PRICE = "PRICE";
+    private static final int SEMANTIC_SEARCH_TOP_K = 100;
+    private static final double SEMANTIC_SEARCH_MIN_SIMILARITY = 0.35d;
 
     private final AuctionMapper auctionMapper;
     private final ItemImageMapper itemImageMapper;
     private final AuctionPricePredictionService auctionPricePredictionService;
+    private final AuctionEmbeddingClient auctionEmbeddingClient;
+    private final AuctionPredictionSupabaseClient auctionPredictionSupabaseClient;
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<AuctionListResponse> getAuctionList(AuctionListRequest request) {
         String order = request.getOrder();
 
-        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
-            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
-        }
+        validateSortOrder(order);
 
         AuctionStatus status = parseAuctionStatus(request.getStatus());
         String sortBy = parseSortBy(request.getSortBy());
@@ -59,6 +66,61 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         int count = auctionMapper.countAuctionList(status, request.getSellerId(), request.getCategoryId());
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request) {
+        validateSortOrder(request.getOrder());
+        String sortBy = parseSortBy(request.getSortBy());
+        String sortOrder = request.getOrder().toUpperCase();
+
+        // 외부 임베딩/Supabase 검색이 꺼져 있으면 빈 결과로 처리한다.
+        if (!auctionEmbeddingClient.isEnabled() || !auctionPredictionSupabaseClient.isEnabled()) {
+            return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+        }
+
+        // 검색어 자체를 임베딩해 semantic search용 query vector를 만든다.
+        AuctionEmbeddingResult embeddingResult = auctionEmbeddingClient.createEmbedding(request.getQ().trim());
+
+        // Supabase pgvector에서 유사한 경매 후보 ID 집합을 먼저 조회한다.
+        List<AuctionQueryEmbeddingMatch> matches = auctionPredictionSupabaseClient.matchAuctionQueryEmbeddings(
+                embeddingResult.getEmbedding(),
+                SEMANTIC_SEARCH_TOP_K,
+                SEMANTIC_SEARCH_MIN_SIMILARITY
+        );
+
+        if (matches == null || matches.isEmpty()) {
+            return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+        }
+
+        List<Long> auctionIds = matches.stream()
+                .map(AuctionQueryEmbeddingMatch::getAuctionId)
+                .distinct()
+                .toList();
+
+        if (auctionIds.isEmpty()) {
+            return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+        }
+
+        // 최종 결과는 MariaDB 기준으로 다시 읽고, 기존 목록 정렬 규칙을 그대로 적용한다.
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        List<AuctionListResponse> list = auctionMapper.findAuctionListByAuctionIds(
+                rowBounds,
+                auctionIds,
+                AuctionStatus.ON_GOING,
+                sortBy,
+                sortOrder
+        );
+        int count = auctionMapper.countAuctionListByAuctionIds(auctionIds, AuctionStatus.ON_GOING);
+
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    private void validateSortOrder(String order) {
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
     }
 
     private AuctionStatus parseAuctionStatus(String status) {
