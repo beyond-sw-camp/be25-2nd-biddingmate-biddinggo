@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.service;
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
 import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionSemanticSearchRequest;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionPricePredictionQuery;
@@ -39,9 +40,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
     public PageResponse<AuctionListResponse> getAuctionList(AuctionListRequest request) {
         String order = request.getOrder();
 
-        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
-            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
-        }
+        validateSortOrder(order);
 
         AuctionStatus status = parseAuctionStatus(request.getStatus());
         String sortBy = parseSortBy(request.getSortBy());
@@ -59,6 +58,19 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         int count = auctionMapper.countAuctionList(status, request.getSellerId(), request.getCategoryId());
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request) {
+        validateSortOrder(request.getOrder());
+        return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+    }
+
+    private void validateSortOrder(String order) {
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
     }
 
     private AuctionStatus parseAuctionStatus(String status) {

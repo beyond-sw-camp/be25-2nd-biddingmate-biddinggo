@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.service;
 import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
 import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionSemanticSearchRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 
 /**
@@ -19,4 +20,10 @@ public interface AuctionQueryService {
      * 경매 ID를 기준으로 상세 정보를 조회한다.
      */
     AuctionDetailResponse getAuctionDetail(Long auctionId);
+
+    /**
+     * 검색어를 기반으로 유사한 경매 후보를 조회한다.
+     * 실제 검색 구현은 후속 단계에서 연결한다.
+     */
+    PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request);
 }
