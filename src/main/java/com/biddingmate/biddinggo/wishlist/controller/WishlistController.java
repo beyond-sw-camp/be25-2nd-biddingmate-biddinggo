@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/wishlists")
@@ -49,6 +52,20 @@ public class WishlistController {
         PageResponse<AuctionDetailResponse> result = wishlistService.findWishlistAuctionsByMemberId(request, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 조회 성공", result);
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "관심 경매 여부 조회", description = "특정 경매가 내 관심 경매인지 조회합니다.")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getWishlistStatus(
+            @RequestParam Long auctionId,
+            @AuthenticationPrincipal Member member
+    ) {
+        boolean wished = wishlistService.existsWishlist(auctionId, member.getId());
+
+        return ApiResponse.of(HttpStatus.OK, null, "관심 경매 여부 조회 성공", Map.of(
+                "auctionId", auctionId,
+                "wished", wished
+        ));
     }
 
     @DeleteMapping("")

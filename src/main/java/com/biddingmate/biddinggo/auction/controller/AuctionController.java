@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.controller;
 import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
 import com.biddingmate.biddinggo.auction.dto.AuctionListRequest;
 import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionSemanticSearchRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionResponse;
@@ -45,6 +46,17 @@ public class AuctionController {
         PageResponse<AuctionListResponse> result = auctionQueryService.getAuctionList(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "경매 목록 조회 완료", result);
+    }
+
+    @GetMapping("/search/semantic")
+    @Operation(summary = "유사도 기반 경매 검색", description = "검색어를 기반으로 유사한 진행 중 경매를 조회하며, 정렬은 기존 경매 목록 기준을 따릅니다.")
+    public ResponseEntity<ApiResponse<PageResponse<AuctionListResponse>>> searchAuctionsBySemantic(
+            @Valid AuctionSemanticSearchRequest request) {
+
+        // semantic search는 후보 추출만 유사도 기반으로 수행하고, 최종 정렬은 기존 목록 규칙을 따른다.
+        PageResponse<AuctionListResponse> result = auctionQueryService.searchAuctionsBySemantic(request);
+
+        return ApiResponse.of(HttpStatus.OK, null, "유사도 기반 경매 검색 완료", result);
     }
 
     @GetMapping("/{auctionId}")

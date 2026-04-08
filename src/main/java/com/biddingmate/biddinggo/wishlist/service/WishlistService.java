@@ -11,5 +11,7 @@ public interface WishlistService {
 
     PageResponse<AuctionDetailResponse> findWishlistAuctionsByMemberId(BasePageRequest request, Long memberId);
 
+    boolean existsWishlist(Long auctionId, Long memberId);
+
     int deleteWishlist(CreateWishlistRequest request, Long memberId);
 }

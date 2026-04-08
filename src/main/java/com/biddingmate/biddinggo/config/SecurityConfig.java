@@ -70,7 +70,10 @@ public class SecurityConfig {
                                 "/api/v1/payments/virtual-accounts/deposit",
                                 "/swagger-ui/**", "/v3/api-docs/**",
                                 "/api/v1/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/auctions", "/api/v1/auctions/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/auctions",
+                                "/api/v1/auctions/**",
+                                "/api/v1/auctions/search").permitAll()
                         .anyRequest().authenticated()
                 );
 

@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Schema(description = "경매 목록 조회 요청 DTO")
 public class AuctionListRequest extends BasePageRequest {
-    @Schema(description = "정렬 기준", example = "CREATED_AT", allowableValues = {"CREATED_AT", "WISH_COUNT"}, nullable = true)
+    @Schema(description = "정렬 기준", example = "CREATED_AT", allowableValues = {"CREATED_AT", "WISH_COUNT", "POPULARITY", "PRICE"}, nullable = true)
     private String sortBy;
 
     @Schema(description = "경매 상태", example = "ON_GOING", nullable = true)

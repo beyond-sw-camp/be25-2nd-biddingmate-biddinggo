@@ -96,4 +96,14 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
                             @Param("status") MemberStatus status);
 
     MemberSellerProfileResponse findSellerStats(@Param("memberId") Long memberId);
+
+    // 판매중인 경매 존재 여부
+    boolean existsOngoingSales(@Param("memberId") Long memberId);
+
+    // 입출중인 경매 존재 여부
+    boolean existsOngoingBids(@Param("memberId") Long memberId);
+
+    // 거래 미완료 존재 여부
+    boolean existsIncompleteDeals(@Param("memberId") Long memberId);
+
 }

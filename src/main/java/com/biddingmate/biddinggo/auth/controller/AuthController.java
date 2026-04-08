@@ -50,6 +50,10 @@ public class AuthController {
         Map<String, Object> userInfo = new HashMap<>();
         if (authentication.getPrincipal() instanceof Member member) {
             userInfo.put("memberId", member.getId());
+            userInfo.put("name", member.getName());
+            userInfo.put("nickname", member.getNickname());
+            userInfo.put("imageUrl", member.getImageUrl());
+            userInfo.put("status", member.getStatus().name());
         }
         userInfo.put("username", authentication.getName());
         userInfo.put("role", authentication.getAuthorities());

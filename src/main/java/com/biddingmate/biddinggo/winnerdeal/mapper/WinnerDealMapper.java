@@ -2,6 +2,7 @@ package com.biddingmate.biddinggo.winnerdeal.mapper;
 
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailQueryResult;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -32,4 +33,6 @@ public interface WinnerDealMapper {
                                                     @Param("memberId") Long memberId);
     long countSaleHistory(@Param("request") WinnerDealHistoryRequest request,
                           @Param("memberId") Long memberId);
+
+    WinnerDealDetailQueryResult findWinnerDealDetail(@Param("winnerDealId") Long winnerDealId);
 }

@@ -27,6 +27,22 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
                          @Param("sellerId") Long sellerId,
                          @Param("categoryId") Long categoryId);
 
+    /**
+     * Supabase에서 찾은 후보 auction ID 집합을 기준으로 실제 경매 목록을 조회한다.
+     * 최종 정렬과 상태 필터는 MariaDB 기준으로 다시 적용한다.
+     */
+    List<AuctionListResponse> findAuctionListByAuctionIds(RowBounds rowBounds,
+                                                          @Param("auctionIds") List<Long> auctionIds,
+                                                          @Param("status") AuctionStatus status,
+                                                          @Param("sortBy") String sortBy,
+                                                          @Param("order") String order);
+
+    /**
+     * 후보 auction ID 집합 중 실제 조회 조건을 만족하는 경매 수를 반환한다.
+     */
+    int countAuctionListByAuctionIds(@Param("auctionIds") List<Long> auctionIds,
+                                     @Param("status") AuctionStatus status);
+
     int updateAuction(Auction auction);
 
     int cancelAuction(@Param("auctionId") Long auctionId,
