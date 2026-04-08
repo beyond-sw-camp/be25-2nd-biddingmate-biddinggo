@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.prediction.client;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionPriceReference;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionPriceReferenceMatch;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionQueryEmbedding;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionQueryEmbeddingMatch;
 
 import java.util.List;
 
@@ -41,5 +42,14 @@ public interface AuctionPredictionSupabaseClient {
             Integer matchCount,
             Double minSimilarity,
             Long excludeAuctionId
+    );
+
+    /**
+     * 검색어 임베딩을 기준으로 유사한 경매 query embedding을 검색한다.
+     */
+    List<AuctionQueryEmbeddingMatch> matchAuctionQueryEmbeddings(
+            List<Double> queryEmbedding,
+            Integer matchCount,
+            Double minSimilarity
     );
 }

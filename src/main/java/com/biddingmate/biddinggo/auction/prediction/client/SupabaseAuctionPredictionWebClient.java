@@ -3,6 +3,7 @@ package com.biddingmate.biddinggo.auction.prediction.client;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionPriceReference;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionPriceReferenceMatch;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionQueryEmbedding;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionQueryEmbeddingMatch;
 import com.biddingmate.biddinggo.config.AuctionPredictionSupabaseProperties;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.RequiredArgsConstructor;
@@ -194,6 +195,47 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
                 .toList();
     }
 
+    @Override
+    public List<AuctionQueryEmbeddingMatch> matchAuctionQueryEmbeddings(
+            List<Double> queryEmbedding,
+            Integer matchCount,
+            Double minSimilarity
+    ) {
+        if (!isEnabled()) {
+            throw new IllegalStateException("Auction prediction supabase client is not configured.");
+        }
+
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("query_embedding", toVectorLiteral(queryEmbedding));
+        requestBody.put("match_count", matchCount);
+        requestBody.put("min_similarity", minSimilarity);
+
+        List<QueryEmbeddingMatchRow> rows = webClient.post()
+                .uri(normalizeBaseUrl(properties.getUrl()) + "/rest/v1/rpc/match_auction_query_embedding")
+                .headers(this::applySupabaseHeaders)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<QueryEmbeddingMatchRow>>() {
+                })
+                .timeout(Duration.ofMillis(properties.getTimeoutMillis()))
+                .block();
+
+        if (rows == null) {
+            return List.of();
+        }
+
+        return rows.stream()
+                .filter(Objects::nonNull)
+                .map(row -> AuctionQueryEmbeddingMatch.builder()
+                        .auctionId(row.auctionId())
+                        .itemId(row.itemId())
+                        .categoryId(row.categoryId())
+                        .build())
+                .toList();
+    }
+
     /**
      * 지정한 Supabase RPC 함수를 공통 방식으로 호출한다.
      */
@@ -318,6 +360,13 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
             @JsonAlias("winner_price") Long winnerPrice,
             @JsonAlias("condition_score") Double conditionScore,
             Double similarity
+    ) {
+    }
+
+    private record QueryEmbeddingMatchRow(
+            @JsonAlias("auction_id") Long auctionId,
+            @JsonAlias("item_id") Long itemId,
+            @JsonAlias("category_id") Long categoryId
     ) {
     }
 }
