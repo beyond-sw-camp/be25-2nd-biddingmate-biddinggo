@@ -15,7 +15,12 @@ public class LoginResponse {
 
     private final String accessToken;
     private final String type;
+    private final Long memberId;
     private final String username;
+    private final String name;
+    private final String nickname;
+    private final String imageUrl;
+    private final String status;
     private final List<String> authorities;
     private final long issuedAt;
     private final long expiredAt;
