@@ -214,7 +214,7 @@
             a.bid_count,
             a.wish_count,
             a.end_date,
-            ii.image_url AS representative_image_url,
+            ii.url AS representative_image_url,
             a.created_at
         FROM auction a
         INNER JOIN auction_item ai ON a.item_id = ai.id
