@@ -2,7 +2,7 @@ package com.biddingmate.biddinggo.winnerdeal.mapper;
 
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
-import com.biddingmate.biddinggo.winnerdeal.dto.RegisterWinnerDealShippingAddressRequest;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailQueryResult;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,5 +41,5 @@ public interface WinnerDealMapper {
 
     // 구매자의 배송지 등록
     int updateShippingAddress(@Param("winnerDealId") Long winnerDealId,
-                              @Param("request") RegisterWinnerDealShippingAddressRequest request);
+                              @Param("request") WinnerDealShippingAddressRequest request);
 }

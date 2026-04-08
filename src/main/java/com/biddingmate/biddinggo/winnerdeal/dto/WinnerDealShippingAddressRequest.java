@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Schema(description = "낙찰 거래 배송지 등록 요청 DTO")
-public class RegisterWinnerDealShippingAddressRequest {
+public class WinnerDealShippingAddressRequest {
     @Schema(description = "우편번호", example = "06109")
     @NotBlank(message = "우편번호는 필수입니다.")
     @Size(max = 20, message = "우편번호는 20자 이하여야 합니다.")

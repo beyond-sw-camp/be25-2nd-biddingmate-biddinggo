@@ -130,6 +130,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
     }
 
     private boolean isShippingAddressRegistered(WinnerDealDetailQueryResult detail) {
+        // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
         return StringUtils.hasText(detail.getRecipient())
                 && StringUtils.hasText(detail.getTel())
                 && StringUtils.hasText(detail.getZipcode())
@@ -137,6 +138,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
     }
 
     private boolean isTrackingNumberRegistered(WinnerDealDetailQueryResult detail) {
+        // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
         return StringUtils.hasText(detail.getCarrier())
                 && StringUtils.hasText(detail.getTrackingNumber());
     }

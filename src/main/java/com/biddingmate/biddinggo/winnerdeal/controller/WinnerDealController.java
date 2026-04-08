@@ -3,7 +3,7 @@ package com.biddingmate.biddinggo.winnerdeal.controller;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.model.Member;
-import com.biddingmate.biddinggo.winnerdeal.dto.RegisterWinnerDealShippingAddressRequest;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
@@ -62,7 +62,7 @@ public class WinnerDealController {
     @PatchMapping("/{winnerDealId}/shipping-address")
     @Operation(summary = "낙찰 거래 배송지 등록", description = "구매자가 낙찰 거래에 배송지 정보를 등록합니다.")
     public ResponseEntity<ApiResponse<Void>> registerShippingAddress(@Parameter(description = "낙찰 거래 ID", example = "1") @PathVariable Long winnerDealId,
-                                                                     @Valid @RequestBody RegisterWinnerDealShippingAddressRequest request,
+                                                                     @Valid @RequestBody WinnerDealShippingAddressRequest request,
                                                                      @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         winnerDealService.registerShippingAddress(winnerDealId, member.getId(), request);
 

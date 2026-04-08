@@ -14,7 +14,7 @@ import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
-import com.biddingmate.biddinggo.winnerdeal.dto.RegisterWinnerDealShippingAddressRequest;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
 import lombok.RequiredArgsConstructor;
@@ -144,7 +144,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
     @Override
     @Transactional
-    public void registerShippingAddress(Long winnerDealId, Long memberId, RegisterWinnerDealShippingAddressRequest request) {
+    public void registerShippingAddress(Long winnerDealId, Long memberId, WinnerDealShippingAddressRequest request) {
         WinnerDeal winnerDeal = winnerDealMapper.findById(winnerDealId);
 
         if (winnerDeal == null) {
@@ -156,10 +156,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_ACCESS_DENIED);
         }
 
-        // 배송지 또는 송장 정보가 이미 있거나 PAID 상태가 아닌 경우
+        // 배송지 또는 운송장 정보가 이미 있거나 PAID 상태가 아닌 경우
         if (!"PAID".equals(winnerDeal.getStatus())
-                || StringUtils.hasText(winnerDeal.getTrackingNumber())
-                || isShippingInfoRegistered(winnerDeal)) {
+                || isShippingInfoRegistered(winnerDeal)
+                || isTrackingNumberRegistered(winnerDeal)) {
             throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_REGISTRATION_NOT_ALLOWED);
         }
 
@@ -207,5 +207,11 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                 && StringUtils.hasText(winnerDeal.getTel())
                 && StringUtils.hasText(winnerDeal.getZipcode())
                 && StringUtils.hasText(winnerDeal.getAddress());
+    }
+
+    private boolean isTrackingNumberRegistered(WinnerDeal winnerDeal) {
+        // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
+        return StringUtils.hasText(winnerDeal.getCarrier())
+                && StringUtils.hasText(winnerDeal.getTrackingNumber());
     }
 }
