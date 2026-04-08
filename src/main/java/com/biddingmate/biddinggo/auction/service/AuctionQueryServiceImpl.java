@@ -6,7 +6,11 @@ import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.auction.dto.AuctionSemanticSearchRequest;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
+import com.biddingmate.biddinggo.auction.prediction.client.AuctionEmbeddingClient;
+import com.biddingmate.biddinggo.auction.prediction.client.AuctionPredictionSupabaseClient;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionEmbeddingResult;
 import com.biddingmate.biddinggo.auction.prediction.model.AuctionPricePredictionQuery;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionQueryEmbeddingMatch;
 import com.biddingmate.biddinggo.auction.prediction.service.AuctionPricePredictionService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
@@ -30,10 +34,14 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
     private static final String SORT_BY_WISH_COUNT = "WISH_COUNT";
     private static final String SORT_BY_POPULARITY = "POPULARITY";
     private static final String SORT_BY_PRICE = "PRICE";
+    private static final int SEMANTIC_SEARCH_TOP_K = 100;
+    private static final double SEMANTIC_SEARCH_MIN_SIMILARITY = 0.45d;
 
     private final AuctionMapper auctionMapper;
     private final ItemImageMapper itemImageMapper;
     private final AuctionPricePredictionService auctionPricePredictionService;
+    private final AuctionEmbeddingClient auctionEmbeddingClient;
+    private final AuctionPredictionSupabaseClient auctionPredictionSupabaseClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -64,7 +72,37 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
     @Transactional(readOnly = true)
     public PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request) {
         validateSortOrder(request.getOrder());
-        return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+
+        if (!auctionEmbeddingClient.isEnabled() || !auctionPredictionSupabaseClient.isEnabled()) {
+            return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+        }
+
+        AuctionEmbeddingResult embeddingResult = auctionEmbeddingClient.createEmbedding(request.getQ().trim());
+
+        List<AuctionQueryEmbeddingMatch> matches = auctionPredictionSupabaseClient.matchAuctionQueryEmbeddings(
+                embeddingResult.getEmbedding(),
+                SEMANTIC_SEARCH_TOP_K,
+                SEMANTIC_SEARCH_MIN_SIMILARITY
+        );
+
+        if (matches == null || matches.isEmpty()) {
+            return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+        }
+
+        List<Long> auctionIds = matches.stream()
+                .map(AuctionQueryEmbeddingMatch::getAuctionId)
+                .distinct()
+                .toList();
+
+        if (auctionIds.isEmpty()) {
+            return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
+        }
+
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        List<AuctionListResponse> list = auctionMapper.findAuctionListByAuctionIds(rowBounds, auctionIds, AuctionStatus.ON_GOING);
+        int count = auctionMapper.countAuctionListByAuctionIds(auctionIds, AuctionStatus.ON_GOING);
+
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
     }
 
     private void validateSortOrder(String order) {
