@@ -178,6 +178,7 @@
         </if>
         ORDER BY
         <choose>
+            <when test='sortBy == "POPULARITY"'>(a.bid_count + a.wish_count) ${order}, a.created_at DESC</when>
             <when test='sortBy == "WISH_COUNT"'>a.wish_count ${order}, a.created_at DESC</when>
             <otherwise>a.created_at ${order}</otherwise>
         </choose>
