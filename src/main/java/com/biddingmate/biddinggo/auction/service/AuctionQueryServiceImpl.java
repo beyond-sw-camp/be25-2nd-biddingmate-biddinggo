@@ -35,7 +35,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
     private static final String SORT_BY_POPULARITY = "POPULARITY";
     private static final String SORT_BY_PRICE = "PRICE";
     private static final int SEMANTIC_SEARCH_TOP_K = 100;
-    private static final double SEMANTIC_SEARCH_MIN_SIMILARITY = 0.45d;
+    private static final double SEMANTIC_SEARCH_MIN_SIMILARITY = 0.35d;
 
     private final AuctionMapper auctionMapper;
     private final ItemImageMapper itemImageMapper;
@@ -73,12 +73,15 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
     public PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request) {
         validateSortOrder(request.getOrder());
 
+        // 외부 임베딩/Supabase 검색이 꺼져 있으면 빈 결과로 처리한다.
         if (!auctionEmbeddingClient.isEnabled() || !auctionPredictionSupabaseClient.isEnabled()) {
             return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
         }
 
+        // 검색어 자체를 임베딩해 semantic search용 query vector를 만든다.
         AuctionEmbeddingResult embeddingResult = auctionEmbeddingClient.createEmbedding(request.getQ().trim());
 
+        // Supabase pgvector에서 유사한 경매 후보 ID 집합을 먼저 조회한다.
         List<AuctionQueryEmbeddingMatch> matches = auctionPredictionSupabaseClient.matchAuctionQueryEmbeddings(
                 embeddingResult.getEmbedding(),
                 SEMANTIC_SEARCH_TOP_K,
@@ -98,6 +101,7 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
             return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
         }
 
+        // 최종 결과는 MariaDB 기준으로 다시 읽고, 진행 중 경매만 최신순으로 정렬한다.
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         List<AuctionListResponse> list = auctionMapper.findAuctionListByAuctionIds(rowBounds, auctionIds, AuctionStatus.ON_GOING);
         int count = auctionMapper.countAuctionListByAuctionIds(auctionIds, AuctionStatus.ON_GOING);

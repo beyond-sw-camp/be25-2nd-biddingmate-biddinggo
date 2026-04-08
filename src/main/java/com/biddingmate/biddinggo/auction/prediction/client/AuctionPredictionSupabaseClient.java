@@ -45,7 +45,8 @@ public interface AuctionPredictionSupabaseClient {
     );
 
     /**
-     * 검색어 임베딩을 기준으로 유사한 경매 query embedding을 검색한다.
+     * 검색어 임베딩을 기준으로 유사한 경매 query embedding 후보를 검색한다.
+     * 최종 정렬/상태 필터는 애플리케이션의 MariaDB 조회 단계에서 다시 적용한다.
      */
     List<AuctionQueryEmbeddingMatch> matchAuctionQueryEmbeddings(
             List<Double> queryEmbedding,

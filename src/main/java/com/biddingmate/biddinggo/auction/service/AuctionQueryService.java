@@ -22,8 +22,8 @@ public interface AuctionQueryService {
     AuctionDetailResponse getAuctionDetail(Long auctionId);
 
     /**
-     * 검색어를 기반으로 유사한 경매 후보를 조회한다.
-     * 실제 검색 구현은 후속 단계에서 연결한다.
+     * 검색어를 임베딩해 유사한 경매 후보를 찾고,
+     * 최종적으로 진행 중 경매만 최신순으로 반환한다.
      */
     PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request);
 }

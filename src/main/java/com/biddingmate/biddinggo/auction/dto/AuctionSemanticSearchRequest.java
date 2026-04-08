@@ -14,6 +14,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+/**
+ * 유사도 기반 경매 검색 요청 DTO.
+ * 검색어는 필수이고, 최종 정렬은 서버에서 최신순으로 고정한다.
+ */
 @Schema(description = "유사도 기반 경매 검색 요청 DTO")
 public class AuctionSemanticSearchRequest extends BasePageRequest {
     @NotBlank(message = "검색어는 필수입니다.")

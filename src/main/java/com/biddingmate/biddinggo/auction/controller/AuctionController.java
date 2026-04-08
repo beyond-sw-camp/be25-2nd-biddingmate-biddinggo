@@ -53,6 +53,7 @@ public class AuctionController {
     public ResponseEntity<ApiResponse<PageResponse<AuctionListResponse>>> searchAuctionsBySemantic(
             @Valid AuctionSemanticSearchRequest request) {
 
+        // semantic search는 후보 추출만 유사도 기반으로 수행하고, 최종 정렬은 최신순으로 고정한다.
         PageResponse<AuctionListResponse> result = auctionQueryService.searchAuctionsBySemantic(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "유사도 기반 경매 검색 완료", result);

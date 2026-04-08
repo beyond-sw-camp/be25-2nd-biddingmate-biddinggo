@@ -206,6 +206,7 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
         }
 
         Map<String, Object> requestBody = new LinkedHashMap<>();
+        // pgvector RPC 함수가 기대하는 형식으로 query embedding과 검색 조건을 전달한다.
         requestBody.put("query_embedding", toVectorLiteral(queryEmbedding));
         requestBody.put("match_count", matchCount);
         requestBody.put("min_similarity", minSimilarity);
@@ -226,6 +227,7 @@ public class SupabaseAuctionPredictionWebClient implements AuctionPredictionSupa
             return List.of();
         }
 
+        // Supabase에서는 후보 ID 집합만 받고, 실제 경매 조회는 MariaDB에서 이어서 수행한다.
         return rows.stream()
                 .filter(Objects::nonNull)
                 .map(row -> AuctionQueryEmbeddingMatch.builder()
