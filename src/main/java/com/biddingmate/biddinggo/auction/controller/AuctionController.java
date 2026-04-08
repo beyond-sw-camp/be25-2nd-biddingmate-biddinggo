@@ -49,11 +49,11 @@ public class AuctionController {
     }
 
     @GetMapping("/search/semantic")
-    @Operation(summary = "유사도 기반 경매 검색", description = "검색어를 기반으로 유사한 진행 중 경매를 최신순으로 조회합니다.")
+    @Operation(summary = "유사도 기반 경매 검색", description = "검색어를 기반으로 유사한 진행 중 경매를 조회하며, 정렬은 기존 경매 목록 기준을 따릅니다.")
     public ResponseEntity<ApiResponse<PageResponse<AuctionListResponse>>> searchAuctionsBySemantic(
             @Valid AuctionSemanticSearchRequest request) {
 
-        // semantic search는 후보 추출만 유사도 기반으로 수행하고, 최종 정렬은 최신순으로 고정한다.
+        // semantic search는 후보 추출만 유사도 기반으로 수행하고, 최종 정렬은 기존 목록 규칙을 따른다.
         PageResponse<AuctionListResponse> result = auctionQueryService.searchAuctionsBySemantic(request);
 
         return ApiResponse.of(HttpStatus.OK, null, "유사도 기반 경매 검색 완료", result);

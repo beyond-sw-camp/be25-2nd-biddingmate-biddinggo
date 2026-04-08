@@ -23,7 +23,7 @@ public interface AuctionQueryService {
 
     /**
      * 검색어를 임베딩해 유사한 경매 후보를 찾고,
-     * 최종적으로 진행 중 경매만 최신순으로 반환한다.
+     * 최종적으로 진행 중 경매만 기존 목록 정렬 기준으로 반환한다.
      */
     PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request);
 }

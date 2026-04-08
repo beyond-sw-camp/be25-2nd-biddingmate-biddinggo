@@ -72,6 +72,8 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
     @Transactional(readOnly = true)
     public PageResponse<AuctionListResponse> searchAuctionsBySemantic(AuctionSemanticSearchRequest request) {
         validateSortOrder(request.getOrder());
+        String sortBy = parseSortBy(request.getSortBy());
+        String sortOrder = request.getOrder().toUpperCase();
 
         // 외부 임베딩/Supabase 검색이 꺼져 있으면 빈 결과로 처리한다.
         if (!auctionEmbeddingClient.isEnabled() || !auctionPredictionSupabaseClient.isEnabled()) {
@@ -101,9 +103,15 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
             return PageResponse.of(List.of(), request.getPage(), request.getSize(), 0);
         }
 
-        // 최종 결과는 MariaDB 기준으로 다시 읽고, 진행 중 경매만 최신순으로 정렬한다.
+        // 최종 결과는 MariaDB 기준으로 다시 읽고, 기존 목록 정렬 규칙을 그대로 적용한다.
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
-        List<AuctionListResponse> list = auctionMapper.findAuctionListByAuctionIds(rowBounds, auctionIds, AuctionStatus.ON_GOING);
+        List<AuctionListResponse> list = auctionMapper.findAuctionListByAuctionIds(
+                rowBounds,
+                auctionIds,
+                AuctionStatus.ON_GOING,
+                sortBy,
+                sortOrder
+        );
         int count = auctionMapper.countAuctionListByAuctionIds(auctionIds, AuctionStatus.ON_GOING);
 
         return PageResponse.of(list, request.getPage(), request.getSize(), count);

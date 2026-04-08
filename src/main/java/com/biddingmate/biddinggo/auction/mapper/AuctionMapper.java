@@ -33,7 +33,9 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
      */
     List<AuctionListResponse> findAuctionListByAuctionIds(RowBounds rowBounds,
                                                           @Param("auctionIds") List<Long> auctionIds,
-                                                          @Param("status") AuctionStatus status);
+                                                          @Param("status") AuctionStatus status,
+                                                          @Param("sortBy") String sortBy,
+                                                          @Param("order") String order);
 
     /**
      * 후보 auction ID 집합 중 실제 조회 조건을 만족하는 경매 수를 반환한다.
