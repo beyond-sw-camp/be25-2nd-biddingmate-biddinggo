@@ -74,6 +74,16 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean existsWishlist(Long auctionId, Long memberId) {
+        if (auctionMapper.findById(auctionId) == null) {
+            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
+        }
+
+        return wishlistMapper.findByMemberIdAndAuctionId(memberId, auctionId) != null;
+    }
+
+    @Override
     @Transactional
     public int deleteWishlist(CreateWishlistRequest request, Long memberId) {
         Long auctionId = request.getAuctionId();
