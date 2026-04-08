@@ -244,6 +244,7 @@
         WHERE id = #{winnerDealId}
     </update>
 
+    <!-- 구매자 구매확정 -->
     <update id="confirmPurchase">
         UPDATE winner_deal
         SET status = 'CONFIRMED',
