@@ -128,9 +128,10 @@ public enum ErrorType {
     WISHLIST_DELETE_FAIL("wishlist-004", "관심 경매 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 낙찰
-    DEAL_NOT_FOUND("review-007", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     WINNER_DEAL_ALREADY_CANCELLED("winner-deal-001", "이미 취소된 낙찰 거래입니다.", HttpStatus.CONFLICT),
     WINNER_DEAL_UPDATE_FAILED("winner-deal-002", "낙찰 거래 상태 변경에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    WINNER_DEAL_NOT_FOUND("winner-deal-003", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    WINNER_DEAL_ACCESS_DENIED("winner-deal-004", "본인의 낙찰 거래만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
 
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
