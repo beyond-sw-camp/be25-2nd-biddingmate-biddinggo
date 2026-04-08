@@ -73,4 +73,87 @@
         FROM auction_inquiry
         WHERE auction_id = #{auctionId}
     </select>
+<<<<<<< feat/member-inquiry-history-c
+
+    <select id="findMyAuctionInquiries" resultType="MemberAuctionInquiryResponse">
+        SELECT
+            inquiryType,
+            answerStatus,
+            createdAt,
+            title,
+            content,
+            answer,
+            answeredAt,
+            auctionId
+        FROM (
+        SELECT
+            'PURCHASE' AS inquiryType,
+            ai.auction_id AS auctionId,
+            ai.status AS answerStatus,
+            ai.created_at AS createdAt,
+            ai.title AS title,
+            ai.content AS content,
+            ai.answer AS answer,
+            ai.answered_at AS answeredAt
+        FROM auction_inquiry ai
+        WHERE ai.writer_id = #{memberId}
+
+        UNION ALL
+
+        SELECT
+            'SALES' AS inquiryType,
+            ai.auction_id AS auctionId,
+            ai.status AS answerStatus,
+            ai.created_at AS createdAt,
+            ai.title AS title,
+            ai.content AS content,
+            ai.answer AS answer,
+            ai.answered_at AS answeredAt
+        FROM auction_inquiry ai
+        INNER JOIN auction a
+        ON ai.auction_id = a.id
+        WHERE a.seller_id = #{memberId}
+        ) t
+        <where>
+            <if test="type != null and type != 'ALL'">
+                t.inquiryType = #{type}
+            </if>
+        </where>
+        ORDER BY createdAt
+        <choose>
+            <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
+                ASC
+            </when>
+            <otherwise>
+                DESC
+            </otherwise>
+        </choose>
+        LIMIT #{pageRequest.size}
+        OFFSET #{pageRequest.offset}
+    </select>
+
+    <select id="countMyAuctionInquiries" resultType="long">
+        SELECT COUNT(*)
+        FROM (
+        SELECT 'PURCHASE' AS inquiryType
+        FROM auction_inquiry ai
+        WHERE ai.writer_id = #{memberId}
+
+        UNION ALL
+
+        SELECT 'SALES' AS inquiryType
+        FROM auction_inquiry ai
+        INNER JOIN auction a
+        ON ai.auction_id = a.id
+        WHERE a.seller_id = #{memberId}
+        ) t
+        <where>
+            <if test="type != null and type != 'ALL'">
+                t.inquiryType = #{type}
+            </if>
+        </where>
+    </select>
 </mapper>
+=======
+</mapper>
+>>>>>>> dev

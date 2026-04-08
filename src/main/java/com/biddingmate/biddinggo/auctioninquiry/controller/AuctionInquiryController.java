@@ -5,6 +5,7 @@ import com.biddingmate.biddinggo.auctioninquiry.dto.AnswerAuctionInquiryResponse
 import com.biddingmate.biddinggo.auctioninquiry.dto.AuctionInquiryView;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryRequest;
 import com.biddingmate.biddinggo.auctioninquiry.dto.CreateAuctionInquiryResponse;
+import com.biddingmate.biddinggo.auctioninquiry.dto.MemberAuctionInquiryResponse;
 import com.biddingmate.biddinggo.auctioninquiry.service.AuctionInquiryService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Auction Inquiry", description = "경매 문의 API")
@@ -99,5 +101,22 @@ public class AuctionInquiryController {
                 "경매 문의 목록 조회 성공",
                 result
         );
+    }
+
+    @Operation(summary = "구매/판매 문의 내역 조회", description = "구매/판매 문의 내역을 조회합니다.")
+    @GetMapping("/members/me/auction-inquiries")
+    public ResponseEntity<ApiResponse<PageResponse<MemberAuctionInquiryResponse>>> getMyAuctionInquiries(
+            @RequestParam(defaultValue = "ALL") String type,
+            @Valid BasePageRequest request,
+            @AuthenticationPrincipal Member member
+    ) {
+        if (member == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+
+        PageResponse<MemberAuctionInquiryResponse> result =
+                auctionInquiryService.getMyAuctionInquiries(member.getId(), type, request);
+
+        return ApiResponse.of(HttpStatus.OK, null, "구매/판매 문의 내역 조회 성공", result);
     }
 }
