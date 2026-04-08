@@ -259,7 +259,7 @@
 
     <!--  소셜 회원 필수 정보 입력  -->
     <update id="updateMemberInfo" parameterType="com.biddingmate.biddinggo.auth.dto.SocialInfoUpdateDto">
-        UPDATE MEMBER
+        UPDATE member
         SET name = #{name},
             nickname = #{nickname},
             image_url = #{imageUrl},
@@ -461,6 +461,7 @@
         SET status = #{status}
         WHERE id = #{memberId}
     </update>
+</mapper>
 
     <!-- 판매중인 경매 존재 여부 -->
     <select id="existsOngoingSales" parameterType="long" resultType="boolean">

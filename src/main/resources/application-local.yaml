@@ -104,4 +104,4 @@ springdoc:
 
 app:
   frontend:
-    redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:5173/oauth/callback}
+    redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:5173/auth/callback}
