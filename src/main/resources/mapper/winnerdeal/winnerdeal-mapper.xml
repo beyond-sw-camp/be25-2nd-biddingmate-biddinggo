@@ -22,6 +22,28 @@
                      #{createdAt}
                  )
     </insert>
+    <select id="findById" resultType="WinnerDeal">
+        SELECT
+            id,
+            auction_id AS auctionId,
+            winner_id AS winnerId,
+            seller_id AS sellerId,
+            winner_price AS winnerPrice,
+            status,
+            delivery_status AS deliveryStatus,
+            confirmed_at AS confirmedAt,
+            zipcode,
+            address,
+            detail_address AS detailAddress,
+            tel,
+            recipient,
+            carrier,
+            tracking_number AS trackingNumber,
+            created_at AS createdAt
+        FROM winner_deal
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
     <select id="findByAuctionId" resultType="WinnerDeal">
         SELECT
             id,
@@ -202,5 +224,16 @@
         WHERE wd.id = #{winnerDealId}
         LIMIT 1
     </select>
+
+    <!-- 구매자의 배송지 등록 -->
+    <update id="updateShippingAddress">
+        UPDATE winner_deal
+        SET zipcode = #{request.zipcode},
+            address = #{request.address},
+            detail_address = #{request.detailAddress},
+            tel = #{request.tel},
+            recipient = #{request.recipient}
+        WHERE id = #{winnerDealId}
+    </update>
 
 </mapper>
