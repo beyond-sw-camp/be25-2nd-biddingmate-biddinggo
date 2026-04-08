@@ -27,6 +27,13 @@ public interface AuctionMapper extends IMybatisCRUD<Auction> {
                          @Param("sellerId") Long sellerId,
                          @Param("categoryId") Long categoryId);
 
+    List<AuctionListResponse> findAuctionListByAuctionIds(RowBounds rowBounds,
+                                                          @Param("auctionIds") List<Long> auctionIds,
+                                                          @Param("status") AuctionStatus status);
+
+    int countAuctionListByAuctionIds(@Param("auctionIds") List<Long> auctionIds,
+                                     @Param("status") AuctionStatus status);
+
     int updateAuction(Auction auction);
 
     int cancelAuction(@Param("auctionId") Long auctionId,

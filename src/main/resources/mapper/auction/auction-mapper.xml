@@ -201,6 +201,51 @@
         </if>
     </select>
 
+    <select id="findAuctionListByAuctionIds" parameterType="map" resultMap="auctionListResultMap">
+        SELECT
+            a.id AS auction_id,
+            ai.id AS item_id,
+            ai.brand,
+            ai.name,
+            a.status,
+            a.type,
+            a.start_price,
+            a.buy_now_price,
+            a.bid_count,
+            a.wish_count,
+            a.end_date,
+            ii.image_url AS representative_image_url,
+            a.created_at
+        FROM auction a
+        INNER JOIN auction_item ai ON a.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id
+            AND ii.display_order = (
+                SELECT MIN(ii2.display_order)
+                FROM item_image ii2
+                WHERE ii2.item_id = ai.id
+            )
+        WHERE a.id IN
+        <foreach collection="auctionIds" item="auctionId" open="(" separator="," close=")">
+            #{auctionId}
+        </foreach>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        ORDER BY a.created_at DESC
+    </select>
+
+    <select id="countAuctionListByAuctionIds" parameterType="map" resultType="_int">
+        SELECT COUNT(*)
+        FROM auction a
+        WHERE a.id IN
+        <foreach collection="auctionIds" item="auctionId" open="(" separator="," close=")">
+            #{auctionId}
+        </foreach>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+    </select>
+
     <select id="findById" parameterType="long" resultType="com.biddingmate.biddinggo.auction.model.Auction">
         SELECT id,
                item_id AS itemId,
