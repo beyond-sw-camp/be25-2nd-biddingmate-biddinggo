@@ -48,7 +48,7 @@ public class ReviewServiceImpl implements ReviewService {
         // 낙찰 정보 조회
         var deal = winnerDealMapper.findByAuctionId(auctionId);
         if (deal == null) {
-            throw new CustomException(ErrorType.DEAL_NOT_FOUND);
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
         }
 
         // 중복 리뷰 방지

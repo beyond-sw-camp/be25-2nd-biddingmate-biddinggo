@@ -171,4 +171,36 @@
         <include refid="winnerDealHistoryStatusFilter"/>
     </select>
 
+    <select id="findWinnerDealDetail" resultType="WinnerDealDetailQueryResult">
+        SELECT wd.id AS winnerDealId,
+               wd.auction_id AS auctionId,
+               ai.id AS itemId,
+               wd.winner_id AS winnerId,
+               wd.seller_id AS sellerId,
+               ai.name AS itemName,
+               ii.url AS itemImageUrl,
+               wd.winner_price AS winnerPrice,
+               wd.status AS status,
+               wd.delivery_status AS deliveryStatus,
+               seller.nickname AS sellerName,
+               winner.nickname AS winnerName,
+               wd.recipient AS recipient,
+               wd.tel AS tel,
+               wd.zipcode AS zipcode,
+               wd.address AS address,
+               wd.detail_address AS detailAddress,
+               wd.carrier AS carrier,
+               wd.tracking_number AS trackingNumber,
+               wd.confirmed_at AS confirmedAt,
+               wd.created_at AS createdAt
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id AND ii.display_order = 1
+        JOIN member seller ON seller.id = wd.seller_id
+        JOIN member winner ON winner.id = wd.winner_id
+        WHERE wd.id = #{winnerDealId}
+        LIMIT 1
+    </select>
+
 </mapper>

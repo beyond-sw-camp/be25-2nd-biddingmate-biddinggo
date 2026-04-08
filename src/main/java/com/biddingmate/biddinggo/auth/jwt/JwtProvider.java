@@ -135,6 +135,7 @@ public class JwtProvider {
                 .accessToken(accessToken)
                 .type("Bearer")
                 .username(username)
+                .status(status)
                 .authorities(authorities)
                 .issuedAt(jwtUtil.getIssuedAt(accessToken))
                 .expiredAt(jwtUtil.getExpiredAt(accessToken))

@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.winnerdeal.service;
 
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
@@ -17,4 +18,7 @@ public interface WinnerDealQueryService {
 
     // 판매내역 조회
     PageResponse<WinnerDealHistoryResponse> findSaleHistory(@Valid WinnerDealHistoryRequest request, Long memberId);
+
+    // 거래 내역 상세조회
+    WinnerDealDetailResponse findWinnerDealDetail(Long winnerDealId, Long memberId);
 }
