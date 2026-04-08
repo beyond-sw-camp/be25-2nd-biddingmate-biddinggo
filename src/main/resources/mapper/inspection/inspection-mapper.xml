@@ -10,6 +10,7 @@
         <result property="name" column="name"/>
         <result property="quality" column="quality"/>
         <result property="inspectionStatus" column="inspection_status"/>
+        <result property="auctionItemStatus" column="auction_item_status"/>
         <result property="representativeImageUrl" column="representative_image_url"/>
         <result property="carrier" column="carrier"/>
         <result property="trackingNumber" column="tracking_number"/>
@@ -75,6 +76,7 @@
             ai.name,
             ai.quality,
             ai.inspection_status,
+            ai.status AS auction_item_status,
             ii.url AS representative_image_url,
             i.carrier,
             i.tracking_number,

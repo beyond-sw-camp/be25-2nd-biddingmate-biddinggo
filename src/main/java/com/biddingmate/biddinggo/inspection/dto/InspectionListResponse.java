@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.inspection.dto;
 
+import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,9 @@ public class InspectionListResponse {
 
     @Schema(description = "검수 상태", example = "PENDING")
     private ItemInspectionStatus inspectionStatus;
+
+    @Schema(description = "경매 상품 상태", example = "PENDING")
+    private AuctionItemStatus auctionItemStatus;
 
     @Schema(description = "대표 이미지 URL", nullable = true)
     private String representativeImageUrl;
