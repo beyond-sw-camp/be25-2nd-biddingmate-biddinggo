@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
@@ -67,5 +68,14 @@ public class WinnerDealController {
         winnerDealService.registerShippingAddress(winnerDealId, member.getId(), request);
 
         return ApiResponse.of(HttpStatus.OK, null, "낙찰 거래 배송지 정보 등록에 성공했습니다.", null);
+    }
+    @PatchMapping("/{winnerDealId}/tracking-number")
+    @Operation(summary = "낙찰 거래 운송장 등록", description = "판매자가 낙찰 거래에 운송장 정보를 등록합니다.")
+    public ResponseEntity<ApiResponse<Void>> registerTrackingNumber(@Parameter(description = "낙찰 거래 ID", example = "1") @PathVariable Long winnerDealId,
+                                                                    @Valid @RequestBody WinnerDealTrackingNumberRequest request,
+                                                                    @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
+        winnerDealService.registerTrackingNumber(winnerDealId, member.getId(), request);
+
+        return ApiResponse.of(HttpStatus.OK, null, "낙찰 거래 운송장 정보 등록에 성공했습니다.", null);
     }
 }

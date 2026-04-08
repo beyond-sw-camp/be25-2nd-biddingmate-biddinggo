@@ -15,6 +15,7 @@ import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
+import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
 import lombok.RequiredArgsConstructor;
@@ -166,6 +167,33 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         int updatedRows = winnerDealMapper.updateShippingAddress(winnerDealId, request);
         if (updatedRows != 1) {
             throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_SAVE_FAILED);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void registerTrackingNumber(Long winnerDealId, Long memberId, WinnerDealTrackingNumberRequest request) {
+        WinnerDeal winnerDeal = winnerDealMapper.findById(winnerDealId);
+
+        if (winnerDeal == null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        // 판매자가 아닌 경우
+        if (!winnerDeal.getSellerId().equals(memberId)) {
+            throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_ACCESS_DENIED);
+        }
+
+        // 운송장 등록은 PAID 상태에서 배송지 정보가 있고 아직 운송장 정보가 없을 때만 허용한다.
+        if (!"PAID".equals(winnerDeal.getStatus())
+                || !isShippingInfoRegistered(winnerDeal)
+                || isTrackingNumberRegistered(winnerDeal)) {
+            throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);
+        }
+
+        int updatedRows = winnerDealMapper.updateTrackingNumber(winnerDealId, request);
+        if (updatedRows != 1) {
+            throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_SAVE_FAILED);
         }
     }
 
