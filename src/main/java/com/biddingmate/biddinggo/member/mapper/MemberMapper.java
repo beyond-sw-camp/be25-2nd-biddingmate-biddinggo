@@ -10,6 +10,7 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
@@ -93,4 +94,6 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     void updateMemberStatus(@Param("memberId") Long memberId,
                             @Param("status") MemberStatus status);
+
+    MemberSellerProfileResponse findSellerStats(@Param("memberId") Long memberId);
 }

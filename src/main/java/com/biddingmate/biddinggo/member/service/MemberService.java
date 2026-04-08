@@ -9,6 +9,7 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.UpdateMemberStatusRequest;
 import jakarta.validation.Valid;
@@ -34,4 +35,5 @@ public interface MemberService {
 
     PageResponse<MemberListView> findAllMemberWithFilter(@Valid MemberListViewRequest request);
     void updateMemberStatus(Long memberId, @Valid UpdateMemberStatusRequest request);
+    MemberSellerProfileResponse getSellerProfile(Long sellerId);
 }

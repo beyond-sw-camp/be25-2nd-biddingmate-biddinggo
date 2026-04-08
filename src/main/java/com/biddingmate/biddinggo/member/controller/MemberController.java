@@ -8,6 +8,7 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.service.MemberService;
@@ -19,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -86,5 +88,12 @@ public class MemberController {
                 memberService.getMySellingItems(member.getId(), status, pageRequest);
 
         return ApiResponse.of(HttpStatus.OK, null, "판매 중인 상품 조회 성공", result);
+    }
+    @GetMapping("/{sellerId}")
+    public ResponseEntity<ApiResponse<MemberSellerProfileResponse>> getSellerProfile(
+            @PathVariable Long sellerId
+    ) {
+        MemberSellerProfileResponse result = memberService.getSellerProfile(sellerId);
+        return ApiResponse.of(HttpStatus.OK, null, "판매자 정보 조회 성공", result);
     }
 }

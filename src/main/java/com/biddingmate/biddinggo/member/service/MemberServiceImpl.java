@@ -12,6 +12,7 @@ import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.dto.UpdateMemberStatusRequest;
@@ -295,5 +296,20 @@ public class MemberServiceImpl implements MemberService {
         }
 
         return member;
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public MemberSellerProfileResponse getSellerProfile(Long sellerId) {
+
+        getMember(sellerId);
+
+        MemberSellerProfileResponse stats = memberMapper.findSellerStats(sellerId);
+
+        // 결과값이 없을 경우 예외 처리
+        if (stats == null) {
+            throw new CustomException(ErrorType.MEMBER_NOT_FOUND);
+        }
+
+        return stats;
     }
 }
