@@ -1,6 +1,6 @@
 package com.biddingmate.biddinggo.wishlist.service;
 
-import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
@@ -21,6 +21,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class WishlistServiceImpl implements WishlistService {
+    private static final String DEFAULT_SORT_BY = "CREATED_AT";
+    private static final String SORT_BY_WISH_COUNT = "WISH_COUNT";
+
     private final AuctionMapper auctionMapper;
     private final WishlistMapper wishlistMapper;
 
@@ -58,19 +61,37 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    public PageResponse<AuctionDetailResponse> findWishlistAuctionsByMemberId(BasePageRequest request, Long memberId) {
-        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+    public PageResponse<AuctionListResponse> findWishlistAuctionsByMemberId(BasePageRequest request, String sortBy, Long memberId) {
         String order = request.getOrder();
 
         if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
             throw new CustomException(ErrorType.INVALID_SORT_ORDER);
         }
+
+        sortBy = parseSortBy(sortBy);
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String sortOrder = order.toUpperCase();
 
-        List<AuctionDetailResponse> auctions = wishlistMapper.findWishlistAuctionsByMemberId(rowBounds, memberId, sortOrder);
+        List<AuctionListResponse> list = wishlistMapper.findWishlistAuctionsByMemberId(
+                rowBounds, memberId, sortBy, sortOrder
+        );
         int count = wishlistMapper.getCountByMemberId(memberId);
 
-        return PageResponse.of(auctions, request.getPage(), request.getSize(), count);
+        return PageResponse.of(list, request.getPage(), request.getSize(), count);
+    }
+
+    private String parseSortBy(String sortBy) {
+        if (sortBy == null || sortBy.isBlank()) {
+            return DEFAULT_SORT_BY;
+        }
+
+        String normalizedSortBy = sortBy.trim().toUpperCase();
+
+        if (!DEFAULT_SORT_BY.equals(normalizedSortBy) && !SORT_BY_WISH_COUNT.equals(normalizedSortBy)) {
+            throw new CustomException(ErrorType.INVALID_SORT_BY);
+        }
+
+        return normalizedSortBy;
     }
 
     @Override

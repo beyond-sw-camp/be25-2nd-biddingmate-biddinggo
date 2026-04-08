@@ -1,6 +1,6 @@
 package com.biddingmate.biddinggo.wishlist.controller;
 
-import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
@@ -45,11 +45,12 @@ public class WishlistController {
 
     @GetMapping("")
     @Operation(summary = "내 관심 경매 조회", description = "사용자의 관심 경매를 조회합니다.")
-    public ResponseEntity<ApiResponse<PageResponse<AuctionDetailResponse>>> getWishlist(
+    public ResponseEntity<ApiResponse<PageResponse<AuctionListResponse>>> getWishlist(
             BasePageRequest request,
+            @RequestParam(required = false, defaultValue = "CREATED_AT") String sortBy,
             @AuthenticationPrincipal Member member
     ) {
-        PageResponse<AuctionDetailResponse> result = wishlistService.findWishlistAuctionsByMemberId(request, member.getId());
+        PageResponse<AuctionListResponse> result = wishlistService.findWishlistAuctionsByMemberId(request, sortBy, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 조회 성공", result);
     }

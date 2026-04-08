@@ -1,6 +1,6 @@
 package com.biddingmate.biddinggo.wishlist.mapper;
 
-import com.biddingmate.biddinggo.auction.dto.AuctionDetailResponse;
+import com.biddingmate.biddinggo.auction.dto.AuctionListResponse;
 import com.biddingmate.biddinggo.common.inif.IMybatisCRUD;
 import com.biddingmate.biddinggo.wishlist.model.Wishlist;
 import org.apache.ibatis.annotations.Mapper;
@@ -13,9 +13,10 @@ import java.util.List;
 public interface WishlistMapper extends IMybatisCRUD<Wishlist> {
     Long findByMemberIdAndAuctionId(@Param("memberId") Long memberId, @Param("auctionId") Long auctionId);
 
-    List<AuctionDetailResponse> findWishlistAuctionsByMemberId (RowBounds rowBounds,
-                                                                @Param("memberId") Long memberId,
-                                                                @Param("order") String sortOrder);
+    List<AuctionListResponse> findWishlistAuctionsByMemberId (RowBounds rowBounds,
+                                                              @Param("memberId") Long memberId,
+                                                              @Param("sortBy") String sortBy,
+                                                              @Param("order") String order);
 
     int getCountByMemberId(@Param("memberId") Long memberId);
 
