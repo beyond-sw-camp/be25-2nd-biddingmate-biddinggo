@@ -46,9 +46,12 @@
     <update id="updateAnswer" parameterType="AuctionInquiry">
         UPDATE auction_inquiry
         SET answer      = #{answer},
-            answerer_id = #{answererId}, answered_at = #{answeredAt},
-            status      = #{status}      WHERE id = #{id}
-                                           AND status = 'PENDING'         </update>
+            answerer_id = #{answererId},
+            answered_at = #{answeredAt},
+            status      = #{status}
+        WHERE id = #{id}
+          AND status = 'PENDING'
+    </update>
 
     <select id="selectInquiryList" resultType="AuctionInquiryView">
         SELECT
@@ -73,7 +76,6 @@
         FROM auction_inquiry
         WHERE auction_id = #{auctionId}
     </select>
-<<<<<<< feat/member-inquiry-history-c
 
     <select id="findMyAuctionInquiries" resultType="MemberAuctionInquiryResponse">
         SELECT
@@ -154,6 +156,4 @@
         </where>
     </select>
 </mapper>
-=======
-</mapper>
->>>>>>> dev
+
