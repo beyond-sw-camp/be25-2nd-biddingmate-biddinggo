@@ -50,7 +50,7 @@ public class WishlistController {
             @RequestParam(required = false, defaultValue = "CREATED_AT") String sortBy,
             @AuthenticationPrincipal Member member
     ) {
-        PageResponse<AuctionListResponse> result = wishlistService.findWishlistAuctionsByMemberId(request, sortBy, member.getId());
+        PageResponse<AuctionListResponse> result = wishlistService.getWishlistAuctionsByMemberId(request, sortBy, member.getId());
 
         return ApiResponse.of(HttpStatus.OK, null, "관심 경매 조회 성공", result);
     }

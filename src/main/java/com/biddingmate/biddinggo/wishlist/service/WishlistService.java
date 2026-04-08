@@ -9,7 +9,7 @@ import com.biddingmate.biddinggo.wishlist.dto.CreateWishlistResponse;
 public interface WishlistService {
     CreateWishlistResponse createWishlist(CreateWishlistRequest request, Long memberId);
 
-    PageResponse<AuctionListResponse> findWishlistAuctionsByMemberId(BasePageRequest request, String sortBy, Long memberI);
+    PageResponse<AuctionListResponse> getWishlistAuctionsByMemberId(BasePageRequest request, String sortBy, Long memberI);
 
     boolean existsWishlist(Long auctionId, Long memberId);
 

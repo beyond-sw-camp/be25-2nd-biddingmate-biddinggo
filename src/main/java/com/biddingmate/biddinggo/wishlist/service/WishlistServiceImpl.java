@@ -23,6 +23,8 @@ import java.util.List;
 public class WishlistServiceImpl implements WishlistService {
     private static final String DEFAULT_SORT_BY = "CREATED_AT";
     private static final String SORT_BY_WISH_COUNT = "WISH_COUNT";
+    private static final String SORT_BY_POPULARITY = "POPULARITY";
+    private static final String SORT_BY_PRICE = "PRICE";
 
     private final AuctionMapper auctionMapper;
     private final WishlistMapper wishlistMapper;
@@ -61,9 +63,8 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    public PageResponse<AuctionListResponse> findWishlistAuctionsByMemberId(BasePageRequest request, String sortBy, Long memberId) {
+    public PageResponse<AuctionListResponse> getWishlistAuctionsByMemberId(BasePageRequest request, String sortBy, Long memberId) {
         String order = request.getOrder();
-
         if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
             throw new CustomException(ErrorType.INVALID_SORT_ORDER);
         }
@@ -87,7 +88,10 @@ public class WishlistServiceImpl implements WishlistService {
 
         String normalizedSortBy = sortBy.trim().toUpperCase();
 
-        if (!DEFAULT_SORT_BY.equals(normalizedSortBy) && !SORT_BY_WISH_COUNT.equals(normalizedSortBy)) {
+        if (!DEFAULT_SORT_BY.equals(normalizedSortBy)
+                && !SORT_BY_WISH_COUNT.equals(normalizedSortBy)
+                && !SORT_BY_POPULARITY.equals(normalizedSortBy)
+                && !SORT_BY_PRICE.equals(normalizedSortBy)) {
             throw new CustomException(ErrorType.INVALID_SORT_BY);
         }
 
