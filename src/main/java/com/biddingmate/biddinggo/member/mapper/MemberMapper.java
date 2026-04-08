@@ -93,4 +93,13 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     void updateMemberStatus(@Param("memberId") Long memberId,
                             @Param("status") MemberStatus status);
+
+    // 판매중인 경매 존재 여부
+    boolean existsOngoingSales(@Param("memberId") Long memberId);
+
+    // 입출중인 경매 존재 여부
+    boolean existsOngoingBids(@Param("memberId") Long memberId);
+
+    // 거래 미완료 존재 여부
+    boolean existsIncompleteDeals(@Param("memberId") Long memberId);
 }

@@ -128,9 +128,10 @@ public enum ErrorType {
     WISHLIST_DELETE_FAIL("wishlist-004", "관심 경매 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 낙찰
-    DEAL_NOT_FOUND("review-007", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     WINNER_DEAL_ALREADY_CANCELLED("winner-deal-001", "이미 취소된 낙찰 거래입니다.", HttpStatus.CONFLICT),
     WINNER_DEAL_UPDATE_FAILED("winner-deal-002", "낙찰 거래 상태 변경에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    WINNER_DEAL_NOT_FOUND("winner-deal-003", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    WINNER_DEAL_ACCESS_DENIED("winner-deal-004", "본인의 낙찰 거래만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
 
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -148,7 +149,12 @@ public enum ErrorType {
     NOTICE_CREATE_FAIL("notice-002", "공지사항 등록을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOTICE_UPDATE_FAIL("notice-003", "공지사항 수정을 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOTICE_DELETE_FAIL("notice-004", "공지사항 삭제를 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_NOTICE_REQUEST("notice-005", "제목 또는 내용의 형식 오류입니다.", HttpStatus.BAD_REQUEST);
+    INVALID_NOTICE_REQUEST("notice-005", "제목 또는 내용의 형식 오류입니다.", HttpStatus.BAD_REQUEST),
+
+    // 회원 탈퇴
+    CANNOT_DELETE_MEMBER_WITH_ONGOING_SALES("account-001","판매 중인 경매가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
+    CANNOT_DELETE_MEMBER_WITH_ONGOING_BIDS("account-002","입찰 중인 경매가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
+    CANNOT_DELETE_MEMBER_WITH_INCOMPLETE_DEALS("account-003","진행 중인 거래가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT);
 
     private final String errorCode;
     private final String message;
