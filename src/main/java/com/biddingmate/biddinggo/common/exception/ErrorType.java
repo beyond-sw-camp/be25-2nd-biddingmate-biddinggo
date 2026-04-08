@@ -138,6 +138,10 @@ public enum ErrorType {
     WINNER_DEAL_TRACKING_NUMBER_ACCESS_DENIED("winner-deal-008", "낙찰 거래의 판매자만 운송장 정보를 등록할 수 있습니다.", HttpStatus.FORBIDDEN),
     WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED("winner-deal-009", "현재 상태의 낙찰 거래에는 운송장 정보를 등록할 수 없습니다.", HttpStatus.CONFLICT),
     WINNER_DEAL_TRACKING_NUMBER_SAVE_FAILED("winner-deal-010", "낙찰 거래 운송장 정보 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    WINNER_DEAL_CONFIRM_ACCESS_DENIED("winner-deal-011", "낙찰 거래의 구매자만 구매확정을 할 수 있습니다.", HttpStatus.FORBIDDEN),
+    WINNER_DEAL_CONFIRM_NOT_ALLOWED("winner-deal-012", "현재 상태의 낙찰 거래는 구매확정을 할 수 없습니다.", HttpStatus.CONFLICT),
+    WINNER_DEAL_CONFIRM_FAILED("winner-deal-013", "낙찰 거래 구매확정 처리에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    WINNER_DEAL_SETTLEMENT_INVALID("winner-deal-014", "낙찰 거래 정산 정보가 올바르지 않습니다.", HttpStatus.CONFLICT),
 
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

@@ -46,4 +46,7 @@ public interface WinnerDealMapper {
 
     int updateTrackingNumber(@Param("winnerDealId") Long winnerDealId,
                              @Param("request") WinnerDealTrackingNumberRequest request);
+
+    int confirmPurchase(@Param("winnerDealId") Long winnerDealId,
+                        @Param("confirmedAt") java.time.LocalDateTime confirmedAt);
 }

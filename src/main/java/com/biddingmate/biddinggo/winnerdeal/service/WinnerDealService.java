@@ -12,4 +12,6 @@ public interface WinnerDealService {
     void registerShippingAddress(Long winnerDealId, Long memberId, WinnerDealShippingAddressRequest request);
     // 판매자 운송장 번호 등록
     void registerTrackingNumber(Long winnerDealId, Long memberId, WinnerDealTrackingNumberRequest request);
+    // 구매자 구매확정
+    void confirmPurchase(Long winnerDealId, Long memberId);
 }

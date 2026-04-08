@@ -244,4 +244,11 @@
         WHERE id = #{winnerDealId}
     </update>
 
+    <update id="confirmPurchase">
+        UPDATE winner_deal
+        SET status = 'CONFIRMED',
+            confirmed_at = #{confirmedAt}
+        WHERE id = #{winnerDealId}
+    </update>
+
 </mapper>

@@ -78,4 +78,12 @@ public class WinnerDealController {
 
         return ApiResponse.of(HttpStatus.OK, null, "낙찰 거래 운송장 정보 등록에 성공했습니다.", null);
     }
+    @PatchMapping("/{winnerDealId}/confirm")
+    @Operation(summary = "낙찰 거래 구매확정", description = "구매자가 낙찰 거래를 구매확정 처리합니다.")
+    public ResponseEntity<ApiResponse<Void>> confirmPurchase(@Parameter(description = "낙찰 거래 ID", example = "1") @PathVariable Long winnerDealId,
+                                                             @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
+        winnerDealService.confirmPurchase(winnerDealId, member.getId());
+
+        return ApiResponse.of(HttpStatus.OK, null, "낙찰 거래 구매확정에 성공했습니다.", null);
+    }
 }
