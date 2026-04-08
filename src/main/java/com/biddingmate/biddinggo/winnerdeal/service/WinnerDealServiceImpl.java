@@ -10,13 +10,11 @@ import com.biddingmate.biddinggo.bid.mapper.BidMapper;
 import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
-import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
-import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
-import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
+import com.biddingmate.biddinggo.winnerdeal.dto.RegisterWinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
 import lombok.RequiredArgsConstructor;
@@ -144,13 +142,31 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         log.info("낙찰 후 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
     }
 
-    private boolean isShippingInfoRegistered(WinnerDeal winnerDeal) {
-        // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
-        return StringUtils.hasText(winnerDeal.getRecipient())
-                && StringUtils.hasText(winnerDeal.getTel())
-                && StringUtils.hasText(winnerDeal.getZipcode())
-                && StringUtils.hasText(winnerDeal.getAddress())
-                && StringUtils.hasText(winnerDeal.getDetailAddress());
+    @Override
+    @Transactional
+    public void registerShippingAddress(Long winnerDealId, Long memberId, RegisterWinnerDealShippingAddressRequest request) {
+        WinnerDeal winnerDeal = winnerDealMapper.findById(winnerDealId);
+
+        if (winnerDeal == null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        // 구매자가 아닌 경우
+        if (!winnerDeal.getWinnerId().equals(memberId)) {
+            throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_ACCESS_DENIED);
+        }
+
+        // 배송지 또는 송장 정보가 이미 있거나 PAID 상태가 아닌 경우
+        if (!"PAID".equals(winnerDeal.getStatus())
+                || StringUtils.hasText(winnerDeal.getTrackingNumber())
+                || isShippingInfoRegistered(winnerDeal)) {
+            throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_REGISTRATION_NOT_ALLOWED);
+        }
+
+        int updatedRows = winnerDealMapper.updateShippingAddress(winnerDealId, request);
+        if (updatedRows != 1) {
+            throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_SAVE_FAILED);
+        }
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {
@@ -183,5 +199,13 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                 .winnerPrice(winnerPrice)
                 .completedAt(LocalDateTime.now())
                 .build());
+    }
+
+    private boolean isShippingInfoRegistered(WinnerDeal winnerDeal) {
+        // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
+        return StringUtils.hasText(winnerDeal.getRecipient())
+                && StringUtils.hasText(winnerDeal.getTel())
+                && StringUtils.hasText(winnerDeal.getZipcode())
+                && StringUtils.hasText(winnerDeal.getAddress());
     }
 }

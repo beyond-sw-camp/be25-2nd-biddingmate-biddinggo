@@ -132,6 +132,9 @@ public enum ErrorType {
     WINNER_DEAL_UPDATE_FAILED("winner-deal-002", "낙찰 거래 상태 변경에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     WINNER_DEAL_NOT_FOUND("winner-deal-003", "해당 경매에 대한 낙찰 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     WINNER_DEAL_ACCESS_DENIED("winner-deal-004", "본인의 낙찰 거래만 조회할 수 있습니다.", HttpStatus.FORBIDDEN),
+    WINNER_DEAL_SHIPPING_ADDRESS_ACCESS_DENIED("winner-deal-005", "낙찰 거래의 구매자만 배송지 정보를 등록할 수 있습니다.", HttpStatus.FORBIDDEN),
+    WINNER_DEAL_SHIPPING_ADDRESS_REGISTRATION_NOT_ALLOWED("winner-deal-006", "현재 상태의 낙찰 거래에는 배송지 정보를 등록할 수 없습니다.", HttpStatus.CONFLICT),
+    WINNER_DEAL_SHIPPING_ADDRESS_SAVE_FAILED("winner-deal-007", "낙찰 거래 배송지 정보 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

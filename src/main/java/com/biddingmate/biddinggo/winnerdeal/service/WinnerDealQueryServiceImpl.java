@@ -133,8 +133,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
         return StringUtils.hasText(detail.getRecipient())
                 && StringUtils.hasText(detail.getTel())
                 && StringUtils.hasText(detail.getZipcode())
-                && StringUtils.hasText(detail.getAddress())
-                && StringUtils.hasText(detail.getDetailAddress());
+                && StringUtils.hasText(detail.getAddress());
     }
 
     private boolean isTrackingNumberRegistered(WinnerDealDetailQueryResult detail) {
