@@ -16,7 +16,6 @@ import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
-import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailQueryResult;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
@@ -208,16 +207,20 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     @Override
     @Transactional
     public void registerTrackingNumberByAdmin(Long winnerDealId, WinnerDealTrackingNumberRequest request) {
-        AdminWinnerDealDetailQueryResult detail = winnerDealMapper.findAdminWinnerDealDetail(winnerDealId);
-
-        if (detail == null) {
+        WinnerDeal winnerDeal = winnerDealMapper.findById(winnerDealId);
+        if (winnerDeal == null) {
             throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
         }
 
-        if (detail.getAuctionType() != AuctionType.INSPECTION
-                || detail.getStatus() != WinnerDealStatus.PAID
-                || !isShippingInfoRegistered(detail)
-                || isTrackingNumberRegistered(detail)) {
+        Auction auction = auctionMapper.findById(winnerDeal.getAuctionId());
+        if (auction == null) {
+            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
+        }
+
+        if (auction.getType() != AuctionType.INSPECTION
+                || winnerDeal.getStatus() != WinnerDealStatus.PAID
+                || !isShippingInfoRegistered(winnerDeal)
+                || isTrackingNumberRegistered(winnerDeal)) {
             throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);
         }
 
@@ -310,18 +313,6 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
         return StringUtils.hasText(winnerDeal.getCarrier())
                 && StringUtils.hasText(winnerDeal.getTrackingNumber());
-    }
-
-    private boolean isShippingInfoRegistered(AdminWinnerDealDetailQueryResult detail) {
-        return StringUtils.hasText(detail.getRecipient())
-                && StringUtils.hasText(detail.getTel())
-                && StringUtils.hasText(detail.getZipcode())
-                && StringUtils.hasText(detail.getAddress());
-    }
-
-    private boolean isTrackingNumberRegistered(AdminWinnerDealDetailQueryResult detail) {
-        return StringUtils.hasText(detail.getCarrier())
-                && StringUtils.hasText(detail.getTrackingNumber());
     }
 
     private String generateDealNumber() {
