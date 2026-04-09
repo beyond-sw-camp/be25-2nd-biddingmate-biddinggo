@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class NotificationResponse {
     @Schema(description = "조회된 알림")
     private Long id;
-    private Long receiverId;
     private NotificationType type;
     private String content;
     private String url;

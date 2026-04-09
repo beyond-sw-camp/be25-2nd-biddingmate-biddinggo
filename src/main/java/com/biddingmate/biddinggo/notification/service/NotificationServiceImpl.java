@@ -23,6 +23,7 @@ import java.util.Map;
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationMapper notificationMapper;
     private final MemberMapper memberMapper;
+    private final NotificationSseService notificationSseService;
 
     @Override
     public CreateNotificationResponse createNotification(CreateNotificationRequest request) {
@@ -45,6 +46,16 @@ public class NotificationServiceImpl implements NotificationService {
         if(result != 1 || notification.getId() == null){
             throw new CustomException(ErrorType.NOTIFICATOIN_SAVE_FAILED);
         }
+
+        NotificationResponse response = NotificationResponse.builder()
+                .id(notification.getId())
+                .type(notification.getType())
+                .content(notification.getContent())
+                .url(notification.getUrl())
+                .readAt(notification.getReadAt())
+                .createdAt(notification.getCreatedAt())
+                .build();
+        notificationSseService.send(notification.getReceiverId(), response);
 
         return CreateNotificationResponse.builder()
                 .id(notification.getId())
