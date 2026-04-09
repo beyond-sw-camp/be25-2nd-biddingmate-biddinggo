@@ -118,16 +118,32 @@
             m.name AS name,
             m.nickname AS nickname,
             m.email AS email,
-
+            m.grade AS grade,
             a.zipcode AS zipcode,
             a.address AS address,
             a.detail_address AS detailAddress,
 
             m.bank_code AS bankCode,
-            m.bank_account AS bankAccount
+            m.bank_account AS bankAccount,
+
+            m.created_at AS createdAt,
+
+            COALESCE(r.reviewCount, 0) AS reviewCount,
+            COALESCE(r.ratingAvg, 0) AS ratingAvg
 
         FROM member m
                  LEFT JOIN address a ON m.id = a.member_id
+            AND a.default_yn = 1
+
+                 LEFT JOIN (
+            SELECT
+                target_id,
+                COUNT(*) AS reviewCount,
+                AVG(rating) AS ratingAvg
+            FROM review
+            GROUP BY target_id
+        ) r ON m.id = r.target_id
+
         WHERE m.id = #{memberId}
     </select>
 
