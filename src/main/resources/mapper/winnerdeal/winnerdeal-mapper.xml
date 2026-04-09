@@ -270,7 +270,7 @@
         JOIN member seller ON seller.id = wd.seller_id
         JOIN member winner ON winner.id = wd.winner_id
         <include refid="adminWinnerDealHistoryFilter"/>
-        ORDER BY wd.created_at ${order}, wd.id DESC
+        ORDER BY wd.created_at DESC, wd.id DESC
     </select>
 
     <select id="countAdminWinnerDealHistory" resultType="long">
