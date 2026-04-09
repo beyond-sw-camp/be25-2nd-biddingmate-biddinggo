@@ -4,6 +4,8 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.review.mapper.ReviewMapper;
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListRequest;
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailQueryResult;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
@@ -111,6 +113,25 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
                 .confirmedAt(detail.getConfirmedAt())
                 .createdAt(detail.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<AdminWinnerDealListResponse> findAdminWinnerDealHistory(AdminWinnerDealListRequest request) {
+        String order = request.getOrder();
+        if (!"ASC".equalsIgnoreCase(order) && !"DESC".equalsIgnoreCase(order)) {
+            throw new CustomException(ErrorType.INVALID_SORT_ORDER);
+        }
+
+        RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
+        String sortOrder = order.toUpperCase();
+
+        List<AdminWinnerDealListResponse> content =
+                winnerDealMapper.findAdminWinnerDealHistory(rowBounds, request, sortOrder);
+
+        long totalElements = winnerDealMapper.countAdminWinnerDealHistory(request);
+
+        return PageResponse.of(content, request.getPage(), request.getSize(), totalElements);
     }
 
     private WinnerDealStatus resolveStatus(WinnerDealDetailQueryResult detail) {
