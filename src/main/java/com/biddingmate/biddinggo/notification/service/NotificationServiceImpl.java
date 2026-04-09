@@ -64,6 +64,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public PageResponse<NotificationResponse> getNotificationsByMemberId(BasePageRequest request, Long receiverId) {
+
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
 
@@ -87,5 +88,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void markAsRead(Long id, Long receiverId) {
         notificationMapper.updateReadAtById(id, receiverId);
+    }
+
+    @Override
+    public int countUnread(Long memberId) {
+
+        return notificationMapper.countUnreadByReceiverId(memberId);
     }
 }

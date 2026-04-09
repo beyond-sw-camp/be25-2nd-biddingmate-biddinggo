@@ -37,6 +37,13 @@
         WHERE receiver_id = #{receiverId}
     </select>
 
+    <select id="countUnreadByReceiverId" resultType="_int">
+        SELECT COUNT(*)
+        FROM notification
+        WHERE receiver_id = #{receiverId}
+          AND read_at IS NULL
+    </select>
+
     <update id="updateReadAtByMemberId">
         UPDATE notification
         SET read_at = NOW()
