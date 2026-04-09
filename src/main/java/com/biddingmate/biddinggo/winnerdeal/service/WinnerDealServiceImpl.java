@@ -7,7 +7,9 @@ import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.prediction.event.AuctionPriceReferenceSyncRequestedEvent;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
+import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.bid.service.BidQueryService;
+import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
@@ -35,6 +37,7 @@ import java.util.List;
 public class WinnerDealServiceImpl implements WinnerDealService {
     private final AuctionMapper auctionMapper;
     private final BidMapper bidMapper;
+    private final BidService bidService;
     private final BidQueryService bidQueryService;
     private final WinnerDealMapper winnerDealMapper;
     private final WinnerDealQueryService winnerDealQueryService;
@@ -195,6 +198,46 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         if (updatedRows != 1) {
             throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_SAVE_FAILED);
         }
+    }
+
+    @Override
+    @Transactional
+    public void confirmPurchase(Long winnerDealId, Long memberId) {
+        WinnerDeal winnerDeal = winnerDealMapper.findById(winnerDealId);
+
+        if (winnerDeal == null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        if (!winnerDeal.getWinnerId().equals(memberId)) {
+            throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_ACCESS_DENIED);
+        }
+
+        // 구매확정은 구매자 본인의 배송완료 거래에 대해서만 1회 허용한다.
+        if (!"PAID".equals(winnerDeal.getStatus())
+                || !"DELIVERED".equals(winnerDeal.getDeliveryStatus())
+                || winnerDeal.getConfirmedAt() != null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_NOT_ALLOWED);
+        }
+
+        int updatedRows = winnerDealMapper.confirmPurchase(winnerDealId, LocalDateTime.now());
+        if (updatedRows != 1) {
+            throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_FAILED);
+        }
+
+        Long lastBidAmount = bidService.getLastBidAmount(memberId, winnerDeal.getAuctionId());
+        if (lastBidAmount == null || lastBidAmount < winnerDeal.getWinnerPrice()) {
+            throw new CustomException(ErrorType.WINNER_DEAL_SETTLEMENT_INVALID);
+        }
+
+        long refundAmount = lastBidAmount - winnerDeal.getWinnerPrice();
+        if (refundAmount < 0) {
+            throw new CustomException(ErrorType.WINNER_DEAL_SETTLEMENT_INVALID);
+        } else if (refundAmount > 0) {
+            pointService.refundBid(memberId, refundAmount);
+        }
+
+        pointService.settleWinnerDeal(winnerDeal.getSellerId(), winnerDeal.getWinnerPrice());
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {
