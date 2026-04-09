@@ -8,6 +8,7 @@
             auction_id,
             winner_id,
             seller_id,
+            deal_number,
             winner_price,
             status,
             delivery_status,
@@ -16,6 +17,7 @@
                      #{auctionId},
                      #{winnerId},
                      #{sellerId},
+                     #{dealNumber},
                      #{winnerPrice},
                      #{status},
                      #{deliveryStatus},
@@ -28,6 +30,7 @@
             auction_id AS auctionId,
             winner_id AS winnerId,
             seller_id AS sellerId,
+            deal_number AS dealNumber,
             winner_price AS winnerPrice,
             status,
             delivery_status AS deliveryStatus,
@@ -50,6 +53,7 @@
             auction_id AS auctionId,
             winner_id AS winnerId,
             seller_id AS sellerId,
+            deal_number AS dealNumber,
             winner_price AS winnerPrice,
             status,
             delivery_status AS deliveryStatus,
@@ -72,6 +76,7 @@
                auction_id AS auctionId,
                winner_id AS winnerId,
                seller_id AS sellerId,
+               deal_number AS dealNumber,
                winner_price AS winnerPrice,
                status,
                delivery_status AS deliveryStatus,
@@ -126,6 +131,7 @@
     <!-- 구매내역 조회 -->
     <select id="findPurchaseHistory" resultType="WinnerDealHistoryResponse">
         SELECT wd.id AS winnerDealId,
+               wd.deal_number AS dealNumber,
                wd.auction_id AS auctionId,
                ai.id AS itemId,
                ai.name AS itemName,
@@ -161,6 +167,7 @@
     <!-- 판매내역 조회 -->
     <select id="findSaleHistory" resultType="WinnerDealHistoryResponse">
         SELECT wd.id AS winnerDealId,
+               wd.deal_number AS dealNumber,
                wd.auction_id AS auctionId,
                ai.id AS itemId,
                ai.name AS itemName,
@@ -193,8 +200,74 @@
         <include refid="winnerDealHistoryStatusFilter"/>
     </select>
 
+    <sql id="adminWinnerDealHistoryFilter">
+        <if test="request.dealNumber != null and request.dealNumber != ''">
+            AND wd.deal_number = #{request.dealNumber}
+        </if>
+        <if test="request.status != null">
+            <choose>
+                <when test="request.status.name() == 'PAID'">
+                    AND wd.status = 'PAID'
+                    AND wd.delivery_status = 'SHIPPED'
+                    AND wd.tracking_number IS NULL
+                </when>
+                <when test="request.status.name() == 'SHIPPED'">
+                    AND wd.status = 'PAID'
+                    AND wd.delivery_status = 'SHIPPED'
+                    AND wd.tracking_number IS NOT NULL
+                </when>
+                <when test="request.status.name() == 'DELIVERED'">
+                    AND wd.status = 'PAID'
+                    AND wd.delivery_status = 'DELIVERED'
+                </when>
+                <when test="request.status.name() == 'CONFIRMED'">
+                    AND wd.status = 'CONFIRMED'
+                </when>
+                <when test="request.status.name() == 'CANCELLED'">
+                    AND wd.status = 'CANCELLED'
+                </when>
+            </choose>
+        </if>
+    </sql>
+
+    <select id="findAdminWinnerDealHistory" resultType="AdminWinnerDealListResponse">
+        SELECT wd.deal_number AS dealNumber,
+               seller.nickname AS sellerName,
+               winner.nickname AS winnerName,
+               ai.name AS itemName,
+               wd.winner_price AS winnerPrice,
+               wd.created_at AS createdAt,
+               CASE
+                   WHEN wd.status = 'CANCELLED' THEN 'CANCELLED'
+                   WHEN wd.status = 'CONFIRMED' THEN 'CONFIRMED'
+                   WHEN wd.delivery_status = 'DELIVERED' THEN 'DELIVERED'
+                   WHEN wd.tracking_number IS NOT NULL THEN 'SHIPPED'
+                   ELSE 'PAID'
+               END AS status
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        JOIN member seller ON seller.id = wd.seller_id
+        JOIN member winner ON winner.id = wd.winner_id
+        WHERE 1 = 1
+        <include refid="adminWinnerDealHistoryFilter"/>
+        ORDER BY wd.created_at ${order}
+    </select>
+
+    <select id="countAdminWinnerDealHistory" resultType="long">
+        SELECT COUNT(*)
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        JOIN member seller ON seller.id = wd.seller_id
+        JOIN member winner ON winner.id = wd.winner_id
+        WHERE 1 = 1
+        <include refid="adminWinnerDealHistoryFilter"/>
+    </select>
+
     <select id="findWinnerDealDetail" resultType="WinnerDealDetailQueryResult">
         SELECT wd.id AS winnerDealId,
+               wd.deal_number AS dealNumber,
                wd.auction_id AS auctionId,
                ai.id AS itemId,
                wd.winner_id AS winnerId,

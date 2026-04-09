@@ -29,12 +29,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class WinnerDealServiceImpl implements WinnerDealService {
+    private static final DateTimeFormatter DEAL_NUMBER_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     private final AuctionMapper auctionMapper;
     private final BidMapper bidMapper;
     private final BidService bidService;
@@ -69,6 +73,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                     .auctionId(auction.getId())
                     .winnerId(winnerBid.getBidderId())
                     .sellerId(auction.getSellerId())
+                    .dealNumber(generateDealNumber())
                     .winnerPrice(finalPrice)
                     .status("PAID")
                     .deliveryStatus("SHIPPED")
@@ -284,5 +289,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
         return StringUtils.hasText(winnerDeal.getCarrier())
                 && StringUtils.hasText(winnerDeal.getTrackingNumber());
+    }
+    private String generateDealNumber() {
+        String datePart = LocalDateTime.now().format(DEAL_NUMBER_DATE_FORMATTER);
+        String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
+        return "WD-" + datePart + "-" + randomPart;
     }
 }

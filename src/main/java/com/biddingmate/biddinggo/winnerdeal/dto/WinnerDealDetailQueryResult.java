@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Getter
 public class WinnerDealDetailQueryResult {
     private Long winnerDealId;
+    private String dealNumber;
     private Long auctionId;
     private Long itemId;
     private Long winnerId;

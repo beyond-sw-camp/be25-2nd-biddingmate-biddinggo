@@ -13,6 +13,7 @@ public class WinnerDeal {
     private Long auctionId;
     private Long winnerId;
     private Long sellerId;
+    private String dealNumber;
     private Long winnerPrice;
     private String status;          // 기본값 'PAID'
     private String deliveryStatus;  // 추가: 기본값 'SHIPPED'

@@ -90,6 +90,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
 
         return WinnerDealDetailResponse.builder()
                 .winnerDealId(detail.getWinnerDealId())
+                .dealNumber(detail.getDealNumber())
                 .auctionId(detail.getAuctionId())
                 .itemId(detail.getItemId())
                 .viewerRole(isBuyer ? "BUYER" : "SELLER")

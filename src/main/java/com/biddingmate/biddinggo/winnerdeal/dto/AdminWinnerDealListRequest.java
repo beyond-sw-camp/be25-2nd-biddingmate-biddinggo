@@ -20,5 +20,5 @@ public class AdminWinnerDealListRequest extends BasePageRequest {
     private WinnerDealStatus status;
 
     @Schema(description = "거래 번호", example = "WD_20260409_A1B2C3", nullable = true)
-    private Long dealNumber;
+    private String dealNumber;
 }

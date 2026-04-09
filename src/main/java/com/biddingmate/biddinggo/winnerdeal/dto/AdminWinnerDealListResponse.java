@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Schema(description = "관리자 거래 내역 조회 응답")
 public class AdminWinnerDealListResponse {
     @Schema(description = "거래 번호", example = "WD_20260409_A1B2C3")
-    private Long dealNumber;
+    private String dealNumber;
 
     @Schema(description = "판매자 닉네임", example = "김셀러")
     private String sellerName;
