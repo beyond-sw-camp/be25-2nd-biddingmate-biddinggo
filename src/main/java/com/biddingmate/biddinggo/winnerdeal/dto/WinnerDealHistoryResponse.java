@@ -15,6 +15,9 @@ public class WinnerDealHistoryResponse {
     @Schema(description = "낙찰 거래 ID", example = "101")
     private Long winnerDealId;
 
+    @Schema(description = "거래 번호", example = "WD_20260409_A1B2C3")
+    private String dealNumber;
+
     @Schema(description = "경매 ID", example = "201")
     private Long auctionId;
 

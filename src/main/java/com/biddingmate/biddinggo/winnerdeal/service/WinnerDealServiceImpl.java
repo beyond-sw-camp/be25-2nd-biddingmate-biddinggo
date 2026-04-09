@@ -7,7 +7,6 @@ import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.prediction.event.AuctionPriceReferenceSyncRequestedEvent;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
-import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
@@ -20,6 +19,7 @@ import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
+import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.RowBounds;
@@ -29,12 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class WinnerDealServiceImpl implements WinnerDealService {
+    private static final DateTimeFormatter DEAL_NUMBER_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final int DEAL_NUMBER_MAX_RETRY_COUNT = 10;
+
     private final AuctionMapper auctionMapper;
     private final BidMapper bidMapper;
     private final BidService bidService;
@@ -69,9 +74,9 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                     .auctionId(auction.getId())
                     .winnerId(winnerBid.getBidderId())
                     .sellerId(auction.getSellerId())
+                    .dealNumber(generateDealNumber())
                     .winnerPrice(finalPrice)
-                    .status("PAID")
-                    .deliveryStatus("SHIPPED")
+                    .status(WinnerDealStatus.PAID)
                     .createdAt(LocalDateTime.now())
                     .build();
 
@@ -125,25 +130,23 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
     }
 
-
     @Override
     @Transactional
     public void handleMemberDeactivationAfterWinning(Long memberId) {
-        log.info("낙찰 후 회원 비활성화 처리 시작 - Member ID: {}", memberId);
+        log.info("낙찰 회원 비활성화 처리 시작 - Member ID: {}", memberId);
 
         List<WinnerDeal> winnerDeals = winnerDealQueryService.findByMemberId(memberId);
 
         for (WinnerDeal winnerDeal : winnerDeals) {
             if (isShippingInfoRegistered(winnerDeal)) {
-                log.info("낙찰 후 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
+                log.info("낙찰 회원 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
                         winnerDeal.getId(), winnerDeal.getAuctionId());
                 return;
             }
-            // 비활성화 시 낙찰 취소 및 낙찰자의 예치금 환불
             refundAndCancelWinnerDeal(winnerDeal);
         }
 
-        log.info("낙찰 후 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
+        log.info("낙찰 회원 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
     }
 
     @Override
@@ -161,7 +164,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         // 배송지 또는 운송장 정보가 이미 있거나 PAID 상태가 아닌 경우
-        if (!"PAID".equals(winnerDeal.getStatus())
+        if (winnerDeal.getStatus() != WinnerDealStatus.PAID
                 || isShippingInfoRegistered(winnerDeal)
                 || isTrackingNumberRegistered(winnerDeal)) {
             throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_REGISTRATION_NOT_ALLOWED);
@@ -188,7 +191,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         // 운송장 등록은 PAID 상태에서 배송지 정보가 있고 아직 운송장 정보가 없을 때만 허용한다.
-        if (!"PAID".equals(winnerDeal.getStatus())
+        if (winnerDeal.getStatus() != WinnerDealStatus.PAID
                 || !isShippingInfoRegistered(winnerDeal)
                 || isTrackingNumberRegistered(winnerDeal)) {
             throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);
@@ -213,9 +216,8 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_ACCESS_DENIED);
         }
 
-        // 구매확정은 구매자 본인의 배송완료 거래에 대해서만 1회 허용한다.
-        if (!"PAID".equals(winnerDeal.getStatus())
-                || !"DELIVERED".equals(winnerDeal.getDeliveryStatus())
+        // 구매확정은 구매자 본인의 배송 중 거래에 대해서만 1회 허용한다.
+        if (winnerDeal.getStatus() != WinnerDealStatus.SHIPPED
                 || winnerDeal.getConfirmedAt() != null) {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_NOT_ALLOWED);
         }
@@ -241,7 +243,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {
-        if ("CANCELLED".equals(winnerDeal.getStatus())) {
+        if (winnerDeal.getStatus() == WinnerDealStatus.CANCELLED) {
             throw new CustomException(ErrorType.WINNER_DEAL_ALREADY_CANCELLED);
         }
 
@@ -285,4 +287,19 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         return StringUtils.hasText(winnerDeal.getCarrier())
                 && StringUtils.hasText(winnerDeal.getTrackingNumber());
     }
+
+    private String generateDealNumber() {
+        for (int attempt = 0; attempt < DEAL_NUMBER_MAX_RETRY_COUNT; attempt++) {
+            String datePart = LocalDateTime.now().format(DEAL_NUMBER_DATE_FORMATTER);
+            String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
+            String dealNumber = "WD-" + datePart + "-" + randomPart;
+
+            if (!winnerDealMapper.existsByDealNumber(dealNumber)) {
+                return dealNumber;
+            }
+        }
+
+        throw new CustomException(ErrorType.WINNER_DEAL_UPDATE_FAILED);
+    }
 }
+

@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.winnerdeal.dto;
 
+import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 public class WinnerDealDetailQueryResult {
     private Long winnerDealId;
+    private String dealNumber;
     private Long auctionId;
     private Long itemId;
     private Long winnerId;
@@ -14,8 +16,7 @@ public class WinnerDealDetailQueryResult {
     private String itemName;
     private String itemImageUrl;
     private Long winnerPrice;
-    private String status;
-    private String deliveryStatus;
+    private WinnerDealStatus status;
     private String sellerName;
     private String winnerName;
     private String recipient;

@@ -1,5 +1,7 @@
 package com.biddingmate.biddinggo.winnerdeal.mapper;
 
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListRequest;
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
@@ -17,6 +19,7 @@ public interface WinnerDealMapper {
     int insert(WinnerDeal winnerDeal);
     WinnerDeal findById(Long id);
     WinnerDeal findByAuctionId(Long auctionId);
+    boolean existsByDealNumber(@Param("dealNumber") String dealNumber);
 
     List<WinnerDeal> findByMemberId(@Param("memberId") Long memberId);
 
@@ -36,6 +39,10 @@ public interface WinnerDealMapper {
                                                     @Param("memberId") Long memberId);
     long countSaleHistory(@Param("request") WinnerDealHistoryRequest request,
                           @Param("memberId") Long memberId);
+    List<AdminWinnerDealListResponse> findAdminWinnerDealHistory(RowBounds rowBounds,
+                                                                 @Param("request") AdminWinnerDealListRequest request,
+                                                                 @Param("order") String order);
+    long countAdminWinnerDealHistory(@Param("request") AdminWinnerDealListRequest request);
 
     // 거래 내역 상세 조회
     WinnerDealDetailQueryResult findWinnerDealDetail(@Param("winnerDealId") Long winnerDealId);
