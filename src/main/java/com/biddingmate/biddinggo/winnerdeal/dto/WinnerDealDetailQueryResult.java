@@ -16,7 +16,6 @@ public class WinnerDealDetailQueryResult {
     private String itemImageUrl;
     private Long winnerPrice;
     private String status;
-    private String deliveryStatus;
     private String sellerName;
     private String winnerName;
     private String recipient;

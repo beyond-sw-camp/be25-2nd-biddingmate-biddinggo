@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @Builder
 @Schema(description = "관리자 거래 내역 조회 응답")
 public class AdminWinnerDealListResponse {
+    @Schema(description = "낙찰 거래 ID", example = "101")
+    private Long winnerDealId;
+
     @Schema(description = "거래 번호", example = "WD_20260409_A1B2C3")
     private String dealNumber;
 

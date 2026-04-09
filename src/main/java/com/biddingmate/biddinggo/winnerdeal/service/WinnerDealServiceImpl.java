@@ -7,7 +7,6 @@ import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.prediction.event.AuctionPriceReferenceSyncRequestedEvent;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
-import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
@@ -76,7 +75,6 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                     .dealNumber(generateDealNumber())
                     .winnerPrice(finalPrice)
                     .status("PAID")
-                    .deliveryStatus("SHIPPED")
                     .createdAt(LocalDateTime.now())
                     .build();
 
@@ -130,25 +128,23 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
     }
 
-
     @Override
     @Transactional
     public void handleMemberDeactivationAfterWinning(Long memberId) {
-        log.info("낙찰 후 회원 비활성화 처리 시작 - Member ID: {}", memberId);
+        log.info("낙찰 회원 비활성화 처리 시작 - Member ID: {}", memberId);
 
         List<WinnerDeal> winnerDeals = winnerDealQueryService.findByMemberId(memberId);
 
         for (WinnerDeal winnerDeal : winnerDeals) {
             if (isShippingInfoRegistered(winnerDeal)) {
-                log.info("낙찰 후 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
+                log.info("낙찰 회원 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
                         winnerDeal.getId(), winnerDeal.getAuctionId());
                 return;
             }
-            // 비활성화 시 낙찰 취소 및 낙찰자의 예치금 환불
             refundAndCancelWinnerDeal(winnerDeal);
         }
 
-        log.info("낙찰 후 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
+        log.info("낙찰 회원 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
     }
 
     @Override
@@ -218,9 +214,8 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_ACCESS_DENIED);
         }
 
-        // 구매확정은 구매자 본인의 배송완료 거래에 대해서만 1회 허용한다.
-        if (!"PAID".equals(winnerDeal.getStatus())
-                || !"DELIVERED".equals(winnerDeal.getDeliveryStatus())
+        // 구매확정은 구매자 본인의 배송 중 거래에 대해서만 1회 허용한다.
+        if (!"SHIPPED".equals(winnerDeal.getStatus())
                 || winnerDeal.getConfirmedAt() != null) {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_NOT_ALLOWED);
         }
@@ -290,9 +285,11 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         return StringUtils.hasText(winnerDeal.getCarrier())
                 && StringUtils.hasText(winnerDeal.getTrackingNumber());
     }
+
     private String generateDealNumber() {
         String datePart = LocalDateTime.now().format(DEAL_NUMBER_DATE_FORMATTER);
         String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
         return "WD-" + datePart + "-" + randomPart;
     }
 }
+

@@ -77,14 +77,11 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
             throw new CustomException(ErrorType.WINNER_DEAL_ACCESS_DENIED);
         }
 
-        WinnerDealStatus status = resolveStatus(detail);
-
+        WinnerDealStatus status = WinnerDealStatus.valueOf(detail.getStatus());
         // 배송지 등록 여부
         boolean shippingAddressRegistered = isShippingAddressRegistered(detail);
-
         // 운송장 등록 여부
         boolean trackingNumberRegistered = isTrackingNumberRegistered(detail);
-
         // 구매자가 해당 낙찰 거래에 리뷰를 이미 작성했는지 확인
         boolean reviewWritten = reviewMapper.countByDealIdAndWriterId(detail.getWinnerDealId(), memberId) > 0;
 
@@ -109,7 +106,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
                 .trackingNumber(detail.getTrackingNumber())
                 .canRegisterShippingAddress(isBuyer && !shippingAddressRegistered && status == WinnerDealStatus.PAID)
                 .canRegisterTrackingNumber(isSeller && shippingAddressRegistered && !trackingNumberRegistered && status == WinnerDealStatus.PAID)
-                .canConfirmPurchase(isBuyer && status == WinnerDealStatus.DELIVERED && detail.getConfirmedAt() == null)
+                .canConfirmPurchase(isBuyer && status == WinnerDealStatus.SHIPPED && detail.getConfirmedAt() == null)
                 .canWriteReview(isBuyer && status == WinnerDealStatus.CONFIRMED && !reviewWritten)
                 .confirmedAt(detail.getConfirmedAt())
                 .createdAt(detail.getCreatedAt())
@@ -133,22 +130,6 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
         long totalElements = winnerDealMapper.countAdminWinnerDealHistory(request);
 
         return PageResponse.of(content, request.getPage(), request.getSize(), totalElements);
-    }
-
-    private WinnerDealStatus resolveStatus(WinnerDealDetailQueryResult detail) {
-        if ("CANCELLED".equals(detail.getStatus())) {
-            return WinnerDealStatus.CANCELLED;
-        }
-        if ("CONFIRMED".equals(detail.getStatus())) {
-            return WinnerDealStatus.CONFIRMED;
-        }
-        if ("DELIVERED".equals(detail.getDeliveryStatus())) {
-            return WinnerDealStatus.DELIVERED;
-        }
-        if (StringUtils.hasText(detail.getTrackingNumber())) {
-            return WinnerDealStatus.SHIPPED;
-        }
-        return WinnerDealStatus.PAID;
     }
 
     private boolean isShippingAddressRegistered(WinnerDealDetailQueryResult detail) {

@@ -1,6 +1,11 @@
 package com.biddingmate.biddinggo.winnerdeal.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,8 +20,7 @@ public class WinnerDeal {
     private Long sellerId;
     private String dealNumber;
     private Long winnerPrice;
-    private String status;          // 기본값 'PAID'
-    private String deliveryStatus;  // 추가: 기본값 'SHIPPED'
+    private String status;
     private LocalDateTime confirmedAt;
     private String zipcode;
     private String address;
