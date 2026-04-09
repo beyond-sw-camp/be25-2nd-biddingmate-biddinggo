@@ -4,5 +4,6 @@ public enum PointHistoryType {
     CHARGE,
     BID,
     EXCHANGE,
-    REFUND
+    REFUND,
+    SETTLEMENT
 }

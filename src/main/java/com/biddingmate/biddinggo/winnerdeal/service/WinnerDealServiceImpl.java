@@ -236,6 +236,8 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         } else if (refundAmount > 0) {
             pointService.refundBid(memberId, refundAmount);
         }
+
+        pointService.settleWinnerDeal(winnerDeal.getSellerId(), winnerDeal.getWinnerPrice());
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {

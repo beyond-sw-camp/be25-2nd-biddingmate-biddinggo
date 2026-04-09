@@ -99,6 +99,24 @@ public class PointServiceImpl implements PointService {
 
     @Override
     @Transactional
+    public void settleWinnerDeal(Long sellerId, Long amount) {
+        memberService.addPoint(sellerId, amount);
+
+        PointHistory pointHistory = PointHistory.builder()
+                .memberId(sellerId)
+                .type(PointHistoryType.SETTLEMENT)
+                .amount(amount)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        int settlement = this.addPointHistory(pointHistory);
+        if (settlement != 1) {
+            throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
+    }
+
+    @Override
+    @Transactional
     public void refundBidsByAuctionIds(List<Long> auctionIds) {
         // 1. 해당 경매들 입찰 전체 조회
         List<RefundDto> refunds = bidQueryService.findByAuctionIds(auctionIds);
