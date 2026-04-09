@@ -1,3 +1,5 @@
 ALTER TABLE point_history
-    MODIFY type VARCHAR(20),
+    DROP CONSTRAINT chk_point_type;
+
+ALTER TABLE point_history
     ADD CONSTRAINT chk_point_type CHECK (`type` IN ('CHARGE', 'BID', 'EXCHANGE', 'REFUND', 'SETTLEMENT'));
