@@ -112,6 +112,29 @@
         </if>
     </sql>
 
+    <!-- 관리자 거래 내역 조회 시 필터링 조각 -->
+    <sql id="adminWinnerDealHistoryFilter">
+        <if test="request.dealNumber != null and request.dealNumber != ''">
+            AND wd.deal_number = #{request.dealNumber}
+        </if>
+        <if test="request.status != null">
+            <choose>
+                <when test="request.status.name() == 'PAID'">
+                    AND wd.status = 'PAID'
+                </when>
+                <when test="request.status.name() == 'SHIPPED'">
+                    AND wd.status = 'SHIPPED'
+                </when>
+                <when test="request.status.name() == 'CONFIRMED'">
+                    AND wd.status = 'CONFIRMED'
+                </when>
+                <when test="request.status.name() == 'CANCELLED'">
+                    AND wd.status = 'CANCELLED'
+                </when>
+            </choose>
+        </if>
+    </sql>
+
     <!-- 구매내역 조회 -->
     <select id="findPurchaseHistory" resultType="WinnerDealHistoryResponse">
         SELECT wd.id AS winnerDealId,
@@ -171,28 +194,6 @@
         WHERE wd.seller_id = #{memberId}
         <include refid="winnerDealHistoryStatusFilter"/>
     </select>
-
-    <sql id="adminWinnerDealHistoryFilter">
-        <if test="request.dealNumber != null and request.dealNumber != ''">
-            AND wd.deal_number = #{request.dealNumber}
-        </if>
-        <if test="request.status != null">
-            <choose>
-                <when test="request.status.name() == 'PAID'">
-                    AND wd.status = 'PAID'
-                </when>
-                <when test="request.status.name() == 'SHIPPED'">
-                    AND wd.status = 'SHIPPED'
-                </when>
-                <when test="request.status.name() == 'CONFIRMED'">
-                    AND wd.status = 'CONFIRMED'
-                </when>
-                <when test="request.status.name() == 'CANCELLED'">
-                    AND wd.status = 'CANCELLED'
-                </when>
-            </choose>
-        </if>
-    </sql>
 
     <select id="findWinnerDealDetail" resultType="WinnerDealDetailQueryResult">
         SELECT wd.id AS winnerDealId,
