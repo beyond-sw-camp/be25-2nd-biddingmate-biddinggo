@@ -44,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
         int result = notificationMapper.insert(notification);
 
         if(result != 1 || notification.getId() == null){
-            throw new CustomException(ErrorType.NOTIFICATOIN_SAVE_FAILED);
+            throw new CustomException(ErrorType.NOTIFICATION_SAVE_FAILED);
         }
 
         NotificationResponse response = NotificationResponse.builder()

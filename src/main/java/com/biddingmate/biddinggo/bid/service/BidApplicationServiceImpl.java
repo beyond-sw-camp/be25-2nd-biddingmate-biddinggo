@@ -11,6 +11,8 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.service.MemberService;
+import com.biddingmate.biddinggo.notification.model.NotificationType;
+import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
 import com.biddingmate.biddinggo.point.model.PointHistory;
 import com.biddingmate.biddinggo.point.model.PointHistoryType;
 import com.biddingmate.biddinggo.point.service.PointService;
@@ -34,11 +36,14 @@ public class BidApplicationServiceImpl implements BidApplicationService {
     private final MemberService memberService;
     private final PointService pointService;
     private final BidService bidService;
+    private final BidQueryService bidQueryService;
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     @Transactional
     public CreateBidResponse createBidProcess(Long memberId, CreateBidRequest request){
         Long auctionId = request.getAuctionId();
+        Long preciousTopBidderId = bidQueryService.findTopBidderId(auctionId);
 
         // 1. 경매 유효성 검증
         Auction auction = auctionMapper.findByIdForUpdate(auctionId);
@@ -112,6 +117,32 @@ public class BidApplicationServiceImpl implements BidApplicationService {
 
         if (pointInsert != 1) {
             throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
+
+        // 입찰 알람
+        notificationPublisher.publishNotification(
+                auction.getSellerId(),
+                NotificationType.NEW_BID,
+                "경매 #" + auctionId + "에 새로운 입찰이 등록되었습니다.",
+                "/auctions/" + auctionId
+        );
+
+        Long currentTopBidderId = bidQueryService.findTopBidderId(auctionId);
+
+        // 알람 분기
+        // 현재 최고입찰자가 존재하고 그 최고 입찰자가 "지금 입찰한 사람이고" 이전에는 그 사람이 최고 입찰자가 아니었을 때
+        // 이번 입찰로 새롭게 1등이 된 경우만 최상위 입찰 알람을 보낸다. (원래 1등이던 사람이 금액만 올린 경우는 중복 알림 방지)
+        if (currentTopBidderId != null && currentTopBidderId.equals(memberId)
+                && (preciousTopBidderId == null || !preciousTopBidderId.equals(memberId))) {
+
+            // 최상위 입찰 알람
+            notificationPublisher.publishNotification(
+                    memberId,
+                    NotificationType.TOP_BID,
+                    "경매 #" + auctionId + "에서 현재 최상위 입찰자가 되었습니다.",
+                    "/auctions/" + auctionId
+            );
+
         }
 
         return CreateBidResponse.builder()
