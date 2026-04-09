@@ -36,4 +36,7 @@ public interface MemberService {
     PageResponse<MemberListView> findAllMemberWithFilter(@Valid MemberListViewRequest request);
     void updateMemberStatus(Long memberId, @Valid UpdateMemberStatusRequest request);
     MemberSellerProfileResponse getSellerProfile(Long sellerId);
+
+    // 사용자 VIP 등급 재산정
+    void recalculateMemberGrade(Long memberId);
 }

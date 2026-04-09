@@ -552,5 +552,20 @@
         )
     </select>
 
+    <!-- 사용자 VIP 등급 재산정을 위한 거래 건수 측정 -->
+    <select id="countConfirmedDealsByMemberId" resultType="long">
+        SELECT COUNT(*)
+        FROM winner_deal
+        WHERE status = 'CONFIRMED'
+          AND (winner_id = #{memberId} OR seller_id = #{memberId})
+    </select>
+
+    <!-- 사용자 VIP 등급 재산정 -->
+    <update id="updateMemberGrade">
+        UPDATE member
+        SET grade = #{grade}
+        WHERE id = #{memberId}
+    </update>
+
 </mapper>
 

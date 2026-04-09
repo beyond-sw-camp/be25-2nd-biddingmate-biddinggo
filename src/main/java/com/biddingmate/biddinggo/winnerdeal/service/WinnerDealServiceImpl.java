@@ -15,6 +15,7 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
+import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.point.service.PointService;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
@@ -48,6 +49,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     private final WinnerDealMapper winnerDealMapper;
     private final WinnerDealQueryService winnerDealQueryService;
     private final AuctionItemMapper auctionItemMapper;
+    private final MemberService memberService;
     private final PointService pointService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -267,6 +269,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         pointService.settleWinnerDeal(winnerDeal.getSellerId(), winnerDeal.getWinnerPrice());
+
+        // 사용자 VIP 등급 재산정
+        memberService.recalculateMemberGrade(winnerDeal.getWinnerId());
+        memberService.recalculateMemberGrade(winnerDeal.getSellerId());
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {
