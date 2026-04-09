@@ -461,6 +461,47 @@
         SET status = #{status}
         WHERE id = #{memberId}
     </update>
+    
+    <select id="findSellerStats" parameterType="long" resultType="MemberSellerProfileResponse">
+        SELECT
+            m.nickname AS nickname,
+            m.image_url AS imageUrl,
+            m.grade AS grade,
+            m.created_at AS createdAt,
+
+            -- 평균 평점 및 리뷰 수
+            (SELECT ROUND(IFNULL(AVG(rating), 0), 1)
+             FROM review
+             WHERE target_id = #{memberId}) AS rating,
+
+            (SELECT COUNT(*)
+             FROM review
+             WHERE target_id = #{memberId}) AS reviewCount,
+
+            -- 총 판매 건수
+            (SELECT COUNT(*)
+             FROM winner_deal
+             WHERE seller_id = #{memberId}
+               AND status IN ('PAID', 'CONFIRMED')) AS totalSales,
+
+            -- 판매 취소 건수
+            (SELECT COUNT(*)
+             FROM winner_deal
+             WHERE seller_id = #{memberId}
+               AND status = 'CANCELLED') AS cancelCount,
+
+            -- 실제 응답률 계산
+            (SELECT
+                 CASE
+                     WHEN COUNT(*) = 0 THEN 0
+                     ELSE ROUND((COUNT(CASE WHEN status = 'ANSWERED' THEN 1 END) / COUNT(*)) * 100)
+                     END
+             FROM auction_inquiry
+             WHERE answerer_id = #{memberId}) AS responseRate
+        FROM member m
+        WHERE m.id = #{memberId}
+          AND m.status != 'DELETED'
+    </select>
 
     <!-- 판매중인 경매 존재 여부 -->
     <select id="existsOngoingSales" parameterType="long" resultType="boolean">
@@ -496,3 +537,4 @@
     </select>
 
 </mapper>
+
