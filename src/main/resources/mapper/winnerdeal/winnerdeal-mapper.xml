@@ -115,7 +115,7 @@
     <!-- 관리자 거래 내역 조회 시 필터링 조각 -->
     <sql id="adminWinnerDealHistoryFilter">
         <if test="request.dealNumber != null and request.dealNumber != ''">
-            AND wd.deal_number = #{request.dealNumber}
+            AND wd.deal_number LIKE CONCAT('%', #{request.dealNumber}, '%')
         </if>
         <if test="request.status != null">
             <choose>
@@ -284,4 +284,12 @@
         <include refid="adminWinnerDealHistoryFilter"/>
     </select>
 
+    <!-- 거래 번호가 존재하는지 여부 -->
+    <select id="existsByDealNumber" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM winner_deal
+            WHERE deal_number = #{dealNumber}
+        )
+    </select>
 </mapper>

@@ -38,6 +38,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WinnerDealServiceImpl implements WinnerDealService {
     private static final DateTimeFormatter DEAL_NUMBER_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final int DEAL_NUMBER_MAX_RETRY_COUNT = 10;
 
     private final AuctionMapper auctionMapper;
     private final BidMapper bidMapper;
@@ -288,9 +289,17 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     }
 
     private String generateDealNumber() {
-        String datePart = LocalDateTime.now().format(DEAL_NUMBER_DATE_FORMATTER);
-        String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
-        return "WD-" + datePart + "-" + randomPart;
+        for (int attempt = 0; attempt < DEAL_NUMBER_MAX_RETRY_COUNT; attempt++) {
+            String datePart = LocalDateTime.now().format(DEAL_NUMBER_DATE_FORMATTER);
+            String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 6).toUpperCase();
+            String dealNumber = "WD-" + datePart + "-" + randomPart;
+
+            if (!winnerDealMapper.existsByDealNumber(dealNumber)) {
+                return dealNumber;
+            }
+        }
+
+        throw new CustomException(ErrorType.WINNER_DEAL_UPDATE_FAILED);
     }
 }
 
