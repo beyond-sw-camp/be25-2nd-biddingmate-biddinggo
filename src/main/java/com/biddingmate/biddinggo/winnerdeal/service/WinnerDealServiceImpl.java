@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.auction.dto.RefundDto;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
+import com.biddingmate.biddinggo.auction.model.AuctionType;
 import com.biddingmate.biddinggo.auction.prediction.event.AuctionPriceReferenceSyncRequestedEvent;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
@@ -15,6 +16,7 @@ import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailQueryResult;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
@@ -205,6 +207,28 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
     @Override
     @Transactional
+    public void registerTrackingNumberByAdmin(Long winnerDealId, WinnerDealTrackingNumberRequest request) {
+        AdminWinnerDealDetailQueryResult detail = winnerDealMapper.findAdminWinnerDealDetail(winnerDealId);
+
+        if (detail == null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        if (detail.getAuctionType() != AuctionType.INSPECTION
+                || detail.getStatus() != WinnerDealStatus.PAID
+                || !isShippingInfoRegistered(detail)
+                || isTrackingNumberRegistered(detail)) {
+            throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);
+        }
+
+        int updatedRows = winnerDealMapper.updateTrackingNumber(winnerDealId, request);
+        if (updatedRows != 1) {
+            throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_SAVE_FAILED);
+        }
+    }
+
+    @Override
+    @Transactional
     public void confirmPurchase(Long winnerDealId, Long memberId) {
         WinnerDeal winnerDeal = winnerDealMapper.findById(winnerDealId);
 
@@ -286,6 +310,18 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
         return StringUtils.hasText(winnerDeal.getCarrier())
                 && StringUtils.hasText(winnerDeal.getTrackingNumber());
+    }
+
+    private boolean isShippingInfoRegistered(AdminWinnerDealDetailQueryResult detail) {
+        return StringUtils.hasText(detail.getRecipient())
+                && StringUtils.hasText(detail.getTel())
+                && StringUtils.hasText(detail.getZipcode())
+                && StringUtils.hasText(detail.getAddress());
+    }
+
+    private boolean isTrackingNumberRegistered(AdminWinnerDealDetailQueryResult detail) {
+        return StringUtils.hasText(detail.getCarrier())
+                && StringUtils.hasText(detail.getTrackingNumber());
     }
 
     private String generateDealNumber() {

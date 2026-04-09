@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.winnerdeal.service;
 
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailResponse;
@@ -26,4 +27,7 @@ public interface WinnerDealQueryService {
 
     // 관리자 거래 내역 조회
     PageResponse<AdminWinnerDealListResponse> findAdminWinnerDealHistory(@Valid AdminWinnerDealListRequest request);
+
+    // 관리자 거래 내역 상세 조회
+    AdminWinnerDealDetailResponse findAdminWinnerDealDetail(Long winnerDealId);
 }

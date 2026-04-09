@@ -270,7 +270,9 @@
         JOIN auction_item ai ON a.item_id = ai.id
         JOIN member seller ON seller.id = wd.seller_id
         JOIN member winner ON winner.id = wd.winner_id
-        <include refid="adminWinnerDealHistoryFilter"/>
+        <where>
+            <include refid="adminWinnerDealHistoryFilter"/>
+        </where>
         ORDER BY wd.created_at DESC, wd.id DESC
     </select>
 
@@ -281,7 +283,9 @@
         JOIN auction_item ai ON a.item_id = ai.id
         JOIN member seller ON seller.id = wd.seller_id
         JOIN member winner ON winner.id = wd.winner_id
-        <include refid="adminWinnerDealHistoryFilter"/>
+        <where>
+            <include refid="adminWinnerDealHistoryFilter"/>
+        </where>
     </select>
 
     <!-- 거래 번호가 존재하는지 여부 -->
@@ -291,5 +295,37 @@
             FROM winner_deal
             WHERE deal_number = #{dealNumber}
         )
+    </select>
+
+    <!-- 관리자 거래 내역 상세 조회 -->
+    <select id="findAdminWinnerDealDetail" resultType="AdminWinnerDealDetailQueryResult">
+        SELECT wd.id AS winnerDealId,
+               wd.deal_number AS dealNumber,
+               wd.auction_id AS auctionId,
+               ai.id AS itemId,
+               ai.name AS itemName,
+               ii.url AS itemImageUrl,
+               a.type AS auctionType,
+               wd.status AS status,
+               wd.winner_price AS winnerPrice,
+               seller.nickname AS sellerName,
+               winner.nickname AS winnerName,
+               wd.recipient AS recipient,
+               wd.tel AS tel,
+               wd.zipcode AS zipcode,
+               wd.address AS address,
+               wd.detail_address AS detailAddress,
+               wd.carrier AS carrier,
+               wd.tracking_number AS trackingNumber,
+               wd.confirmed_at AS confirmedAt,
+               wd.created_at AS createdAt
+        FROM winner_deal wd
+        JOIN auction a ON wd.auction_id = a.id
+        JOIN auction_item ai ON a.item_id = ai.id
+        LEFT JOIN item_image ii ON ii.item_id = ai.id AND ii.display_order = 1
+        JOIN member seller ON seller.id = wd.seller_id
+        JOIN member winner ON winner.id = wd.winner_id
+        WHERE wd.id = #{winnerDealId}
+            LIMIT 1
     </select>
 </mapper>
