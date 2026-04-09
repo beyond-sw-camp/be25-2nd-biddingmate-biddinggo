@@ -20,7 +20,7 @@ public class WinnerDeal {
     private Long sellerId;
     private String dealNumber;
     private Long winnerPrice;
-    private String status;
+    private WinnerDealStatus status;
     private LocalDateTime confirmedAt;
     private String zipcode;
     private String address;

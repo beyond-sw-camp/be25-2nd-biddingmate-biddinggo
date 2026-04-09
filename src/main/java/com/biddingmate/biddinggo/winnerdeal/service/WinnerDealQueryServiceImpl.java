@@ -77,7 +77,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
             throw new CustomException(ErrorType.WINNER_DEAL_ACCESS_DENIED);
         }
 
-        WinnerDealStatus status = WinnerDealStatus.valueOf(detail.getStatus());
+        WinnerDealStatus status = detail.getStatus();
         // 배송지 등록 여부
         boolean shippingAddressRegistered = isShippingAddressRegistered(detail);
         // 운송장 등록 여부

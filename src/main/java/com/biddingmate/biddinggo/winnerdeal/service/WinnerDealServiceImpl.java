@@ -19,6 +19,7 @@ import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDeal;
+import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.RowBounds;
@@ -74,7 +75,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                     .sellerId(auction.getSellerId())
                     .dealNumber(generateDealNumber())
                     .winnerPrice(finalPrice)
-                    .status("PAID")
+                    .status(WinnerDealStatus.PAID)
                     .createdAt(LocalDateTime.now())
                     .build();
 
@@ -162,7 +163,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         // 배송지 또는 운송장 정보가 이미 있거나 PAID 상태가 아닌 경우
-        if (!"PAID".equals(winnerDeal.getStatus())
+        if (winnerDeal.getStatus() != WinnerDealStatus.PAID
                 || isShippingInfoRegistered(winnerDeal)
                 || isTrackingNumberRegistered(winnerDeal)) {
             throw new CustomException(ErrorType.WINNER_DEAL_SHIPPING_ADDRESS_REGISTRATION_NOT_ALLOWED);
@@ -189,7 +190,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         // 운송장 등록은 PAID 상태에서 배송지 정보가 있고 아직 운송장 정보가 없을 때만 허용한다.
-        if (!"PAID".equals(winnerDeal.getStatus())
+        if (winnerDeal.getStatus() != WinnerDealStatus.PAID
                 || !isShippingInfoRegistered(winnerDeal)
                 || isTrackingNumberRegistered(winnerDeal)) {
             throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);
@@ -215,7 +216,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         // 구매확정은 구매자 본인의 배송 중 거래에 대해서만 1회 허용한다.
-        if (!"SHIPPED".equals(winnerDeal.getStatus())
+        if (winnerDeal.getStatus() != WinnerDealStatus.SHIPPED
                 || winnerDeal.getConfirmedAt() != null) {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_NOT_ALLOWED);
         }
@@ -241,7 +242,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {
-        if ("CANCELLED".equals(winnerDeal.getStatus())) {
+        if (winnerDeal.getStatus() == WinnerDealStatus.CANCELLED) {
             throw new CustomException(ErrorType.WINNER_DEAL_ALREADY_CANCELLED);
         }
 
