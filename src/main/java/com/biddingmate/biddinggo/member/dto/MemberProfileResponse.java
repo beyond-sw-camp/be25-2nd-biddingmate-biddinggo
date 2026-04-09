@@ -21,4 +21,9 @@ public class MemberProfileResponse {
     private String bankCode;
     private String bankAccount;
 
+    private LocalDateTime createdAt;
+    private long reviewCount;
+    private Double ratingAvg;
+
+    private String grade;
 }
