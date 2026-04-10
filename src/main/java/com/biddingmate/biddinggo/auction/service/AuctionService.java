@@ -28,6 +28,11 @@ public interface AuctionService {
      */
     void cancelAuction(Long auctionId, Long sellerId);
 
+    /**
+     * 寃쎈ℓ瑜?利됱떆 援щℓ濡?醫낅즺?쒕떎.
+     */
+    void buyNowAuction(Long auctionId, Long buyerId);
+
     // 유저 비활성화 이벤트
     void handleMemberDeactivationBeforeWinning(Long memberId);
 }

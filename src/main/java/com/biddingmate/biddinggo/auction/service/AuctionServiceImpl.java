@@ -20,6 +20,7 @@ import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
+import com.biddingmate.biddinggo.winnerdeal.service.WinnerDealService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final BidService bidService;
     private final PointService pointService;
     private final ApplicationEventPublisher eventPublisher;
+    private final WinnerDealService winnerDealService;
 
     @Override
     @Transactional
@@ -114,6 +116,26 @@ public class AuctionServiceImpl implements AuctionService {
         if (updatedCount != 1) {
             throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
         }
+    }
+
+    @Override
+    @Transactional
+    public void buyNowAuction(Long auctionId, Long buyerId) {
+        if (auctionId == null || auctionId <= 0 || buyerId == null || buyerId <= 0) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
+        }
+
+        Auction auction = getAuctionForModification(auctionId);
+
+        if (auction.getSellerId().equals(buyerId)) {
+            throw new CustomException(ErrorType.CANNOT_BID_ON_OWN_AUCTION);
+        }
+
+        if (!isAuctionBuyNowAvailable(auction) || auction.getBuyNowPrice() == null) {
+            throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
+        }
+
+        winnerDealService.processBuyNow(auction, buyerId);
     }
 
     @Override
@@ -247,6 +269,14 @@ public class AuctionServiceImpl implements AuctionService {
         return auction.getStatus() == AuctionStatus.ON_GOING
                 && auction.getBidCount() != null
                 && auction.getBidCount() == 0;
+    }
+
+    private boolean isAuctionBuyNowAvailable(Auction auction) {
+        LocalDateTime now = LocalDateTime.now();
+
+        return auction.getStatus() == AuctionStatus.ON_GOING
+                && !now.isBefore(auction.getStartDate())
+                && !now.isAfter(auction.getEndDate());
     }
 
     // 입찰 무효화

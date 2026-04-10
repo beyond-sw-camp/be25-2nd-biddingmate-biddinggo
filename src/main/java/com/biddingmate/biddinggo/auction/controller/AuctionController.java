@@ -129,4 +129,18 @@ public class AuctionController {
 
         return ApiResponse.of(HttpStatus.OK, null, "경매 취소 완료", result);
     }
+    @PostMapping("/{auctionId}/buy-now")
+    @Operation(summary = "Buy now", description = "Completes the auction immediately with the configured buy-now price.")
+    public ResponseEntity<ApiResponse<CreateAuctionResponse>> buyNowAuction(
+            @PathVariable Long auctionId,
+            @AuthenticationPrincipal Member member) {
+
+        auctionService.buyNowAuction(auctionId, member.getId());
+
+        CreateAuctionResponse result = CreateAuctionResponse.builder()
+                .auctionId(auctionId)
+                .build();
+
+        return ApiResponse.of(HttpStatus.OK, null, "Buy now completed", result);
+    }
 }

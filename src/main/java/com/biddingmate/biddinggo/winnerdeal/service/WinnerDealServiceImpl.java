@@ -156,6 +156,79 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
     @Override
     @Transactional
+    public void processBuyNow(Auction auction, Long buyerId) {
+        Long buyNowPrice = auction.getBuyNowPrice();
+        if (buyNowPrice == null) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
+        }
+
+        Long lastBidAmount = bidService.getLastBidAmount(buyerId, auction.getId());
+        long additionalAmount = Math.max(buyNowPrice - lastBidAmount, 0L);
+
+        if (additionalAmount > 0 && memberService.getCurrentPoint(buyerId) < additionalAmount) {
+            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
+        }
+
+        if (additionalAmount > 0) {
+            memberService.deductPoint(buyerId, additionalAmount);
+        }
+
+        AuctionItem auctionItem = auctionItemMapper.findById(auction.getItemId());
+
+        WinnerDeal winnerDeal = WinnerDeal.builder()
+                .auctionId(auction.getId())
+                .winnerId(buyerId)
+                .sellerId(auction.getSellerId())
+                .dealNumber(generateDealNumber())
+                .winnerPrice(buyNowPrice)
+                .status(WinnerDealStatus.PAID)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        winnerDealMapper.insert(winnerDeal);
+
+        auction.setStatus(AuctionStatus.ENDED);
+        auction.setWinnerId(buyerId);
+        auction.setWinnerPrice(buyNowPrice);
+
+        int updatedRows = auctionMapper.updateAuctionResult(auction);
+        if (updatedRows != 1) {
+            throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+        }
+
+        auctionItemMapper.updateStatus(
+                auction.getItemId(),
+                AuctionItemStatus.SOLD,
+                AuctionItemStatus.ON_AUCTION,
+                null
+        );
+
+        publishAuctionPriceReferenceSyncRequestedEvent(auction, auctionItem, buyNowPrice);
+
+        List<RefundDto> refunds =
+                bidQueryService.findRefundTargetsExcludingWinner(auction.getId(), buyerId);
+
+        for (RefundDto refund : refunds) {
+            pointService.refundBid(refund.getBidderId(), refund.getAmount());
+        }
+
+        notificationPublisher.publishNotification(
+                buyerId,
+                NotificationType.WIN,
+                "Buy now completed for auction #" + auction.getId(),
+                "/auctions/" + auction.getId()
+        );
+
+        notificationPublisher.publishNotification(
+                auction.getSellerId(),
+                NotificationType.WIN,
+                "Auction #" + auction.getId() + " was completed with buy now.",
+                "/auctions/" + auction.getId()
+        );
+    }
+
+    @Override
+    @Transactional
     public void handleMemberDeactivationAfterWinning(Long memberId) {
         log.info("낙찰 회원 비활성화 처리 시작 - Member ID: {}", memberId);
 
@@ -284,12 +357,12 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_FAILED);
         }
 
-        Long lastBidAmount = bidService.getLastBidAmount(memberId, winnerDeal.getAuctionId());
-        if (lastBidAmount == null || lastBidAmount < winnerDeal.getWinnerPrice()) {
-            throw new CustomException(ErrorType.WINNER_DEAL_SETTLEMENT_INVALID);
-        }
+        Long maxBidAmount = bidQueryService.findMaxBidAmountByAuctionAndBidder(winnerDeal.getAuctionId(), memberId);
+        long reservedAmount = maxBidAmount != null && maxBidAmount >= winnerDeal.getWinnerPrice()
+                ? maxBidAmount
+                : winnerDeal.getWinnerPrice();
 
-        long refundAmount = lastBidAmount - winnerDeal.getWinnerPrice();
+        long refundAmount = reservedAmount - winnerDeal.getWinnerPrice();
         if (refundAmount < 0) {
             throw new CustomException(ErrorType.WINNER_DEAL_SETTLEMENT_INVALID);
         } else if (refundAmount > 0) {
