@@ -15,6 +15,7 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
+import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.notification.model.NotificationType;
 import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
 import com.biddingmate.biddinggo.point.service.PointService;
@@ -50,6 +51,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     private final WinnerDealMapper winnerDealMapper;
     private final WinnerDealQueryService winnerDealQueryService;
     private final AuctionItemMapper auctionItemMapper;
+    private final MemberService memberService;
     private final PointService pointService;
     private final ApplicationEventPublisher eventPublisher;
     private final NotificationPublisher notificationPublisher;
@@ -230,9 +232,6 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                 "상품이 발송되었습니다. 운송사: " + request.getCarrier() + ", 송장번호 : " + request.getTrackingNumber(),
                 "/winner-deals/" + winnerDealId
         );
-
-
-
     }
 
     @Override
@@ -298,6 +297,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         pointService.settleWinnerDeal(winnerDeal.getSellerId(), winnerDeal.getWinnerPrice());
+
+        // 사용자 VIP 등급 재산정
+        memberService.recalculateMemberGrade(winnerDeal.getWinnerId());
+        memberService.recalculateMemberGrade(winnerDeal.getSellerId());
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {

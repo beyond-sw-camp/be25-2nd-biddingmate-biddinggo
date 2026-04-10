@@ -14,6 +14,7 @@ import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
+import com.biddingmate.biddinggo.member.model.MemberGrade;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
 import org.apache.ibatis.annotations.Mapper;
@@ -107,5 +108,11 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // 거래 미완료 존재 여부
     boolean existsIncompleteDeals(@Param("memberId") Long memberId);
 
+    // 사용자 VIP 등급 재산정을 위한 거래 건수 측정
+    long countConfirmedDealsByMemberId(@Param("memberId") Long memberId);
+
+    // 사용자 VIP 등급 재산정
+    void updateMemberGrade(@Param("memberId") Long memberId,
+                           @Param("grade") MemberGrade grade);
+
     MemberSalesAuctionSummaryResponse countMySalesAuctionSummary(@Param("memberId") Long memberId);
-}

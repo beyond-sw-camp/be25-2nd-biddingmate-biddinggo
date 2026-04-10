@@ -20,6 +20,7 @@ import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.dto.UpdateMemberStatusRequest;
 import com.biddingmate.biddinggo.member.event.MemberStatusUpdateEvent;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
+import com.biddingmate.biddinggo.member.model.MemberGrade;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,9 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
+    private static final long SILVER_MIN_CONFIRMED_DEAL_COUNT = 5L;
+    private static final long GOLD_MIN_CONFIRMED_DEAL_COUNT = 20L;
+
     private final MemberMapper memberMapper;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -337,7 +341,30 @@ public class MemberServiceImpl implements MemberService {
 
         return stats;
     }
+  
+    @Override
+    @Transactional
+    public void recalculateMemberGrade(Long memberId) {
+        getMember(memberId);
 
+        long confirmedDealCount = memberMapper.countConfirmedDealsByMemberId(memberId);
+        MemberGrade grade = resolveMemberGrade(confirmedDealCount);
+
+        memberMapper.updateMemberGrade(memberId, grade);
+    }
+
+    private MemberGrade resolveMemberGrade(long confirmedDealCount) {
+        if (confirmedDealCount >= GOLD_MIN_CONFIRMED_DEAL_COUNT) {
+            return MemberGrade.GOLD;
+        }
+
+        if (confirmedDealCount >= SILVER_MIN_CONFIRMED_DEAL_COUNT) {
+            return MemberGrade.SILVER;
+        }
+
+        return MemberGrade.BRONZE;
+    } 
+  
     private void validateSalesAuctionStatus(String status) {
         if (status == null || status.isBlank()) {
             throw new CustomException(ErrorType.INVALID_AUCTION_STATUS);
