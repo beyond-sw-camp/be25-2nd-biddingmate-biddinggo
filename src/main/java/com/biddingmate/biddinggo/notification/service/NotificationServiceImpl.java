@@ -44,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
         int result = notificationMapper.insert(notification);
 
         if(result != 1 || notification.getId() == null){
-            throw new CustomException(ErrorType.NOTIFICATOIN_SAVE_FAILED);
+            throw new CustomException(ErrorType.NOTIFICATION_SAVE_FAILED);
         }
 
         NotificationResponse response = NotificationResponse.builder()
@@ -64,6 +64,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public PageResponse<NotificationResponse> getNotificationsByMemberId(BasePageRequest request, Long receiverId) {
+
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
 
@@ -87,5 +88,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void markAsRead(Long id, Long receiverId) {
         notificationMapper.updateReadAtById(id, receiverId);
+    }
+
+    @Override
+    public int countUnread(Long memberId) {
+
+        return notificationMapper.countUnreadByReceiverId(memberId);
     }
 }

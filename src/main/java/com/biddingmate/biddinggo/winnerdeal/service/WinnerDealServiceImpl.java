@@ -15,6 +15,8 @@ import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
+import com.biddingmate.biddinggo.notification.model.NotificationType;
+import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
 import com.biddingmate.biddinggo.point.service.PointService;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
@@ -50,6 +52,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     private final AuctionItemMapper auctionItemMapper;
     private final PointService pointService;
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     @Transactional
@@ -105,6 +108,15 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             log.info("낙찰 처리 성공 - Auction ID: {}, Winner: {}, Price: {}",
                     auction.getId(), winnerBid.getBidderId(), finalPrice);
 
+            // 낙찰 알람
+            notificationPublisher.publishNotification(
+                    winnerBid.getBidderId(),
+                    NotificationType.WIN,
+                    "축하합니다. 경매 #" + auction.getId() + " 낙찰이 확정되었습니다.",
+                    "/auctions/" + auction.getId()
+            );
+
+
             List<RefundDto> refunds =
                     bidQueryService.findRefundTargetsExcludingWinner(auction.getId(), winnerBid.getBidderId());
 
@@ -128,6 +140,15 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                     null
             );
             log.info("유찰 처리 완료 - Auction ID: {}", auction.getId());
+
+            // 유찰 알람
+            notificationPublisher.publishNotification(
+                    auction.getSellerId(),
+                    NotificationType.AUCTION_UNSOLD,
+                    "경매 #" + auction.getId() + "가 유찰되었습니다.",
+                    "/auctions/" + auction.getId()
+            );
+
         }
     }
 
@@ -202,6 +223,16 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         if (updatedRows != 1) {
             throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_SAVE_FAILED);
         }
+
+        notificationPublisher.publishNotification(
+                winnerDeal.getWinnerId(),
+                NotificationType.DELIVERY,
+                "상품이 발송되었습니다. 운송사: " + request.getCarrier() + ", 송장번호 : " + request.getTrackingNumber(),
+                "/winner-deals/" + winnerDealId
+        );
+
+
+
     }
 
     @Override
