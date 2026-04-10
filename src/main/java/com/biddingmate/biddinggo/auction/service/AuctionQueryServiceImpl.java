@@ -31,6 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuctionQueryServiceImpl implements AuctionQueryService {
     private static final String DEFAULT_SORT_BY = "CREATED_AT";
+    private static final String SORT_BY_END_DATE = "END_DATE";
     private static final String SORT_BY_WISH_COUNT = "WISH_COUNT";
     private static final String SORT_BY_POPULARITY = "POPULARITY";
     private static final String SORT_BY_PRICE = "PRICE";
@@ -145,7 +146,8 @@ public class AuctionQueryServiceImpl implements AuctionQueryService {
         if (!DEFAULT_SORT_BY.equals(normalizedSortBy)
                 && !SORT_BY_WISH_COUNT.equals(normalizedSortBy)
                 && !SORT_BY_POPULARITY.equals(normalizedSortBy)
-                && !SORT_BY_PRICE.equals(normalizedSortBy)) {
+                && !SORT_BY_PRICE.equals(normalizedSortBy)
+                && !SORT_BY_END_DATE.equals(normalizedSortBy)) {
             throw new CustomException(ErrorType.INVALID_SORT_BY);
         }
 

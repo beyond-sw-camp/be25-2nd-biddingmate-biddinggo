@@ -79,6 +79,7 @@
 
     <select id="findMyAuctionInquiries" resultType="MemberAuctionInquiryResponse">
         SELECT
+            id,
             inquiryType,
             answerStatus,
             createdAt,
@@ -89,6 +90,7 @@
             auctionId
         FROM (
         SELECT
+            ai.id AS id,
             'PURCHASE' AS inquiryType,
             ai.auction_id AS auctionId,
             ai.status AS answerStatus,
@@ -103,6 +105,7 @@
         UNION ALL
 
         SELECT
+            ai.id AS id,
             'SALES' AS inquiryType,
             ai.auction_id AS auctionId,
             ai.status AS answerStatus,

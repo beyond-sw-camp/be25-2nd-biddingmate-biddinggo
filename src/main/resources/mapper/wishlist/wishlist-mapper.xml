@@ -11,6 +11,7 @@
         <result property="type" column="type"/>
         <result property="startPrice" column="start_price"/>
         <result property="buyNowPrice" column="buy_now_price"/>
+        <result property="vickreyPrice" column="vickrey_price"/>
         <result property="bidCount" column="bid_count"/>
         <result property="wishCount" column="wish_count"/>
         <result property="endDate" column="end_date"/>
@@ -53,6 +54,7 @@
         a.type,
         a.start_price,
         a.buy_now_price,
+        a.vickrey_price,
         a.bid_count,
         a.wish_count,
         a.end_date,
@@ -73,6 +75,7 @@
             <when test='sortBy == "PRICE"'>COALESCE(a.vickrey_price, a.start_price) ${order}, a.created_at DESC</when>
             <when test='sortBy == "POPULARITY"'>(a.bid_count + a.wish_count) ${order}, a.created_at DESC</when>
             <when test='sortBy == "WISH_COUNT"'>a.wish_count ${order}, a.created_at DESC</when>
+            <when test='sortBy == "END_DATE"'>a.end_date ${order}, a.created_at DESC</when>
             <otherwise>a.created_at ${order}</otherwise>
         </choose>
     </select>

@@ -42,6 +42,9 @@ public class AuctionListResponse {
     @Schema(description = "즉시 구매가", example = "180000", nullable = true)
     private Long buyNowPrice;
 
+    @Schema(description = "차순위 입찰가", example = "150000", nullable = true)
+    private Long vickreyPrice;
+
     @Schema(description = "입찰 수", example = "0")
     private Integer bidCount;
 

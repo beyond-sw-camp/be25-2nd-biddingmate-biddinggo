@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 public class MemberAuctionInquiryResponse {
 
+    private Long id;
+
     // 내가 구매하려는 글에 작성한 것인지, 판매하려는 글에 작성된 것인지 구분하기 위한 타입
     private String inquiryType;
 
