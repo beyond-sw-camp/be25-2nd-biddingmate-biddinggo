@@ -22,15 +22,18 @@
     <select id="findDashboardInfoById" parameterType="long" resultType="MemberDashboardResponse">
         SELECT  m.nickname AS nickname,
                 m.grade AS grade,
-                m.point AS POINT
+                m.point AS point,
+                m.image_url AS imageUrl
         FROM member m
         WHERE m.id = #{memberId}
     </select>
 
-    <select id="findWonItemsById" parameterType="long" resultType="MemberWonItemResponse">
+    <select id="findPurchaseItemsById" parameterType="long" resultType="MemberWonItemResponse">
         SELECT  ii.url AS imageUrl,                     -- 상품 대표 이미지 URL
                 ai.name AS itemName,                    -- 상품 이름
-                wd.delivery_status AS deliveryStatus    -- 배송 상태
+                wd.status AS status,                    -- 거래 상태
+                wd.winner_price AS winnerPrice,         -- 구매 금액
+                wd.created_at AS createdAt             -- 거래 생성일
         FROM winner_deal wd
 
         -- 낙찰된 경매 정보 연결
@@ -47,18 +50,20 @@
         AND ii.`display_order` = 1              -- 대표 이미지 1장만
 
         WHERE wd.winner_id = #{memberId}
-        AND wd.status IN ('PAID', 'CONFIRMED')  -- 배송 취소 상태 제외
+
+        AND wd.status IN ('PAID', 'SHIPPED')
         ORDER BY wd.created_at DESC             -- 최신순
-        LIMIT 2
+        LIMIT 3                                 -- 최근 3건만 노출
     </select>
 
     <select id="findBiddingItemsById" parameterType="long" resultType="MemberBiddingItemResponse">
         SELECT
             ii.url AS imageUrl,                 -- 상품 대표 이미지 URL
             ai.name AS itemName,                -- 상품 이름
-            a.vickrey_price AS currentPrice,    -- 차순위 가격
+            COALESCE(a.vickrey_price, a.start_price) AS currentPrice, -- 현재가(차순위가 없으면 시작가)
             mb.myBidPrice AS myBidPrice,        -- 내가 해당 경매에서 입찰한 최고 금액
-            a.end_date AS endDate               -- 경매 종료일
+            a.end_date AS endDate,              -- 경매 종료일
+            a.status AS status                  -- 경매 상태
         FROM (                                  -- 한 경매에 여러 번 입찰 가능, MAX()로 "내 최고 입찰가" 뽑기
                  SELECT
                      b.auction_id,
@@ -78,9 +83,8 @@
                            ON ii.item_id = ai.id
                                AND ii.`display_order` = 1
 
-        WHERE a.status = 'ON_GOING'
-        ORDER BY a.end_date ASC
-        LIMIT 3
+        ORDER BY a.end_date DESC
+        LIMIT 2
     </select>
 
     <select id="findById" parameterType="long" resultType="Member">
@@ -315,34 +319,39 @@
         WHERE id = #{memberId}
     </update>
 
-<select id="findSalesByMember" resultType="MemberSalesItemResponse">
+<select id="findSalesItemsById" parameterType="long" resultType="MemberSalesItemResponse">
     SELECT
-        ai.name AS itemName,                   -- 상품명
-        buyer.name AS buyerName,              -- 구매자 이름
-        wd.winner_price AS price,             -- 판매 금액
-        wd.confirmed_at AS completedAt,       -- 거래 완료 날짜
-        wd.delivery_status AS deliveryStatus  -- 배송 상태
+        ii.url AS imageUrl,             -- 상품 대표 이미지 URL
+        ai.name AS itemName,            -- 상품명
+        wd.status AS status,            -- 거래 상태
+        wd.winner_price AS winnerPrice, -- 판매 금액(낙찰 금액)
+        wd.created_at AS createdAt      -- 거래 생성일
     FROM winner_deal wd
+
+    -- 거래와 연결된 경매 정보 조회
     INNER JOIN auction a
-        ON wd.auction_id = a.id
+    ON wd.auction_id = a.id
+
+    -- 경매에 연결된 상품 정보 조회
     INNER JOIN auction_item ai
-        ON a.item_id = ai.id
-    INNER JOIN member buyer
-        ON wd.winner_id = buyer.id
+    ON a.item_id = ai.id
+
+    -- 상품 대표 이미지 1장만 조회
+    LEFT JOIN item_image ii
+    ON ii.item_id = ai.id
+    AND ii.display_order = 1
+
+    -- 해당 회원이 판매자인 거래만 조회
     WHERE wd.seller_id = #{memberId}
-      AND wd.status IN ('PAID', 'CONFIRMED')
 
-    <choose>
-        <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
-            ORDER BY wd.confirmed_at ASC
-        </when>
-        <otherwise>
-            ORDER BY wd.confirmed_at DESC
-        </otherwise>
-    </choose>
+    -- 진행 중인 판매 현황만 조회
+    AND wd.status IN ('PAID', 'SHIPPED', 'CONFIRMED')
 
-    LIMIT #{pageRequest.size}
-    OFFSET #{pageRequest.offset}
+    -- 최신 거래 순으로 정렬
+    ORDER BY wd.created_at DESC
+
+    -- 3건만 노출
+    LIMIT 3
 </select>
 
 <select id="countSalesByMemberId" resultType="long">
@@ -367,7 +376,7 @@
     INNER JOIN member seller
         ON wd.seller_id = seller.id
     WHERE wd.winner_id = #{memberId}
-      AND wd.status IN ('PAID', 'CONFIRMED')
+      AND wd.status IN ('PAID', 'CONFIRMED', 'CONFIRMED')
 
     <choose>
         <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
