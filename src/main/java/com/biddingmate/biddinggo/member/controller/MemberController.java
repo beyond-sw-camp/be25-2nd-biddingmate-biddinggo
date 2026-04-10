@@ -83,13 +83,13 @@ public class MemberController {
 
     @Operation(
             summary = "경매관리",
-            description = "로그인한 회원의 경매를 상태별(ALL, SCHEDULED, ONGOING, SUCCESS, FAILED, CANCELLED)로 조회합니다."
+            description = "로그인한 회원의 경매를 상태별(ALL, PENDING, ONGOING, SUCCESS, FAILED, CANCELLED)로 조회합니다."
     )
     @GetMapping("/me/sales/auctions")
     public ResponseEntity<ApiResponse<MemberSalesAuctionResultResponse>> getSellingItems(
             @AuthenticationPrincipal Member member,
             @Parameter(
-                    description = "조회 타입(ALL, SCHEDULED, ONGOING, SUCCESS, FAILED, CANCELLED)",
+                    description = "조회 타입(ALL, PENDING, ONGOING, SUCCESS, FAILED, CANCELLED)",
                     example = "ONGOING"
             )
             @RequestParam String type,
