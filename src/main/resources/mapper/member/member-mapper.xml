@@ -626,7 +626,6 @@
             SUM(CASE WHEN a.status = 'ENDED' AND a.winner_id IS NULL THEN 1 ELSE 0 END) AS failedCount
         FROM auction a
         WHERE a.seller_id = #{memberId}
-          AND a.status != 'CANCELLED'
     </select>
 </mapper>
 
