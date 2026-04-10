@@ -7,11 +7,14 @@ import com.biddingmate.biddinggo.member.dto.MemberDashboardResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionResultResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
-import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionResponse;
 import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -78,17 +81,26 @@ public class MemberController {
         return ApiResponse.of(HttpStatus.OK, null, "구매 내역 조회 성공", result);
     }
 
-    @GetMapping("/me/auctions")
-    public ResponseEntity<ApiResponse<PageResponse<MemberSellingItemResponse>>> getSellingItems(
+    @Operation(
+            summary = "경매관리",
+            description = "로그인한 회원의 경매를 상태별(ALL, ONGOING, SUCCESS, FAILED)로 조회합니다."
+    )
+    @GetMapping("/me/sales/auctions")
+    public ResponseEntity<ApiResponse<MemberSalesAuctionResultResponse>> getSellingItems(
             @AuthenticationPrincipal Member member,
-            @RequestParam String status,
+            @Parameter(
+                    description = "조회 타입(ALL, ONGOING, SUCCESS, FAILED)",
+                    example = "ONGOING"
+            )
+            @RequestParam String type,
             @Valid BasePageRequest pageRequest
     ) {
-        PageResponse<MemberSellingItemResponse> result =
-                memberService.getMySellingItems(member.getId(), status, pageRequest);
+        MemberSalesAuctionResultResponse result =
+                memberService.getMySalesAuctions(member.getId(), type, pageRequest);
 
-        return ApiResponse.of(HttpStatus.OK, null, "판매 중인 상품 조회 성공", result);
+        return ApiResponse.of(HttpStatus.OK, null, "경매 관리 목록 조회 성공", result);
     }
+
     @GetMapping("/{sellerId}")
     public ResponseEntity<ApiResponse<MemberSellerProfileResponse>> getSellerProfile(
             @PathVariable Long sellerId
