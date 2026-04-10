@@ -92,6 +92,7 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     long countMySalesAuctions(@Param("memberId") Long memberId, @Param("type") String type);
 
     List<MemberListView> findAllWithFilter(RowBounds rowBounds, String sortOrder, String keyword, MemberStatus status);
+
     int countTotalMember(String keyword, MemberStatus status);
 
     void updateMemberStatus(@Param("memberId") Long memberId,
@@ -116,3 +117,4 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
                            @Param("grade") MemberGrade grade);
 
     MemberSalesAuctionSummaryResponse countMySalesAuctionSummary(@Param("memberId") Long memberId);
+}
