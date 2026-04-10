@@ -346,9 +346,11 @@ public class MemberServiceImpl implements MemberService {
         String normalizedStatus = status.toUpperCase();
 
         if (!"ALL".equals(normalizedStatus)
+                && !"PENDING".equals(normalizedStatus)
                 && !"ONGOING".equals(normalizedStatus)
                 && !"SUCCESS".equals(normalizedStatus)
-                && !"FAILED".equals(normalizedStatus)) {
+                && !"FAILED".equals(normalizedStatus)
+                && !"CANCELLED".equals(normalizedStatus)) {
             throw new CustomException(ErrorType.INVALID_AUCTION_STATUS);
         }
     }

@@ -555,19 +555,31 @@
 <!--    경매 목록 조회-->
     <select id="findMySalesAuctions" resultType="MemberSalesAuctionResponse">
         SELECT
+        auctionId,
+        itemName,
+        currentPrice,
+        bidCount,
+        endDate,
+        auctionType,
+        saleStatus,
+        imageUrl
+        FROM (
+        SELECT
         a.id AS auctionId,
         ai.name AS itemName,
         COALESCE(a.winner_price, a.vickrey_price, a.start_price) AS currentPrice,
-        a.start_price AS startPrice,
         a.bid_count AS bidCount,
         a.end_date AS endDate,
         a.type AS auctionType,
         CASE
+        WHEN a.status = 'PENDING' THEN 'PENDING'
         WHEN a.status = 'ON_GOING' THEN 'ONGOING'
         WHEN a.status = 'ENDED' AND a.winner_id IS NOT NULL THEN 'SUCCESS'
         WHEN a.status = 'ENDED' AND a.winner_id IS NULL THEN 'FAILED'
+        WHEN a.status = 'CANCELLED' THEN 'CANCELLED'
         END AS saleStatus,
-        ii.url AS imageUrl
+        ii.url AS imageUrl,
+        a.created_at AS createdAt
         FROM auction a
         INNER JOIN auction_item ai
         ON a.item_id = ai.id
@@ -575,19 +587,15 @@
         ON ii.item_id = ai.id
         AND ii.display_order = 1
         WHERE a.seller_id = #{memberId}
-        AND a.status != 'CANCELLED'
-        AND (
-        #{type} = 'ALL'
-        OR (#{type} = 'ONGOING' AND a.status = 'ON_GOING')
-        OR (#{type} = 'SUCCESS' AND a.status = 'ENDED' AND a.winner_id IS NOT NULL)
-        OR (#{type} = 'FAILED' AND a.status = 'ENDED' AND a.winner_id IS NULL)
-        )
+        ) q
+        WHERE #{type} = 'ALL'
+        OR q.saleStatus = #{type}
         <choose>
             <when test="pageRequest.order != null and pageRequest.order.toUpperCase() == 'ASC'">
-                ORDER BY a.created_at ASC
+                ORDER BY q.createdAt ASC
             </when>
             <otherwise>
-                ORDER BY a.created_at DESC
+                ORDER BY q.createdAt DESC
             </otherwise>
         </choose>
         LIMIT #{pageRequest.size}
@@ -599,12 +607,13 @@
         SELECT COUNT(*)
         FROM auction a
         WHERE a.seller_id = #{memberId}
-          AND a.status != 'CANCELLED'
-      AND (
+        AND (
             #{type} = 'ALL'
+           OR (#{type} = 'PENDING' AND a.status = 'PENDING')
            OR (#{type} = 'ONGOING' AND a.status = 'ON_GOING')
            OR (#{type} = 'SUCCESS' AND a.status = 'ENDED' AND a.winner_id IS NOT NULL)
            OR (#{type} = 'FAILED' AND a.status = 'ENDED' AND a.winner_id IS NULL)
+           OR (#{type} = 'CANCELLED' AND a.status = 'CANCELLED')
             )
     </select>
 
