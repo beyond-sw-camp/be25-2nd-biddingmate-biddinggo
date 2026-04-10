@@ -18,11 +18,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.List;
 
 @Slf4j
 @Configuration
@@ -59,17 +57,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         ResponseCookie cookie = jwtCookieService.createRefreshTokenCookie(refreshToken, Duration.ofDays(1));
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        List<String> authorities = member.getAuthorities().stream()
-                .map(authority -> authority.getAuthority())
-                .toList();
-        String accessToken = jwtProvider.createAccessToken(member.getUsername(), authorities, member.getStatus().name());
-        String targetUrl = UriComponentsBuilder
-                .fromUriString(frontendRedirectUri)
-                .queryParam("accessToken", accessToken)
-                .build()
-                .toUriString();
-
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, frontendRedirectUri);
 
 
     }
