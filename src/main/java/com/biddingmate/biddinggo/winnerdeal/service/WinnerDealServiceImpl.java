@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.auction.dto.RefundDto;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
+import com.biddingmate.biddinggo.auction.model.AuctionType;
 import com.biddingmate.biddinggo.auction.prediction.event.AuctionPriceReferenceSyncRequestedEvent;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
@@ -192,6 +193,32 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
         // 운송장 등록은 PAID 상태에서 배송지 정보가 있고 아직 운송장 정보가 없을 때만 허용한다.
         if (winnerDeal.getStatus() != WinnerDealStatus.PAID
+                || !isShippingInfoRegistered(winnerDeal)
+                || isTrackingNumberRegistered(winnerDeal)) {
+            throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);
+        }
+
+        int updatedRows = winnerDealMapper.updateTrackingNumber(winnerDealId, request);
+        if (updatedRows != 1) {
+            throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_SAVE_FAILED);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void registerTrackingNumberByAdmin(Long winnerDealId, WinnerDealTrackingNumberRequest request) {
+        WinnerDeal winnerDeal = winnerDealMapper.findById(winnerDealId);
+        if (winnerDeal == null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        Auction auction = auctionMapper.findById(winnerDeal.getAuctionId());
+        if (auction == null) {
+            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
+        }
+
+        if (auction.getType() != AuctionType.INSPECTION
+                || winnerDeal.getStatus() != WinnerDealStatus.PAID
                 || !isShippingInfoRegistered(winnerDeal)
                 || isTrackingNumberRegistered(winnerDeal)) {
             throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);

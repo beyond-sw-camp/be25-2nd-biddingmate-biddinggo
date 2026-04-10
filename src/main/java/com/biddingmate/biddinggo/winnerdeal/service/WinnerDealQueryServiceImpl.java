@@ -4,6 +4,9 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.review.mapper.ReviewMapper;
+import com.biddingmate.biddinggo.auction.model.AuctionType;
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailQueryResult;
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealDetailQueryResult;
@@ -132,6 +135,47 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
         return PageResponse.of(content, request.getPage(), request.getSize(), totalElements);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public AdminWinnerDealDetailResponse findAdminWinnerDealDetail(Long winnerDealId) {
+        AdminWinnerDealDetailQueryResult detail = winnerDealMapper.findAdminWinnerDealDetail(winnerDealId);
+        if (detail == null) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        boolean inspectionItem = detail.getAuctionType() == AuctionType.INSPECTION;
+        boolean shippingAddressRegistered = isShippingAddressRegistered(detail);
+        boolean trackingNumberRegistered = isTrackingNumberRegistered(detail);
+
+        return AdminWinnerDealDetailResponse.builder()
+                .winnerDealId(detail.getWinnerDealId())
+                .dealNumber(detail.getDealNumber())
+                .auctionId(detail.getAuctionId())
+                .itemId(detail.getItemId())
+                .itemName(detail.getItemName())
+                .itemImageUrl(detail.getItemImageUrl())
+                .auctionType(detail.getAuctionType())
+                .inspectionItem(inspectionItem)
+                .status(detail.getStatus())
+                .winnerPrice(detail.getWinnerPrice())
+                .sellerName(detail.getSellerName())
+                .winnerName(detail.getWinnerName())
+                .recipient(detail.getRecipient())
+                .tel(detail.getTel())
+                .zipcode(detail.getZipcode())
+                .address(detail.getAddress())
+                .detailAddress(detail.getDetailAddress())
+                .carrier(detail.getCarrier())
+                .trackingNumber(detail.getTrackingNumber())
+                .canRegisterTrackingNumber(inspectionItem
+                        && detail.getStatus() == WinnerDealStatus.PAID
+                        && shippingAddressRegistered
+                        && !trackingNumberRegistered)
+                .confirmedAt(detail.getConfirmedAt())
+                .createdAt(detail.getCreatedAt())
+                .build();
+    }
+
     private boolean isShippingAddressRegistered(WinnerDealDetailQueryResult detail) {
         // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
         return StringUtils.hasText(detail.getRecipient())
@@ -142,6 +186,18 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
 
     private boolean isTrackingNumberRegistered(WinnerDealDetailQueryResult detail) {
         // null, 빈 문자열, 공백만 있는 값은 미입력으로 본다.
+        return StringUtils.hasText(detail.getCarrier())
+                && StringUtils.hasText(detail.getTrackingNumber());
+    }
+
+    private boolean isShippingAddressRegistered(AdminWinnerDealDetailQueryResult detail) {
+        return StringUtils.hasText(detail.getRecipient())
+                && StringUtils.hasText(detail.getTel())
+                && StringUtils.hasText(detail.getZipcode())
+                && StringUtils.hasText(detail.getAddress());
+    }
+
+    private boolean isTrackingNumberRegistered(AdminWinnerDealDetailQueryResult detail) {
         return StringUtils.hasText(detail.getCarrier())
                 && StringUtils.hasText(detail.getTrackingNumber());
     }

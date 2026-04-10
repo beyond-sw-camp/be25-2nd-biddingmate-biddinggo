@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.winnerdeal.mapper;
 
+import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailQueryResult;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealHistoryRequest;
@@ -43,6 +44,7 @@ public interface WinnerDealMapper {
                                                                  @Param("request") AdminWinnerDealListRequest request,
                                                                  @Param("order") String order);
     long countAdminWinnerDealHistory(@Param("request") AdminWinnerDealListRequest request);
+    AdminWinnerDealDetailQueryResult findAdminWinnerDealDetail(@Param("winnerDealId") Long winnerDealId);
 
     // 거래 내역 상세 조회
     WinnerDealDetailQueryResult findWinnerDealDetail(@Param("winnerDealId") Long winnerDealId);
