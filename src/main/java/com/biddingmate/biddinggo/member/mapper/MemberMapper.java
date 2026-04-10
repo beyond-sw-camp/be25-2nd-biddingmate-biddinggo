@@ -9,9 +9,10 @@ import com.biddingmate.biddinggo.member.dto.MemberListView;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionSummaryResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
-import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.model.MemberGrade;
 import com.biddingmate.biddinggo.member.model.Member;
@@ -82,13 +83,13 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // 총 구매 개수 조회
     long countPurchasesByMemberId(@Param("memberId") Long memberId);
 
-    List<MemberSellingItemResponse> findSellingItemsByMemberId(
+    List<MemberSalesAuctionResponse> findMySalesAuctions(
             @Param("memberId") Long memberId,
-            @Param("status") String upperCase,
+            @Param("type") String type,
             @Param("pageRequest") BasePageRequest pageRequest
     );
 
-    long countSellingItemsByMemberId(@Param("memberId") Long memberId, @Param("status") String upperCase);
+    long countMySalesAuctions(@Param("memberId") Long memberId, @Param("type") String type);
 
     List<MemberListView> findAllWithFilter(RowBounds rowBounds, String sortOrder, String keyword, MemberStatus status);
     int countTotalMember(String keyword, MemberStatus status);
@@ -113,4 +114,5 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // 사용자 VIP 등급 재산정
     void updateMemberGrade(@Param("memberId") Long memberId,
                            @Param("grade") MemberGrade grade);
-}
+
+    MemberSalesAuctionSummaryResponse countMySalesAuctionSummary(@Param("memberId") Long memberId);

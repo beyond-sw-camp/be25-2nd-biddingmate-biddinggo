@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MemberSellingItemResponse {
+public class MemberSalesAuctionResponse {
 
     // 상품명
     private String itemName;
@@ -23,12 +25,18 @@ public class MemberSellingItemResponse {
     // 입찰 수
     private Integer bidCount;
 
-    // 남은 시간(초)
-    private Long remainingSeconds;
+    // 종료 날짜
+    private LocalDateTime endDate;
 
-    // 경매 타입
+    // 경매 타입 (NORMAL, TIME_DEAL, INSPECTION)
     private String auctionType;
 
     // 대표 이미지 URL
     private String imageUrl;
+
+    // 판매 상태 (ONGOING, SUCCESS, FAILED)
+    private String saleStatus;
+
+    // 경매 ID
+    private Long auctionId;
 }

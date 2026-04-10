@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Notification {
+
     private Long id;
     private Long receiverId;
     private NotificationType type;

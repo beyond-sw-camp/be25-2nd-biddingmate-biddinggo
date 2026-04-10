@@ -7,6 +7,7 @@ import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.notification.dto.CreateNotificationRequest;
 import com.biddingmate.biddinggo.notification.dto.CreateNotificationResponse;
 import com.biddingmate.biddinggo.notification.dto.NotificationResponse;
+import com.biddingmate.biddinggo.notification.dto.UnreadNotificationResponse;
 import com.biddingmate.biddinggo.notification.service.NotificationService;
 import com.biddingmate.biddinggo.notification.service.NotificationSseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,7 @@ public class NotificationController {
         모두 알림 등록 프로세스를 구현하면 (notificationService 를 사용하여)
         알림 등록 api 는 삭제 예정
      */
+
     @PostMapping("/")
     @Operation(summary = "알림 등록", description = "알림을 등록합니다.")
     public ResponseEntity<ApiResponse<CreateNotificationResponse>> createBid(
@@ -91,4 +93,18 @@ public class NotificationController {
     ) {
         return notificationSseService.subscribe(member.getId());
     }
+
+    @GetMapping("/unread-count")
+    @Operation(summary = "읽지 않은 알림 수 조회")
+    public ResponseEntity<ApiResponse<UnreadNotificationResponse>> getUnreadCount(
+            @AuthenticationPrincipal Member member
+    ) {
+
+        UnreadNotificationResponse result = UnreadNotificationResponse.builder()
+                .unreadCount(notificationService.countUnread(member.getId()))
+                .build();
+
+        return ApiResponse.of(HttpStatus.OK, null, "읽지 않은 알림 수 조회 성공", result);
+    }
+
 }

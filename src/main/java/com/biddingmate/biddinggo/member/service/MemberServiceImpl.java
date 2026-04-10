@@ -11,9 +11,11 @@ import com.biddingmate.biddinggo.member.dto.MemberListViewRequest;
 import com.biddingmate.biddinggo.member.dto.MemberProfileResponse;
 import com.biddingmate.biddinggo.member.dto.MemberProfileUpdateRequest;
 import com.biddingmate.biddinggo.member.dto.MemberPurchaseItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionResultResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionSummaryResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSalesItemResponse;
 import com.biddingmate.biddinggo.member.dto.MemberSellerProfileResponse;
-import com.biddingmate.biddinggo.member.dto.MemberSellingItemResponse;
+import com.biddingmate.biddinggo.member.dto.MemberSalesAuctionResponse;
 import com.biddingmate.biddinggo.member.dto.MemberWonItemResponse;
 import com.biddingmate.biddinggo.member.dto.UpdateMemberStatusRequest;
 import com.biddingmate.biddinggo.member.event.MemberStatusUpdateEvent;
@@ -199,35 +201,43 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public PageResponse<MemberSellingItemResponse> getMySellingItems(Long memberId, String status, BasePageRequest pageRequest) {
+    public MemberSalesAuctionResultResponse getMySalesAuctions(Long memberId, String type, BasePageRequest pageRequest) {
 
         // 회원 존재 여부 확인
         memberExists(memberId);
 
         // 상태값 검증
-        if (!"ON_GOING".equalsIgnoreCase(status)) {
-            throw new CustomException(ErrorType.INVALID_AUCTION_STATUS);
-        }
+        validateSalesAuctionStatus(type);
 
         // 정렬값은 최신순으로
         if (pageRequest.getOrder() == null || pageRequest.getOrder().isBlank()) {
             pageRequest.setOrder("DESC");
         }
 
-        // 판매중 상품 목록 조회
-        List<MemberSellingItemResponse> content =
-                memberMapper.findSellingItemsByMemberId(memberId, status.toUpperCase(), pageRequest);
+        String normalizedStatus = type.toUpperCase();
 
-        // 전체 개수 조회
+        // 판매 상품 목록 조회
+        List<MemberSalesAuctionResponse> content =
+                memberMapper.findMySalesAuctions(memberId, normalizedStatus, pageRequest);
+
+        // 현재 선택한 상태 기준, 전체 개수 조회
         long totalElements =
-                memberMapper.countSellingItemsByMemberId(memberId, status.toUpperCase());
+                memberMapper.countMySalesAuctions(memberId, normalizedStatus);
 
-        return PageResponse.of(
+        PageResponse<MemberSalesAuctionResponse> auctions = PageResponse.of(
                 content,
                 pageRequest.getPage(),
                 pageRequest.getSize(),
                 totalElements
         );
+
+        MemberSalesAuctionSummaryResponse summary =
+                memberMapper.countMySalesAuctionSummary(memberId);
+
+        return MemberSalesAuctionResultResponse.builder()
+                .summary(summary)
+                .auctions(auctions)
+                .build();
     }
 
     @Override
@@ -331,7 +341,7 @@ public class MemberServiceImpl implements MemberService {
 
         return stats;
     }
-
+  
     @Override
     @Transactional
     public void recalculateMemberGrade(Long memberId) {
@@ -353,5 +363,20 @@ public class MemberServiceImpl implements MemberService {
         }
 
         return MemberGrade.BRONZE;
+    } 
+  
+    private void validateSalesAuctionStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_STATUS);
+        }
+
+        String normalizedStatus = status.toUpperCase();
+
+        if (!"ALL".equals(normalizedStatus)
+                && !"ONGOING".equals(normalizedStatus)
+                && !"SUCCESS".equals(normalizedStatus)
+                && !"FAILED".equals(normalizedStatus)) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_STATUS);
+        }
     }
 }
