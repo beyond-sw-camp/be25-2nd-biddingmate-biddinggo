@@ -4,6 +4,9 @@ import com.biddingmate.biddinggo.common.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -20,6 +23,21 @@ public class GlobalExceptionHandler {
                 errorType.getHttpStatus(),
                 errorType.getErrorCode(),
                 e.getMessage(),
+                null
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        FieldError fieldError = e.getBindingResult().getFieldErrors().stream().findFirst().orElse(null);
+        String message = fieldError != null ? fieldError.getDefaultMessage() : ErrorType.BAD_REQUEST.getMessage();
+
+        log.warn("요청 검증 예외 발생 - Message: {}", message);
+
+        return ApiResponse.of(
+                ErrorType.BAD_REQUEST.getHttpStatus(),
+                ErrorType.BAD_REQUEST.getErrorCode(),
+                message,
                 null
         );
     }
@@ -44,6 +62,18 @@ public class GlobalExceptionHandler {
                 ErrorType.INTERNAL_ERROR.getHttpStatus(),
                 ErrorType.INTERNAL_ERROR.getErrorCode(),
                 e.getMessage(),
+                null
+        );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException e) {
+        log.warn("인증 실패 예외 발생 - Message: {}", e.getMessage());
+
+        return ApiResponse.of(
+                ErrorType.UNAUTHORIZED.getHttpStatus(),
+                ErrorType.UNAUTHORIZED.getErrorCode(),
+                ErrorType.UNAUTHORIZED.getMessage(),
                 null
         );
     }

@@ -38,3 +38,5 @@ out/
 
 ### env 파일 ###
 .env
+
+AGENTS.md

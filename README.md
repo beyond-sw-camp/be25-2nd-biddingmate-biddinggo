@@ -86,7 +86,7 @@
 
 # 3.  ERD
 ![](img/erd.png)<br/>
-🔗[ ERD ](https://www.erdcloud.com/d/dDdGFuogL2iKmdRJm)
+🔗[ ERD ](https://www.erdcloud.com/d/dWKrWvBcWyqzdomS4)
 
 ---
 
@@ -100,13 +100,15 @@
 <br/>
 
 ---
-
 # 6.  API 명세서
+![](img/table.PNG)<br/>
+🔗[API 명세서](https://hill-work-100.notion.site/3291072487c380e2a69eff6a242b2e82?v=3291072487c381608c7f000c0d215d7a)
 <br/>
 
 ---
-
 # 7.  화면 및 기능 설계서
+![](img/table.PNG)<br/>
+🔗[화면 및 기능 설계서](https://www.figma.com/design/0dOGV93f5reRfWgJiv1rBH/Biddinggo?node-id=185-1330&t=DaXBKBPbxL8Q8Hgr-1)
 <br/>
 
 ---
