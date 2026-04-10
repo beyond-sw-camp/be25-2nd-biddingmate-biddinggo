@@ -45,13 +45,16 @@ public class MemberServiceImpl implements MemberService {
         // 회원 존재 여부 체크
         memberExists(memberId);
 
-        // 회원 정보 조회
+        // 회원 정보 기본 조회
         MemberDashboardResponse summary = memberMapper.findDashboardInfoById(memberId);
 
-        // 낙찰된 물품 목록 조회
-        List<MemberWonItemResponse> wonItems = memberMapper.findWonItemsById(memberId);
+        // 진행 중인 구매 현황 조회
+        List<MemberWonItemResponse> purchaseItems = memberMapper.findPurchaseItemsById(memberId);
 
-        // 입찰 중인 물품 목록 조회
+        // 진행 중인 판매 현황 조회
+        List<MemberSalesItemResponse> salesItems = memberMapper.findSalesItemsById(memberId);
+
+        // 입찰 내역 조회
         List<MemberBiddingItemResponse> biddingItems = memberMapper.findBiddingItemsById(memberId);
 
         // 대시보드 응답 DTO
@@ -59,8 +62,10 @@ public class MemberServiceImpl implements MemberService {
                 .nickname(summary.getNickname())
                 .grade(summary.getGrade())
                 .point(summary.getPoint())
-                .wonItems(wonItems)
+                .imageUrl(summary.getImageUrl())
+                .purchaseItems(purchaseItems)
                 .biddingItems(biddingItems)
+                .salesItems(salesItems)
                 .build();
     }
 
