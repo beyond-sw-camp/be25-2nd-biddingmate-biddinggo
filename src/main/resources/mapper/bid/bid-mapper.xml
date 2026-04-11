@@ -144,7 +144,7 @@
             #{auctionId}
         </foreach>
         AND b.status = 'ACTIVE'
-        GROUP BY b.bidder_id
+        GROUP BY b.auction_id, b.bidder_id
     </select>
 
     <!-- 비활성화 된 사용자의 최고 입찰 조회 -->
