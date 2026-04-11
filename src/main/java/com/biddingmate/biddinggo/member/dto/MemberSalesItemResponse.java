@@ -13,9 +13,6 @@ import java.time.LocalDateTime;
 @Builder
 public class MemberSalesItemResponse {
 
-    // 상품 대표 이미지 URL
-    private String imageUrl;
-
     // 상품명
     private String itemName;
 
