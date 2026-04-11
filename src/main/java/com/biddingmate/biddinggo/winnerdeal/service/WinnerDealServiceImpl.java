@@ -163,7 +163,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             if (isShippingInfoRegistered(winnerDeal)) {
                 log.info("낙찰 회원 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
                         winnerDeal.getId(), winnerDeal.getAuctionId());
-                return;
+                continue;
+            }
+            if(winnerDeal.getStatus()==WinnerDealStatus.CANCELLED){
+                continue;
             }
             refundAndCancelWinnerDeal(winnerDeal);
         }

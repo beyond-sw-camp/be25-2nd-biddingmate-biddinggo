@@ -25,4 +25,13 @@
         WHERE target_id = #{targetMemberId}
     </select>
 
+    <select id="existsByReporterIdAndTargetId" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, 1, 0)
+        FROM report
+        WHERE reporter_id = #{reporterId}
+          AND target_id = #{targetId}
+          AND target_type = #{targetType}
+    </select>
+
+
 </mapper>

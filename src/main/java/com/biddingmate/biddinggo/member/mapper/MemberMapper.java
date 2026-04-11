@@ -108,4 +108,6 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     boolean existsIncompleteDeals(@Param("memberId") Long memberId);
 
     MemberSalesAuctionSummaryResponse countMySalesAuctionSummary(@Param("memberId") Long memberId);
+
+    Member findByIdForUpdate(@Param("id") Long id);
 }
