@@ -497,7 +497,7 @@
             (SELECT COUNT(*)
              FROM winner_deal
              WHERE seller_id = #{memberId}
-               AND status IN ('PAID', 'CONFIRMED')) AS totalSales,
+               AND status IN ('PAID','SHIPPED','CONFIRMED')) AS totalSales,
 
             -- 판매 취소 건수
             (SELECT COUNT(*)

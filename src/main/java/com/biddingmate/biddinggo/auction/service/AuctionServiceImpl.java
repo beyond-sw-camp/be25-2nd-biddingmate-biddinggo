@@ -1,24 +1,22 @@
 package com.biddingmate.biddinggo.auction.service;
 
-import com.biddingmate.biddinggo.auction.dto.BidCountDto;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionFromInspectionItemRequest;
 import com.biddingmate.biddinggo.auction.dto.CreateAuctionRequest;
 import com.biddingmate.biddinggo.auction.dto.UpdateAuctionRequest;
 import com.biddingmate.biddinggo.auction.event.AuctionCancelledEvent;
-import com.biddingmate.biddinggo.auction.prediction.event.AuctionQueryEmbeddingSyncRequestedEvent;
-import com.biddingmate.biddinggo.auction.prediction.model.AuctionEmbeddingSyncTrigger;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.YesNo;
+import com.biddingmate.biddinggo.auction.prediction.event.AuctionQueryEmbeddingSyncRequestedEvent;
+import com.biddingmate.biddinggo.auction.prediction.model.AuctionEmbeddingSyncTrigger;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.bid.service.BidQueryService;
 import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
-import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
-import com.biddingmate.biddinggo.member.model.MemberStatus;
+import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import com.biddingmate.biddinggo.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
