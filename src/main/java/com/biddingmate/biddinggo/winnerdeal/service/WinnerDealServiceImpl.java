@@ -159,8 +159,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     public void handleMemberDeactivationAfterWinning(Long memberId) {
         log.info("낙찰 회원 비활성화 처리 시작 - Member ID: {}", memberId);
 
-        List<WinnerDeal> winnerDeals = winnerDealQueryService.findByMemberId(memberId);
-
+        handleWinnerDeactivation(memberId);
+        handleSellerDeactivation(memberId);
+    }
+/*
         for (WinnerDeal winnerDeal : winnerDeals) {
             if (isShippingInfoRegistered(winnerDeal)) {
                 log.info("낙찰 회원 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
@@ -176,6 +178,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         log.info("낙찰 회원 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
     }
 
+*/
     @Override
     @Transactional
     public void registerShippingAddress(Long winnerDealId, Long memberId, WinnerDealShippingAddressRequest request) {
@@ -304,6 +307,46 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         // 사용자 VIP 등급 재산정
         memberService.recalculateMemberGrade(winnerDeal.getWinnerId());
         memberService.recalculateMemberGrade(winnerDeal.getSellerId());
+    }
+
+    private void handleWinnerDeactivation(Long memberId) {
+        List<WinnerDeal> winnerDeals = winnerDealQueryService.findByWinnerId(memberId);
+
+        for (WinnerDeal winnerDeal : winnerDeals) {
+            if (shouldKeepDealOnDeactivation(winnerDeal)) {
+                log.info("Keep winner deal after winner deactivation - WinnerDeal ID: {}, Auction ID: {}",
+                        winnerDeal.getId(), winnerDeal.getAuctionId());
+                continue;
+            }
+
+            refundAndCancelWinnerDeal(winnerDeal);
+        }
+
+        log.info("Winner-side deactivation handling finished - Member ID: {}, Count: {}", memberId, winnerDeals.size());
+    }
+
+    private void handleSellerDeactivation(Long memberId) {
+        List<WinnerDeal> sellerDeals = winnerDealQueryService.findBySellerId(memberId);
+
+        for (WinnerDeal winnerDeal : sellerDeals) {
+            if (shouldKeepDealOnDeactivation(winnerDeal)) {
+                log.info("Keep winner deal after seller deactivation - WinnerDeal ID: {}, Auction ID: {}",
+                        winnerDeal.getId(), winnerDeal.getAuctionId());
+                continue;
+            }
+
+            refundAndCancelWinnerDeal(winnerDeal);
+        }
+
+        log.info("Seller-side deactivation handling finished - Member ID: {}, Count: {}", memberId, sellerDeals.size());
+    }
+
+    private boolean shouldKeepDealOnDeactivation(WinnerDeal winnerDeal) {
+        if (winnerDeal.getStatus() == WinnerDealStatus.CANCELLED) {
+            return true;
+        }
+
+        return isShippingInfoRegistered(winnerDeal);
     }
 
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {

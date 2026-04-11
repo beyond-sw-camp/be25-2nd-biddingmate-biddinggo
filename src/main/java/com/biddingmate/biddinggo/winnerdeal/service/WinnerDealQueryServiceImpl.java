@@ -32,8 +32,14 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<WinnerDeal> findByMemberId(Long memberId) {
-        return winnerDealMapper.findByMemberId(memberId);
+    public List<WinnerDeal> findByWinnerId(Long memberId) {
+        return winnerDealMapper.findByWinnerId(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<WinnerDeal> findBySellerId(Long memberId) {
+        return winnerDealMapper.findBySellerId(memberId);
     }
 
     @Override
