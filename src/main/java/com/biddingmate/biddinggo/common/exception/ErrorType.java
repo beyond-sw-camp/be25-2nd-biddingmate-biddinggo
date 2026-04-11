@@ -142,6 +142,7 @@ public enum ErrorType {
     WINNER_DEAL_CONFIRM_NOT_ALLOWED("winner-deal-012", "현재 상태의 낙찰 거래는 구매확정을 할 수 없습니다.", HttpStatus.CONFLICT),
     WINNER_DEAL_CONFIRM_FAILED("winner-deal-013", "낙찰 거래 구매확정 처리에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     WINNER_DEAL_SETTLEMENT_INVALID("winner-deal-014", "낙찰 거래 정산 정보가 올바르지 않습니다.", HttpStatus.CONFLICT),
+    WINNER_DEAL_BID_AMOUNT_NOT_FOUND("winner-deal-015", "낙찰자의 예치 입찰금을 찾을 수 없습니다.", HttpStatus.CONFLICT),
 
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

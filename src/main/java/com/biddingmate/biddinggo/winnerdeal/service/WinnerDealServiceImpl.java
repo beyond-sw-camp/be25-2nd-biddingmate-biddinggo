@@ -316,7 +316,17 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_UPDATE_FAILED);
         }
 
-        pointService.refundBid(winnerDeal.getWinnerId(), winnerDeal.getWinnerPrice());
+        // 낙찰 취소 환불은 비크리 낙찰가가 아니라 낙찰자가 실제 예치한 최고 입찰금 기준으로 처리
+        Long depositedAmount = bidQueryService.findMaxBidAmountByAuctionAndBidderRegardlessStatus(
+                winnerDeal.getAuctionId(),
+                winnerDeal.getWinnerId()
+        );
+
+        if (depositedAmount == null || depositedAmount <= 0) {
+            throw new CustomException(ErrorType.WINNER_DEAL_BID_AMOUNT_NOT_FOUND);
+        }
+
+        pointService.refundBid(winnerDeal.getWinnerId(), depositedAmount);
     }
 
     private void publishAuctionPriceReferenceSyncRequestedEvent(Auction auction, AuctionItem auctionItem, Long winnerPrice) {
