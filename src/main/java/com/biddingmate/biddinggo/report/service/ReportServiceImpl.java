@@ -6,6 +6,7 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.event.MemberStatusUpdateEvent;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
+import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.model.MemberStatus;
 import com.biddingmate.biddinggo.point.service.PointService;
 import com.biddingmate.biddinggo.report.dto.ReportCreateRequest;
@@ -37,12 +38,12 @@ public class ReportServiceImpl implements ReportService {
         if (request.getTargetMemberId().equals(reporterId)) {
             throw new CustomException(ErrorType.CANNOT_REPORT_SELF);
         }
-        // 중복 신고 검증
-        if (reportMapper.existsByReporterIdAndTargetId(reporterId, request.getTargetMemberId(), "MEMBER")) {
-            throw new CustomException(ErrorType.ALREADY_REPORTED);
-        }
+//        // 중복 신고 검증
+//        if (reportMapper.existsByReporterIdAndTargetId(reporterId, request.getTargetMemberId(), "MEMBER")) {
+//            throw new CustomException(ErrorType.ALREADY_REPORTED);
+//        }
         // 동시성 제어를 위한 유저 락
-        memberMapper.findByIdForUpdate(request.getTargetMemberId());
+        Member targetMember = memberMapper.findByIdForUpdate(request.getTargetMemberId());
 
         // 신고 데이터 저장
         Report report = Report.builder()
@@ -59,7 +60,7 @@ public class ReportServiceImpl implements ReportService {
         // 누적 횟수 확인 (3회 이상 시 커스텀 정지 로직 실행)
         int reportCount = reportMapper.countByTargetMemberId(request.getTargetMemberId());
 
-        if (reportCount >= 3) {
+        if (reportCount >= 3 && targetMember.getStatus() != MemberStatus.ACTIVE) {
             processMemberDeactivation(request.getTargetMemberId());
         }
     }

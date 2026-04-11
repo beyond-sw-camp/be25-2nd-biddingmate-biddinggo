@@ -284,8 +284,8 @@ public class AuctionServiceImpl implements AuctionService {
 
         for (Long auctionId : auctionIds) {
             // 비활성화 된 사용자의 최고 입찰 금액 환불
-           // Long amount = bidQueryService.findMaxBidAmountByAuctionAndBidder(auctionId, memberId);
-           // pointService.refundBid(memberId, amount);
+            Long amount = bidQueryService.findMaxBidAmountByAuctionAndBidder(auctionId, memberId);
+            pointService.refundBid(memberId, amount);
 
             // 활성화 중인 상위 2개 입찰 조회 (비크리 핵심)
             List<Bid> topBids = bidQueryService.findTop2ActiveBids(auctionId);
