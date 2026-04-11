@@ -33,14 +33,17 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     MemberProfileResponse findProfileById(@Param("memberId") Long memberId);
 
-    // 대시보드
+    // 대시보드 프로필 기본 정보
     MemberDashboardResponse findDashboardInfoById(@Param("memberId") Long memberId);
 
-    // 낙찰된 물품 목록
-    List<MemberWonItemResponse> findWonItemsById(@Param("memberId") Long memberId);
+    // 진행 중 구매 현황
+    List<MemberWonItemResponse> findPurchaseItemsById(@Param("memberId") Long memberId);
 
-    // 입찰 중 물품 목록
+    // 입찰 내역
     List<MemberBiddingItemResponse> findBiddingItemsById(@Param("memberId") Long memberId);
+
+    // 진행 중 판매 현황
+    List<MemberSalesItemResponse> findSalesItemsById(@Param("memberId") Long memberId);
 
     // 아이디를 통한 사용자 조회(auth)
     Member selectMemberByUsername(@Param("username") String username);

@@ -10,9 +10,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberBiddingItemResponse {
+
+    // 상품 대표 이미지 URL
     private String imageUrl;
+
+    // 상품명
     private String itemName;
+
+    // 현재가
     private Long currentPrice;
+
+    // 내 입찰가
     private Long myBidPrice;
+
+    // 경매 종료 일시
     private LocalDateTime endDate;
+
+    // 경매 상태
+    private String status;
 }
