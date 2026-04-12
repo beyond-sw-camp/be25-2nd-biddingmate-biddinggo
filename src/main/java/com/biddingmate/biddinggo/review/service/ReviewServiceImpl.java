@@ -14,6 +14,7 @@ import com.biddingmate.biddinggo.review.dto.SellerReviewResponse;
 import com.biddingmate.biddinggo.review.mapper.ReviewMapper;
 import com.biddingmate.biddinggo.review.model.Review;
 import com.biddingmate.biddinggo.winnerdeal.mapper.WinnerDealMapper;
+import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,10 @@ public class ReviewServiceImpl implements ReviewService {
         var deal = winnerDealMapper.findByAuctionId(auctionId);
         if (deal == null) {
             throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
+        }
+
+        if (deal.getStatus() != WinnerDealStatus.CONFIRMED) {
+            throw new CustomException(ErrorType.WINNER_DEAL_NOT_CONFIRMED);
         }
 
         // 중복 리뷰 방지
