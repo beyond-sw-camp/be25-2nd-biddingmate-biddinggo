@@ -110,11 +110,19 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             log.info("낙찰 처리 성공 - Auction ID: {}, Winner: {}, Price: {}",
                     auction.getId(), winnerBid.getBidderId(), finalPrice);
 
-            // 낙찰 알람
+            // 낙찰 알람(구매자)
             notificationPublisher.publishNotification(
                     winnerBid.getBidderId(),
                     NotificationType.WIN,
                     "축하합니다. 경매 #" + auction.getId() + " 낙찰이 확정되었습니다.",
+                    "/auctions/" + auction.getId()
+            );
+
+            // 낙찰 알람(판매자)
+            notificationPublisher.publishNotification(
+                    auction.getSellerId(),
+                    NotificationType.WIN,
+                    "경매 #" + auction.getId() + " 낙찰이 확정되었습니다.",
                     "/auctions/" + auction.getId()
             );
 
