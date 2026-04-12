@@ -120,7 +120,8 @@ public enum ErrorType {
     NOT_ENOUGH_POINT("bid-006", "보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST),
     CANNOT_BID_ON_OWN_AUCTION("bid-007", "자신의 경매에 입찰할 수 없습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_ALREADY_FINISHED("bid-008", "이미 종료된 경매이거나 연장할 수 없는 상태입니다.", HttpStatus.CONFLICT),
-    CANNOT_BUY_NOW_OWN_AUCTION("bid-009", "자신의 경매는 즉시구매할 수 없습니다.", HttpStatus.CONFLICT),
+    CANNOT_BUY_NOW("bid-009", "해당 경매는 현재 즉시구매할 수 없습니다.", HttpStatus.CONFLICT),
+    CANNOT_BUY_NOW_OWN_AUCTION("bid-010", "자신의 경매는 즉시구매할 수 없습니다.", HttpStatus.CONFLICT),
 
     // 관심 경매
     WISHLIST_SAVE_FAIL("wishlist-001", "관심 경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),

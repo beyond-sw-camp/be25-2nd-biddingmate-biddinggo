@@ -135,15 +135,10 @@ public class AuctionServiceImpl implements AuctionService {
             throw new CustomException(ErrorType.CANNOT_BUY_NOW_OWN_AUCTION);
         }
 
-        // 현재 경매가 즉시구매 가능한 상태인지 확인한다.
-        if (!isAuctionBuyNowAvailable(auction) || auction.getBuyNowPrice() == null) {
-            throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
-        }
-
-        // 즉시 구매가 존재 검증
+        // 현재 경매가 즉시구매 가능한 상태인지 확인
         Long buyNowPrice = auction.getBuyNowPrice();
-        if (buyNowPrice == null) {
-            throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
+        if (!isAuctionBuyNowAvailable(auction)) {
+            throw new CustomException(ErrorType.CANNOT_BUY_NOW);
         }
 
         // 기존 입찰로 이미 선점한 금액을 반영해 추가로 필요한 포인트만 계산한다.
@@ -295,7 +290,8 @@ public class AuctionServiceImpl implements AuctionService {
     private boolean isAuctionBuyNowAvailable(Auction auction) {
         LocalDateTime now = LocalDateTime.now();
 
-        return auction.getStatus() == AuctionStatus.ON_GOING
+        return auction.getBuyNowPrice() != null
+                && auction.getStatus() == AuctionStatus.ON_GOING
                 && !now.isBefore(auction.getStartDate())
                 && !now.isAfter(auction.getEndDate());
     }
