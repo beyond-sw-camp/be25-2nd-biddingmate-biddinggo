@@ -20,9 +20,7 @@ public class MemberDeactivationBeforeWinningListener {
     @Transactional
     public void handle(MemberStatusUpdateEvent event) {
         if (event.getStatus() == MemberStatus.INACTIVE) {
-            if (event.getStatus() == MemberStatus.INACTIVE) {
-                auctionService.handleMemberDeactivationBeforeWinning(event.getMemberId());
-            }
+            auctionService.handleMemberDeactivationBeforeWinning(event.getMemberId());
         }
     }
 }

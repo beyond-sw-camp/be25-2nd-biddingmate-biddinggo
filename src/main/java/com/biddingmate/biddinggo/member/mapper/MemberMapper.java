@@ -120,4 +120,6 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
                            @Param("grade") MemberGrade grade);
 
     MemberSalesAuctionSummaryResponse countMySalesAuctionSummary(@Param("memberId") Long memberId);
+
+    Member findByIdForUpdate(@Param("id") Long id);
 }

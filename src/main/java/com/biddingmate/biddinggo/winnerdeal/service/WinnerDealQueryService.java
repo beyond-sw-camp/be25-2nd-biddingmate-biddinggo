@@ -14,7 +14,8 @@ import java.util.List;
 
 public interface WinnerDealQueryService {
     // 낙찰 완료된 거래를 회원 기준으로 조회
-    List<WinnerDeal> findByMemberId(Long memberId);
+    List<WinnerDeal> findByWinnerId(Long memberId);
+    List<WinnerDeal> findBySellerId(Long memberId);
 
     // 구매내역 조회
     PageResponse<WinnerDealHistoryResponse> findPurchaseHistory(@Valid WinnerDealHistoryRequest request, Long memberId);

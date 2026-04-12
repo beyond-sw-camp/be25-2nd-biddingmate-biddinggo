@@ -640,5 +640,11 @@
         WHERE a.seller_id = #{memberId}
     </select>
 
+    <select id="findByIdForUpdate" resultType="Member">
+        SELECT *
+        FROM member
+        WHERE id = #{id}
+            FOR UPDATE
+    </select>
 </mapper>
 
