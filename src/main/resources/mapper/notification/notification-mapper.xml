@@ -19,16 +19,21 @@
                  )
     </insert>
 
-    <select id="getNotificationsByMemberId">
+
+    <select id="getNotificationsByMemberId"
+            resultType="com.biddingmate.biddinggo.notification.dto.NotificationResponse">
         SELECT id,
-               receiver_id AS receiverId,
-               type,
-               content,
-               url,
-               read_at AS readAt,
-               created_at AS createdAt
+        type,
+        content,
+        url,
+        read_at AS readAt,
+        created_at AS createdAt
         FROM notification
         WHERE receiver_id = #{receiverId}
+        <choose>
+            <when test="order == 'ASC'">ORDER BY created_at ASC</when>
+            <otherwise>ORDER BY created_at DESC</otherwise>
+        </choose>
     </select>
 
     <select id="getNotificationCount">
