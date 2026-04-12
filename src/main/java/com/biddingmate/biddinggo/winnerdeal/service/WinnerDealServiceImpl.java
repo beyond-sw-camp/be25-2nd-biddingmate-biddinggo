@@ -18,6 +18,8 @@ import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.notification.model.NotificationType;
 import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
+import com.biddingmate.biddinggo.point.model.PointHistory;
+import com.biddingmate.biddinggo.point.model.PointHistoryType;
 import com.biddingmate.biddinggo.point.service.PointService;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
@@ -159,6 +161,19 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     public void processBuyNow(Auction auction, Long buyerId, Long buyNowPrice, long additionalAmount) {
         // 기존 입찰금을 제외하고 부족한 금액만 추가 차감한다.
         memberService.deductPoint(buyerId, additionalAmount);
+
+        // 즉시구매로 추가 차감된 금액을 입찰 포인트 히스토리로 남긴다.
+        PointHistory pointHistory = PointHistory.builder()
+                .memberId(buyerId)
+                .type(PointHistoryType.BID)
+                .amount(additionalAmount)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        int pointInsert = pointService.addPointHistory(pointHistory);
+        if (pointInsert != 1) {
+            throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
 
         // 거래 완료 후 시세 반영 이벤트에 사용할 상품 정보를 조회한다.
         AuctionItem auctionItem = auctionItemMapper.findById(auction.getItemId());
