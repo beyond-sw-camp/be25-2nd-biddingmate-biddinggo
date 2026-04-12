@@ -223,6 +223,7 @@
             nickname,
             email,
             role,
+            status,
             created_at
 
         ) VALUES (
@@ -232,6 +233,7 @@
             #{nickname},
             #{email},
             #{role},
+            #{status},
             NOW()
                  )
     </insert>
