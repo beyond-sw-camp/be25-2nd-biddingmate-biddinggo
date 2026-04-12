@@ -172,11 +172,13 @@
         SELECT i.id AS inspectionId,
                ai.id AS itemId,
                ai.name AS name,
+               m.nickname AS sellerNickname,
                i.status AS status,
                ai.quality AS quality,
                i.created_at AS createdAt
         FROM inspection i
         INNER JOIN auction_item ai ON i.item_id = ai.id
+        LEFT JOIN member m ON ai.seller_id = m.id
         <where>
             <if test="request.status != null">
                 AND i.status = #{request.status}

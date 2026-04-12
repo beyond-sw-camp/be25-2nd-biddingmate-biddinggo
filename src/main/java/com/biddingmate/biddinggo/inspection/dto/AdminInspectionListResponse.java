@@ -19,6 +19,8 @@ public class AdminInspectionListResponse {
     private Long itemId;
     @Schema(description = "상품명", example = "Galaxy S25")
     private String name;
+    @Schema(description = "판매자 닉네임", example = "선우짱123")
+    private String sellerNickname;
     @Schema(description = "검수 상태", example = "PENDING")
     private ItemInspectionStatus status;
     @Schema(description = "상품 상태", example = "최상")
