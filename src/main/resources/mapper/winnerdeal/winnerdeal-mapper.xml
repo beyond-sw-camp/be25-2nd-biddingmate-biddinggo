@@ -64,7 +64,28 @@
         LIMIT 1
     </select>
 
-    <select id="findByMemberId" resultType="WinnerDeal">
+    <select id="findByWinnerId" resultType="WinnerDeal">
+        SELECT id,
+               auction_id AS auctionId,
+               winner_id AS winnerId,
+               seller_id AS sellerId,
+               deal_number AS dealNumber,
+               winner_price AS winnerPrice,
+               status,
+               confirmed_at AS confirmedAt,
+               zipcode,
+               address,
+               detail_address AS detailAddress,
+               tel,
+               recipient,
+               carrier,
+               tracking_number AS trackingNumber,
+               created_at AS createdAt
+        FROM winner_deal
+        WHERE winner_id = #{memberId}
+    </select>
+
+    <select id="findBySellerId" resultType="WinnerDeal">
         SELECT id,
                auction_id AS auctionId,
                winner_id AS winnerId,
@@ -83,7 +104,6 @@
                created_at AS createdAt
         FROM winner_deal
         WHERE seller_id = #{memberId}
-           OR winner_id = #{memberId}
     </select>
 
     <update id="updateStatus">

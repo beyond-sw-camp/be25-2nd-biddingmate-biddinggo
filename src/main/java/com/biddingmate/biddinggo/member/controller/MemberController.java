@@ -63,24 +63,6 @@ public class MemberController {
         return ApiResponse.of(HttpStatus.OK, null, "회원 탈퇴 성공", null);
     }
 
-    @GetMapping("/me/sales")
-    public ResponseEntity<ApiResponse<PageResponse<MemberSalesItemResponse>>> getSales(
-            @AuthenticationPrincipal Member member,
-            @Valid BasePageRequest pageRequest
-    ) {
-        PageResponse<MemberSalesItemResponse> result = memberService.getMySales(member.getId(), pageRequest);
-        return ApiResponse.of(HttpStatus.OK, null, "판매 내역 조회 성공", result);
-    }
-
-    @GetMapping("/me/purchases")
-    public ResponseEntity<ApiResponse<PageResponse<MemberPurchaseItemResponse>>> getPurchases(
-            @AuthenticationPrincipal Member member,
-            @Valid BasePageRequest pageRequest
-    ) {
-        PageResponse<MemberPurchaseItemResponse> result = memberService.getMyPurchases(member.getId(), pageRequest);
-        return ApiResponse.of(HttpStatus.OK, null, "구매 내역 조회 성공", result);
-    }
-
     @Operation(
             summary = "경매관리",
             description = "로그인한 회원의 경매를 상태별(ALL, PENDING, ONGOING, SUCCESS, FAILED, CANCELLED)로 조회합니다."

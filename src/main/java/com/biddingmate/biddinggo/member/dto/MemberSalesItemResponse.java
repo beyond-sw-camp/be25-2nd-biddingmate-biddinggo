@@ -13,9 +13,15 @@ import java.time.LocalDateTime;
 @Builder
 public class MemberSalesItemResponse {
 
+    // 상품명
     private String itemName;
-    private String buyerName;
-    private Long price;
-    private LocalDateTime completedAt;
-    private String deliveryStatus;
+
+    // 거래 상태
+    private String status;
+
+    // 판매 금액
+    private Long winnerPrice;
+
+    // 거래 생성일
+    private LocalDateTime createdAt;
 }

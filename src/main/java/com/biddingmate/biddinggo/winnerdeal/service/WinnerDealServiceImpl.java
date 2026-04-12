@@ -226,13 +226,18 @@ public class WinnerDealServiceImpl implements WinnerDealService {
     public void handleMemberDeactivationAfterWinning(Long memberId) {
         log.info("낙찰 회원 비활성화 처리 시작 - Member ID: {}", memberId);
 
-        List<WinnerDeal> winnerDeals = winnerDealQueryService.findByMemberId(memberId);
-
+        handleWinnerDeactivation(memberId);
+        handleSellerDeactivation(memberId);
+    }
+/*
         for (WinnerDeal winnerDeal : winnerDeals) {
             if (isShippingInfoRegistered(winnerDeal)) {
                 log.info("낙찰 회원 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
                         winnerDeal.getId(), winnerDeal.getAuctionId());
-                return;
+                continue;
+            }
+            if(winnerDeal.getStatus()==WinnerDealStatus.CANCELLED){
+                continue;
             }
             refundAndCancelWinnerDeal(winnerDeal);
         }
@@ -240,6 +245,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         log.info("낙찰 회원 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
     }
 
+*/
     @Override
     @Transactional
     public void registerShippingAddress(Long winnerDealId, Long memberId, WinnerDealShippingAddressRequest request) {
@@ -370,6 +376,46 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         memberService.recalculateMemberGrade(winnerDeal.getSellerId());
     }
 
+    private void handleWinnerDeactivation(Long memberId) {
+        List<WinnerDeal> winnerDeals = winnerDealQueryService.findByWinnerId(memberId);
+
+        for (WinnerDeal winnerDeal : winnerDeals) {
+            if (shouldKeepDealOnDeactivation(winnerDeal)) {
+                log.info("Keep winner deal after winner deactivation - WinnerDeal ID: {}, Auction ID: {}",
+                        winnerDeal.getId(), winnerDeal.getAuctionId());
+                continue;
+            }
+
+            refundAndCancelWinnerDeal(winnerDeal);
+        }
+
+        log.info("Winner-side deactivation handling finished - Member ID: {}, Count: {}", memberId, winnerDeals.size());
+    }
+
+    private void handleSellerDeactivation(Long memberId) {
+        List<WinnerDeal> sellerDeals = winnerDealQueryService.findBySellerId(memberId);
+
+        for (WinnerDeal winnerDeal : sellerDeals) {
+            if (shouldKeepDealOnDeactivation(winnerDeal)) {
+                log.info("Keep winner deal after seller deactivation - WinnerDeal ID: {}, Auction ID: {}",
+                        winnerDeal.getId(), winnerDeal.getAuctionId());
+                continue;
+            }
+
+            refundAndCancelWinnerDeal(winnerDeal);
+        }
+
+        log.info("Seller-side deactivation handling finished - Member ID: {}, Count: {}", memberId, sellerDeals.size());
+    }
+
+    private boolean shouldKeepDealOnDeactivation(WinnerDeal winnerDeal) {
+        if (winnerDeal.getStatus() == WinnerDealStatus.CANCELLED) {
+            return true;
+        }
+
+        return isShippingInfoRegistered(winnerDeal);
+    }
+
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {
         if (winnerDeal.getStatus() == WinnerDealStatus.CANCELLED) {
             throw new CustomException(ErrorType.WINNER_DEAL_ALREADY_CANCELLED);
@@ -380,7 +426,17 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_UPDATE_FAILED);
         }
 
-        pointService.refundBid(winnerDeal.getWinnerId(), winnerDeal.getWinnerPrice());
+        // 낙찰 취소 환불은 비크리 낙찰가가 아니라 낙찰자가 실제 예치한 최고 입찰금 기준으로 처리
+        Long depositedAmount = bidQueryService.findMaxBidAmountByAuctionAndBidderRegardlessStatus(
+                winnerDeal.getAuctionId(),
+                winnerDeal.getWinnerId()
+        );
+
+        if (depositedAmount == null || depositedAmount <= 0) {
+            throw new CustomException(ErrorType.WINNER_DEAL_BID_AMOUNT_NOT_FOUND);
+        }
+
+        pointService.refundBid(winnerDeal.getWinnerId(), depositedAmount);
     }
 
     private void publishAuctionPriceReferenceSyncRequestedEvent(Auction auction, AuctionItem auctionItem, Long winnerPrice) {
