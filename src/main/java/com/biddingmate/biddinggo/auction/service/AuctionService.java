@@ -29,7 +29,7 @@ public interface AuctionService {
     void cancelAuction(Long auctionId, Long sellerId);
 
     /**
-     * 寃쎈ℓ瑜?利됱떆 援щℓ濡?醫낅즺?쒕떎.
+     * 즉시 구매
      */
     void buyNowAuction(Long auctionId, Long buyerId);
 

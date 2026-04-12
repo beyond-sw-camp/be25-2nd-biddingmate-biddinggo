@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import com.biddingmate.biddinggo.common.response.ApiResponse;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.member.model.Member;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -130,17 +131,11 @@ public class AuctionController {
         return ApiResponse.of(HttpStatus.OK, null, "경매 취소 완료", result);
     }
     @PostMapping("/{auctionId}/buy-now")
-    @Operation(summary = "Buy now", description = "Completes the auction immediately with the configured buy-now price.")
-    public ResponseEntity<ApiResponse<CreateAuctionResponse>> buyNowAuction(
-            @PathVariable Long auctionId,
-            @AuthenticationPrincipal Member member) {
-
+    @Operation(summary = "즉시 구매", description = "설정된 즉시구매가로 경매를 즉시 종료하고 거래를 확정합니다.")
+    public ResponseEntity<ApiResponse<Void>> buyNowAuction(@Parameter(description = "경매 ID", example = "1") @PathVariable Long auctionId,
+                                                           @Parameter(hidden = true) @AuthenticationPrincipal Member member) {
         auctionService.buyNowAuction(auctionId, member.getId());
 
-        CreateAuctionResponse result = CreateAuctionResponse.builder()
-                .auctionId(auctionId)
-                .build();
-
-        return ApiResponse.of(HttpStatus.OK, null, "Buy now completed", result);
+        return ApiResponse.of(HttpStatus.OK, null, "즉시 구매 완료", null);
     }
 }

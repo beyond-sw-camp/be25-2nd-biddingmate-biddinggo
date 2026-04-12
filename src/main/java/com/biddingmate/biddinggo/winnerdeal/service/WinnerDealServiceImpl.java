@@ -156,25 +156,14 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
     @Override
     @Transactional
-    public void processBuyNow(Auction auction, Long buyerId) {
-        Long buyNowPrice = auction.getBuyNowPrice();
-        if (buyNowPrice == null) {
-            throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
-        }
+    public void processBuyNow(Auction auction, Long buyerId, Long buyNowPrice, long additionalAmount) {
+        // 기존 입찰금을 제외하고 부족한 금액만 추가 차감한다.
+        memberService.deductPoint(buyerId, additionalAmount);
 
-        Long lastBidAmount = bidService.getLastBidAmount(buyerId, auction.getId());
-        long additionalAmount = Math.max(buyNowPrice - lastBidAmount, 0L);
-
-        if (additionalAmount > 0 && memberService.getCurrentPoint(buyerId) < additionalAmount) {
-            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
-        }
-
-        if (additionalAmount > 0) {
-            memberService.deductPoint(buyerId, additionalAmount);
-        }
-
+        // 거래 완료 후 시세 반영 이벤트에 사용할 상품 정보를 조회한다.
         AuctionItem auctionItem = auctionItemMapper.findById(auction.getItemId());
 
+        // 즉시구매 성사와 동시에 낙찰 거래를 생성한다.
         WinnerDeal winnerDeal = WinnerDeal.builder()
                 .auctionId(auction.getId())
                 .winnerId(buyerId)
@@ -187,6 +176,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
         winnerDealMapper.insert(winnerDeal);
 
+        // 경매를 종료하고 낙찰자와 최종 거래 금액을 확정한다.
         auction.setStatus(AuctionStatus.ENDED);
         auction.setWinnerId(buyerId);
         auction.setWinnerPrice(buyNowPrice);
@@ -196,6 +186,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
         }
 
+        // 경매 상품도 판매 완료 상태로 변경한다.
         auctionItemMapper.updateStatus(
                 auction.getItemId(),
                 AuctionItemStatus.SOLD,
@@ -203,8 +194,10 @@ public class WinnerDealServiceImpl implements WinnerDealService {
                 null
         );
 
+        // 즉시구매 완료 가격을 시세/예측 데이터에 반영할 수 있도록 이벤트를 발행한다.
         publishAuctionPriceReferenceSyncRequestedEvent(auction, auctionItem, buyNowPrice);
 
+        // 낙찰자를 제외한 기존 입찰자들의 보증금성 입찰 금액을 환불한다.
         List<RefundDto> refunds =
                 bidQueryService.findRefundTargetsExcludingWinner(auction.getId(), buyerId);
 
@@ -212,17 +205,18 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             pointService.refundBid(refund.getBidderId(), refund.getAmount());
         }
 
+        // 거래 완료 사실을 구매자와 판매자에게 각각 알린다.
         notificationPublisher.publishNotification(
                 buyerId,
                 NotificationType.WIN,
-                "Buy now completed for auction #" + auction.getId(),
+                "경매 #" + auction.getId() + "의 즉시구매가 완료되었습니다.",
                 "/auctions/" + auction.getId()
         );
 
         notificationPublisher.publishNotification(
                 auction.getSellerId(),
                 NotificationType.WIN,
-                "Auction #" + auction.getId() + " was completed with buy now.",
+                "경매 #" + auction.getId() + "이 즉시구매로 종료되었습니다.",
                 "/auctions/" + auction.getId()
         );
     }
