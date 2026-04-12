@@ -151,6 +151,7 @@ public enum ErrorType {
     REVIEW_DELETE_FAIL("review-004", "리뷰 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_THE_WINNER("review-005", "낙찰자만 해당 경매의 리뷰를 남길 수 있습니다.", HttpStatus.FORBIDDEN),
     SELLER_NOT_FOUND("review-006", "해당 경매의 판매자 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    WINNER_DEAL_NOT_CONFIRMED("review-007", "구매 확정된 거래에 대해서만 리뷰를 작성할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
     // 알림
     NOTIFICATION_SAVE_FAILED("notification-001", "알림 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
