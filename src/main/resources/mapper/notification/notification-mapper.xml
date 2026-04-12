@@ -19,6 +19,7 @@
                  )
     </insert>
 
+
     <select id="getNotificationsByMemberId"
             resultType="com.biddingmate.biddinggo.notification.dto.NotificationResponse">
         SELECT id,
