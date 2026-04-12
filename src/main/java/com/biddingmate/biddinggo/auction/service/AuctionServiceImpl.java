@@ -16,8 +16,11 @@ import com.biddingmate.biddinggo.bid.service.BidService;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.item.model.AuctionItem;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
+import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.item.service.AuctionItemService;
 import com.biddingmate.biddinggo.point.service.PointService;
+import com.biddingmate.biddinggo.winnerdeal.service.WinnerDealService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,8 @@ public class AuctionServiceImpl implements AuctionService {
     private final BidService bidService;
     private final PointService pointService;
     private final ApplicationEventPublisher eventPublisher;
+    private final WinnerDealService winnerDealService;
+    private final MemberService memberService;
 
     @Override
     @Transactional
@@ -112,6 +117,46 @@ public class AuctionServiceImpl implements AuctionService {
         if (updatedCount != 1) {
             throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
         }
+    }
+
+    @Override
+    @Transactional
+    public void buyNowAuction(Long auctionId, Long buyerId) {
+        // 유효하지 않은 경매 ID 요청은 즉시 차단한다.
+        if (auctionId == null || auctionId <= 0) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
+        }
+
+        // 즉시구매 처리 중 동시성 문제를 막기 위해 수정용 경매 정보를 조회한다.
+        Auction auction = getAuctionForModification(auctionId);
+
+        // 판매자는 자신의 경매를 즉시구매할 수 없다.
+        if (auction.getSellerId().equals(buyerId)) {
+            throw new CustomException(ErrorType.CANNOT_BUY_NOW_OWN_AUCTION);
+        }
+
+        // 현재 경매가 즉시구매 가능한 상태인지 확인한다.
+        if (!isAuctionBuyNowAvailable(auction) || auction.getBuyNowPrice() == null) {
+            throw new CustomException(ErrorType.AUCTION_CANCEL_NOT_ALLOWED);
+        }
+
+        // 즉시 구매가 존재 검증
+        Long buyNowPrice = auction.getBuyNowPrice();
+        if (buyNowPrice == null) {
+            throw new CustomException(ErrorType.INVALID_AUCTION_CREATE_REQUEST);
+        }
+
+        // 기존 입찰로 이미 선점한 금액을 반영해 추가로 필요한 포인트만 계산한다.
+        Long lastBidAmount = bidService.getLastBidAmount(buyerId, auctionId);
+        long additionalAmount = Math.max(buyNowPrice - lastBidAmount, 0L);
+
+        // 즉시구매에 필요한 차액만큼 현재 포인트가 충분한지 검증한다.
+        if (additionalAmount > 0 && memberService.getCurrentPoint(buyerId) < additionalAmount) {
+            throw new CustomException(ErrorType.NOT_ENOUGH_POINT);
+        }
+
+        // 검증이 끝난 뒤 실제 거래 생성과 종료 처리는 winnerDeal 서비스에 위임한다.
+        winnerDealService.processBuyNow(auction, buyerId, buyNowPrice, additionalAmount);
     }
 
     @Override
@@ -245,6 +290,14 @@ public class AuctionServiceImpl implements AuctionService {
         return auction.getStatus() == AuctionStatus.ON_GOING
                 && auction.getBidCount() != null
                 && auction.getBidCount() == 0;
+    }
+
+    private boolean isAuctionBuyNowAvailable(Auction auction) {
+        LocalDateTime now = LocalDateTime.now();
+
+        return auction.getStatus() == AuctionStatus.ON_GOING
+                && !now.isBefore(auction.getStartDate())
+                && !now.isAfter(auction.getEndDate());
     }
 
     // 입찰 무효화
