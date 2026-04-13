@@ -15,6 +15,7 @@ import com.biddingmate.biddinggo.member.model.Member;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,33 +31,42 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/members")
+@Tag(name = "Member", description = "회원 API")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
 
+    @Operation(summary = "마이페이지 조회", description = "로그인한 회원의 대시보드 정보를 조회합니다.")
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<MemberDashboardResponse>> getDashboard(@AuthenticationPrincipal Member member) {
         MemberDashboardResponse result = memberService.getMyDashboard(member.getId());
         return ApiResponse.of(HttpStatus.OK, null, "회원 마이페이지 조회 성공", result);
     }
 
+    @Operation(summary = "프로필 조회", description = "로그인한 회원의 프로필 정보를 조회합니다.")
     @GetMapping("/me/profile")
     public ResponseEntity<ApiResponse<MemberProfileResponse>> getProfile(@AuthenticationPrincipal Member member) {
         MemberProfileResponse result = memberService.getMyProfile(member.getId());
         return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 조회 성공", result);
     }
 
+    @Operation(summary = "프로필 수정", description = "로그인한 회원의 프로필 정보를 수정합니다.")
     @PatchMapping("/me/profile")
     public ResponseEntity<ApiResponse<MemberProfileResponse>> updateMyProfile(
             @AuthenticationPrincipal Member member,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "프로필 수정 요청 DTO",
+                    required = true
+            )
             @RequestBody MemberProfileUpdateRequest request
     ) {
         MemberProfileResponse result = memberService.updateMyProfile(member.getId(), request);
         return ApiResponse.of(HttpStatus.OK, null, "회원 프로필 수정 성공", result);
     }
 
+    @Operation(summary = "회원 탈퇴", description = "로그인한 회원이 계정을 탈퇴합니다.")
     @DeleteMapping("/me")
     public ResponseEntity<ApiResponse<Void>> deleteAccount(@AuthenticationPrincipal Member member) {
         memberService.deleteMyAccount(member.getId());
@@ -83,8 +93,10 @@ public class MemberController {
         return ApiResponse.of(HttpStatus.OK, null, "경매 관리 목록 조회 성공", result);
     }
 
+    @Operation(summary = "판매자 프로필 조회", description = "판매자의 프로필 정보를 조회합니다.")
     @GetMapping("/{sellerId}")
     public ResponseEntity<ApiResponse<MemberSellerProfileResponse>> getSellerProfile(
+            @Parameter(description = "판매자 ID", example = "1")
             @PathVariable Long sellerId
     ) {
         MemberSellerProfileResponse result = memberService.getSellerProfile(sellerId);
