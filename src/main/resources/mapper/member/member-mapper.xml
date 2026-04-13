@@ -648,5 +648,12 @@
         WHERE id = #{id}
             FOR UPDATE
     </select>
+
+    <select id="findAllActiveMemberIds" resultType="long">
+        SELECT
+            id
+        FROM member
+        WHERE status = 'ACTIVE'
+    </select>
 </mapper>
 
