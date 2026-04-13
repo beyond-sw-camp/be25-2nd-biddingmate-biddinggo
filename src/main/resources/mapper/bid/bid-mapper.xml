@@ -144,7 +144,7 @@
             #{auctionId}
         </foreach>
         AND b.status = 'ACTIVE'
-        GROUP BY b.bidder_id
+        GROUP BY b.auction_id, b.bidder_id
     </select>
 
     <!-- 비활성화 된 사용자의 최고 입찰 조회 -->
@@ -154,6 +154,14 @@
         WHERE auction_id = #{auctionId}
           AND bidder_id = #{bidderId}
           AND status = 'INACTIVE'
+    </select>
+
+    <!-- 비활성화 처리 과정에서 bid 상태가 이미 INACTIVE로 바뀔 수 있으므로 상태와 무관하게 최고 입찰금을 조회한다. -->
+    <select id="findMaxBidAmountByAuctionAndBidderRegardlessStatus" parameterType="map" resultType="long">
+        SELECT MAX(amount)
+        FROM bid
+        WHERE auction_id = #{auctionId}
+          AND bidder_id = #{bidderId}
     </select>
 
     <!-- 비활성화 시 입찰 무효화 -->

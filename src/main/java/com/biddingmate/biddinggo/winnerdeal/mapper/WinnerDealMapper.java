@@ -22,7 +22,8 @@ public interface WinnerDealMapper {
     WinnerDeal findByAuctionId(Long auctionId);
     boolean existsByDealNumber(@Param("dealNumber") String dealNumber);
 
-    List<WinnerDeal> findByMemberId(@Param("memberId") Long memberId);
+    List<WinnerDeal> findByWinnerId(@Param("memberId") Long memberId);
+    List<WinnerDeal> findBySellerId(@Param("memberId") Long memberId);
 
     int updateStatus(@Param("id") Long id,
                      @Param("status") String status);

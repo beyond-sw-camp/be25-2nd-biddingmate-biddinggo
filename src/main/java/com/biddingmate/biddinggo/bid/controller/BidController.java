@@ -56,7 +56,7 @@ public class BidController {
         return ApiResponse.of(HttpStatus.OK, null, "입찰 기록 조회 성공", result);
     }
 
-    @GetMapping("/users/me/bids")
+    @GetMapping("/members/me/bids")
     @Operation(summary = "입찰 중인 경매 조회", description = "입찰 중인 경매를 조회합니다.")
     public ResponseEntity<ApiResponse<PageResponse<BidListResponse>>> getBidAuctionsForUser(
         BasePageRequest request,

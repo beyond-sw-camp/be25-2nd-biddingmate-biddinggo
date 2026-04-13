@@ -120,6 +120,8 @@ public enum ErrorType {
     NOT_ENOUGH_POINT("bid-006", "보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST),
     CANNOT_BID_ON_OWN_AUCTION("bid-007", "자신의 경매에 입찰할 수 없습니다.", HttpStatus.BAD_REQUEST),
     AUCTION_ALREADY_FINISHED("bid-008", "이미 종료된 경매이거나 연장할 수 없는 상태입니다.", HttpStatus.CONFLICT),
+    CANNOT_BUY_NOW("bid-009", "해당 경매는 현재 즉시구매할 수 없습니다.", HttpStatus.CONFLICT),
+    CANNOT_BUY_NOW_OWN_AUCTION("bid-010", "자신의 경매는 즉시구매할 수 없습니다.", HttpStatus.CONFLICT),
 
     // 관심 경매
     WISHLIST_SAVE_FAIL("wishlist-001", "관심 경매 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -142,6 +144,7 @@ public enum ErrorType {
     WINNER_DEAL_CONFIRM_NOT_ALLOWED("winner-deal-012", "현재 상태의 낙찰 거래는 구매확정을 할 수 없습니다.", HttpStatus.CONFLICT),
     WINNER_DEAL_CONFIRM_FAILED("winner-deal-013", "낙찰 거래 구매확정 처리에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     WINNER_DEAL_SETTLEMENT_INVALID("winner-deal-014", "낙찰 거래 정산 정보가 올바르지 않습니다.", HttpStatus.CONFLICT),
+    WINNER_DEAL_BID_AMOUNT_NOT_FOUND("winner-deal-015", "낙찰자의 예치 입찰금을 찾을 수 없습니다.", HttpStatus.CONFLICT),
 
     // 리뷰
     REVIEW_SAVE_FAIL("review-001", "리뷰 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -150,6 +153,7 @@ public enum ErrorType {
     REVIEW_DELETE_FAIL("review-004", "리뷰 삭제에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_THE_WINNER("review-005", "낙찰자만 해당 경매의 리뷰를 남길 수 있습니다.", HttpStatus.FORBIDDEN),
     SELLER_NOT_FOUND("review-006", "해당 경매의 판매자 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    WINNER_DEAL_NOT_CONFIRMED("review-007", "구매 확정된 거래에 대해서만 리뷰를 작성할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
     // 알림
     NOTIFICATION_SAVE_FAILED("notification-001", "알림 등록에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
@@ -164,7 +168,13 @@ public enum ErrorType {
     // 회원 탈퇴
     CANNOT_DELETE_MEMBER_WITH_ONGOING_SALES("account-001","판매 중인 경매가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
     CANNOT_DELETE_MEMBER_WITH_ONGOING_BIDS("account-002","입찰 중인 경매가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
-    CANNOT_DELETE_MEMBER_WITH_INCOMPLETE_DEALS("account-003","진행 중인 거래가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT);
+    CANNOT_DELETE_MEMBER_WITH_INCOMPLETE_DEALS("account-003","진행 중인 거래가 존재하여 탈퇴할 수 없습니다.", HttpStatus.CONFLICT),
+
+    // 신고
+    CANNOT_REPORT_SELF("report-001", "자기 자신은 신고할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_REPORT_TARGET("report-002", "신고 대상이 올바르지 않습니다.", HttpStatus.NOT_FOUND),
+    REPORT_CREATE_FAIL("report-003", "신고 접수에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    ALREADY_REPORTED("report-004", "이미 신고한 사용자입니다.", HttpStatus.CONFLICT);
 
     private final String errorCode;
     private final String message;

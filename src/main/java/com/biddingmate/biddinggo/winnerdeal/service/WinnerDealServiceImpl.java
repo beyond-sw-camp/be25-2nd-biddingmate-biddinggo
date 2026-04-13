@@ -18,6 +18,8 @@ import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
 import com.biddingmate.biddinggo.member.service.MemberService;
 import com.biddingmate.biddinggo.notification.model.NotificationType;
 import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
+import com.biddingmate.biddinggo.point.model.PointHistory;
+import com.biddingmate.biddinggo.point.model.PointHistoryType;
 import com.biddingmate.biddinggo.point.service.PointService;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealShippingAddressRequest;
 import com.biddingmate.biddinggo.winnerdeal.dto.WinnerDealTrackingNumberRequest;
@@ -110,11 +112,19 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             log.info("낙찰 처리 성공 - Auction ID: {}, Winner: {}, Price: {}",
                     auction.getId(), winnerBid.getBidderId(), finalPrice);
 
-            // 낙찰 알람
+            // 낙찰 알람(구매자)
             notificationPublisher.publishNotification(
                     winnerBid.getBidderId(),
                     NotificationType.WIN,
                     "축하합니다. 경매 #" + auction.getId() + " 낙찰이 확정되었습니다.",
+                    "/auctions/" + auction.getId()
+            );
+
+            // 낙찰 알람(판매자)
+            notificationPublisher.publishNotification(
+                    auction.getSellerId(),
+                    NotificationType.WIN,
+                    "경매 #" + auction.getId() + " 낙찰이 확정되었습니다.",
                     "/auctions/" + auction.getId()
             );
 
@@ -156,16 +166,101 @@ public class WinnerDealServiceImpl implements WinnerDealService {
 
     @Override
     @Transactional
+    public void processBuyNow(Auction auction, Long buyerId, Long buyNowPrice, long additionalAmount) {
+        // 기존 입찰금을 제외하고 부족한 금액만 추가 차감한다.
+        memberService.deductPoint(buyerId, additionalAmount);
+
+        // 즉시구매로 추가 차감된 금액을 입찰 포인트 히스토리로 남긴다.
+        PointHistory pointHistory = PointHistory.builder()
+                .memberId(buyerId)
+                .type(PointHistoryType.BID)
+                .amount(additionalAmount)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        int pointInsert = pointService.addPointHistory(pointHistory);
+        if (pointInsert != 1) {
+            throw new CustomException(ErrorType.POINT_HISTORY_SAVE_FAILED);
+        }
+
+        // 거래 완료 후 시세 반영 이벤트에 사용할 상품 정보를 조회한다.
+        AuctionItem auctionItem = auctionItemMapper.findById(auction.getItemId());
+
+        // 즉시구매 성사와 동시에 낙찰 거래를 생성한다.
+        WinnerDeal winnerDeal = WinnerDeal.builder()
+                .auctionId(auction.getId())
+                .winnerId(buyerId)
+                .sellerId(auction.getSellerId())
+                .dealNumber(generateDealNumber())
+                .winnerPrice(buyNowPrice)
+                .status(WinnerDealStatus.PAID)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        winnerDealMapper.insert(winnerDeal);
+
+        // 경매를 종료하고 낙찰자와 최종 거래 금액을 확정한다.
+        auction.setStatus(AuctionStatus.ENDED);
+        auction.setWinnerId(buyerId);
+        auction.setWinnerPrice(buyNowPrice);
+
+        int updatedRows = auctionMapper.updateAuctionResult(auction);
+        if (updatedRows != 1) {
+            throw new CustomException(ErrorType.ITEM_NOT_AUCTIONABLE);
+        }
+
+        // 경매 상품도 판매 완료 상태로 변경한다.
+        auctionItemMapper.updateStatus(
+                auction.getItemId(),
+                AuctionItemStatus.SOLD,
+                AuctionItemStatus.ON_AUCTION,
+                null
+        );
+
+        // 즉시구매 완료 가격을 시세/예측 데이터에 반영할 수 있도록 이벤트를 발행한다.
+        publishAuctionPriceReferenceSyncRequestedEvent(auction, auctionItem, buyNowPrice);
+
+        // 낙찰자를 제외한 기존 입찰자들의 보증금성 입찰 금액을 환불한다.
+        List<RefundDto> refunds =
+                bidQueryService.findRefundTargetsExcludingWinner(auction.getId(), buyerId);
+
+        for (RefundDto refund : refunds) {
+            pointService.refundBid(refund.getBidderId(), refund.getAmount());
+        }
+
+        // 거래 완료 사실을 구매자와 판매자에게 각각 알린다.
+        notificationPublisher.publishNotification(
+                buyerId,
+                NotificationType.WIN,
+                "경매 #" + auction.getId() + "의 즉시구매가 완료되었습니다.",
+                "/auctions/" + auction.getId()
+        );
+
+        notificationPublisher.publishNotification(
+                auction.getSellerId(),
+                NotificationType.WIN,
+                "경매 #" + auction.getId() + "이 즉시구매로 종료되었습니다.",
+                "/auctions/" + auction.getId()
+        );
+    }
+
+    @Override
+    @Transactional
     public void handleMemberDeactivationAfterWinning(Long memberId) {
         log.info("낙찰 회원 비활성화 처리 시작 - Member ID: {}", memberId);
 
-        List<WinnerDeal> winnerDeals = winnerDealQueryService.findByMemberId(memberId);
-
+        handleWinnerDeactivation(memberId);
+        handleSellerDeactivation(memberId);
+    }
+/*
         for (WinnerDeal winnerDeal : winnerDeals) {
             if (isShippingInfoRegistered(winnerDeal)) {
                 log.info("낙찰 회원 비활성화 거래 유지 - WinnerDeal ID: {}, Auction ID: {}",
                         winnerDeal.getId(), winnerDeal.getAuctionId());
-                return;
+                continue;
+            }
+            if(winnerDeal.getStatus()==WinnerDealStatus.CANCELLED){
+                continue;
             }
             refundAndCancelWinnerDeal(winnerDeal);
         }
@@ -173,6 +268,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         log.info("낙찰 회원 비활성화 대상 거래 수 - Member ID: {}, Count: {}", memberId, winnerDeals.size());
     }
 
+*/
     @Override
     @Transactional
     public void registerShippingAddress(Long winnerDealId, Long memberId, WinnerDealShippingAddressRequest request) {
@@ -284,12 +380,12 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_FAILED);
         }
 
-        Long lastBidAmount = bidService.getLastBidAmount(memberId, winnerDeal.getAuctionId());
-        if (lastBidAmount == null || lastBidAmount < winnerDeal.getWinnerPrice()) {
-            throw new CustomException(ErrorType.WINNER_DEAL_SETTLEMENT_INVALID);
-        }
+        Long maxBidAmount = bidQueryService.findMaxBidAmountByAuctionAndBidder(winnerDeal.getAuctionId(), memberId);
+        long reservedAmount = maxBidAmount != null && maxBidAmount >= winnerDeal.getWinnerPrice()
+                ? maxBidAmount
+                : winnerDeal.getWinnerPrice();
 
-        long refundAmount = lastBidAmount - winnerDeal.getWinnerPrice();
+        long refundAmount = reservedAmount - winnerDeal.getWinnerPrice();
         if (refundAmount < 0) {
             throw new CustomException(ErrorType.WINNER_DEAL_SETTLEMENT_INVALID);
         } else if (refundAmount > 0) {
@@ -303,6 +399,46 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         memberService.recalculateMemberGrade(winnerDeal.getSellerId());
     }
 
+    private void handleWinnerDeactivation(Long memberId) {
+        List<WinnerDeal> winnerDeals = winnerDealQueryService.findByWinnerId(memberId);
+
+        for (WinnerDeal winnerDeal : winnerDeals) {
+            if (shouldKeepDealOnDeactivation(winnerDeal)) {
+                log.info("Keep winner deal after winner deactivation - WinnerDeal ID: {}, Auction ID: {}",
+                        winnerDeal.getId(), winnerDeal.getAuctionId());
+                continue;
+            }
+
+            refundAndCancelWinnerDeal(winnerDeal);
+        }
+
+        log.info("Winner-side deactivation handling finished - Member ID: {}, Count: {}", memberId, winnerDeals.size());
+    }
+
+    private void handleSellerDeactivation(Long memberId) {
+        List<WinnerDeal> sellerDeals = winnerDealQueryService.findBySellerId(memberId);
+
+        for (WinnerDeal winnerDeal : sellerDeals) {
+            if (shouldKeepDealOnDeactivation(winnerDeal)) {
+                log.info("Keep winner deal after seller deactivation - WinnerDeal ID: {}, Auction ID: {}",
+                        winnerDeal.getId(), winnerDeal.getAuctionId());
+                continue;
+            }
+
+            refundAndCancelWinnerDeal(winnerDeal);
+        }
+
+        log.info("Seller-side deactivation handling finished - Member ID: {}, Count: {}", memberId, sellerDeals.size());
+    }
+
+    private boolean shouldKeepDealOnDeactivation(WinnerDeal winnerDeal) {
+        if (winnerDeal.getStatus() == WinnerDealStatus.CANCELLED) {
+            return true;
+        }
+
+        return isShippingInfoRegistered(winnerDeal);
+    }
+
     private void refundAndCancelWinnerDeal(WinnerDeal winnerDeal) {
         if (winnerDeal.getStatus() == WinnerDealStatus.CANCELLED) {
             throw new CustomException(ErrorType.WINNER_DEAL_ALREADY_CANCELLED);
@@ -313,7 +449,17 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_UPDATE_FAILED);
         }
 
-        pointService.refundBid(winnerDeal.getWinnerId(), winnerDeal.getWinnerPrice());
+        // 낙찰 취소 환불은 비크리 낙찰가가 아니라 낙찰자가 실제 예치한 최고 입찰금 기준으로 처리
+        Long depositedAmount = bidQueryService.findMaxBidAmountByAuctionAndBidderRegardlessStatus(
+                winnerDeal.getAuctionId(),
+                winnerDeal.getWinnerId()
+        );
+
+        if (depositedAmount == null || depositedAmount <= 0) {
+            throw new CustomException(ErrorType.WINNER_DEAL_BID_AMOUNT_NOT_FOUND);
+        }
+
+        pointService.refundBid(winnerDeal.getWinnerId(), depositedAmount);
     }
 
     private void publishAuctionPriceReferenceSyncRequestedEvent(Auction auction, AuctionItem auctionItem, Long winnerPrice) {

@@ -11,10 +11,12 @@ import java.util.Map;
 @Component
 public class DefaultConditionScorePolicy implements ConditionScorePolicy {
     private static final Map<String, Double> CONDITION_SCORES = Map.ofEntries(
-            Map.entry("최상", 1.0d),
-            Map.entry("상", 0.7d),
-            Map.entry("중", 0.5d),
-            Map.entry("하", 0.2d)
+            Map.entry("새상품", 1.0d),
+            Map.entry("S", 0.9d),
+            Map.entry("A+", 0.7d),
+            Map.entry("A", 0.6d),
+            Map.entry("B", 0.4d),
+            Map.entry("C", 0.2d)
     );
 
     @Override

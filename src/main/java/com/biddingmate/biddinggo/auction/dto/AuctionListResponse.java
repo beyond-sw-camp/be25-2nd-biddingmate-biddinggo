@@ -2,6 +2,7 @@ package com.biddingmate.biddinggo.auction.dto;
 
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
 import com.biddingmate.biddinggo.auction.model.AuctionType;
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,6 +36,9 @@ public class AuctionListResponse {
 
     @Schema(description = "경매 타입", example = "TIME_DEAL")
     private AuctionType type;
+
+    @Schema(description = "검수 여부", example = "NO")
+    private YesNo inspectionYn;
 
     @Schema(description = "시작가", example = "100000")
     private Long startPrice;

@@ -18,11 +18,14 @@ public class MemberDashboardResponse {
     private String nickname;
     private String grade;
     private Long point;
+    private String imageUrl;
 
-    // 낙찰된 물품 목록
-    private List<MemberWonItemResponse> wonItems;
+    // 진행 중인 구매 현황
+    private List<MemberWonItemResponse> purchaseItems;
 
-    // 입찰 중 물품 목록
+    // 진행 중인 판매 현황
+    private List<MemberSalesItemResponse> salesItems;
+
+    // 입찰 내역
     private List<MemberBiddingItemResponse> biddingItems;
-
 }
