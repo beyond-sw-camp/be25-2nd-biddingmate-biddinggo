@@ -2,7 +2,7 @@ package com.biddingmate.biddinggo.bid.service;
 
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.bid.dto.BidListResponse;
-import com.biddingmate.biddinggo.bid.dto.BidResponse;
+import com.biddingmate.biddinggo.bid.dto.BidMaskingResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.model.Bid;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
@@ -19,7 +19,7 @@ public interface BidService {
 
     Bid getVickreyBid(Long auctionId);
 
-    PageResponse<BidResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId);
+    PageResponse<BidMaskingResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId);
 
     PageResponse<BidListResponse> getBidAuctionsByMemberId(BasePageRequest request, Long memberId);
 
