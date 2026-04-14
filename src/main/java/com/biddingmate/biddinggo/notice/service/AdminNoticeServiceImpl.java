@@ -49,10 +49,10 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
         String body = notice.getContent() == null ? "" : notice.getContent().trim();
         String content = title.isEmpty() ? body : "[공지] " + title + "\n" + body;
 
-        notificationPublisher.publishToActiveUser(
+        notificationPublisher.publishToActiveUsers(
                 NotificationType.ADMIN_NOTICE,
                 content,
-                null
+                "/notices/" + notice.getId()
         );
 
         return toResponse(notice);
@@ -81,6 +81,17 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
 
         Notice updatedNotice = noticeMapper.findById(noticeId);
 
+        String title = updatedNotice.getTitle() == null ? "" : updatedNotice.getTitle().trim();
+        String content = title.isEmpty()
+                ? "[공지 수정] 공지 내용이 수정되었습니다."
+                : "[공지 수정] " + title;
+
+        notificationPublisher.publishToActiveUsers(
+                NotificationType.ADMIN_NOTICE,
+                content,
+                "/notices/" + updatedNotice.getId()
+        );
+
         return toResponse(updatedNotice);
     }
 
@@ -105,6 +116,7 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
             throw new CustomException(ErrorType.NOTICE_DELETE_FAIL);
         }
 
+        notificationPublisher.removeNoticeNotifications(noticeId);
 
     }
 
