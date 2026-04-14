@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.winnerdeal.dto;
 
 import com.biddingmate.biddinggo.auction.model.AuctionType;
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,9 @@ public class AdminWinnerDealDetailResponse {
 
     @Schema(description = "경매 타입", example = "INSPECTION")
     private AuctionType auctionType;
+
+    @Schema(description = "검수 경매 여부", example = "YES")
+    private YesNo inspectionYn;
 
     @Schema(description = "검수 물품 여부", example = "true")
     private Boolean inspectionItem;

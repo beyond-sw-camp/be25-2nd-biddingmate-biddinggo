@@ -4,7 +4,7 @@ import com.biddingmate.biddinggo.auction.dto.RefundDto;
 import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.auction.model.AuctionStatus;
-import com.biddingmate.biddinggo.auction.model.AuctionType;
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.auction.prediction.event.AuctionPriceReferenceSyncRequestedEvent;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
@@ -343,7 +343,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
         }
 
-        if (auction.getType() != AuctionType.INSPECTION
+        if (auction.getInspectionYn() != YesNo.YES
                 || winnerDeal.getStatus() != WinnerDealStatus.PAID
                 || !isShippingInfoRegistered(winnerDeal)
                 || isTrackingNumberRegistered(winnerDeal)) {
