@@ -1,5 +1,7 @@
 package com.biddingmate.biddinggo.report.service;
 
+import com.biddingmate.biddinggo.auction.mapper.AuctionMapper;
+import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.event.MemberStatusUpdateEvent;
@@ -23,10 +25,20 @@ public class ReportServiceImpl implements ReportService {
     private final ReportMapper reportMapper;
     private final MemberMapper memberMapper;
     private final ApplicationEventPublisher eventPublisher;
-
+    private final AuctionMapper auctionMapper;
     @Override
     @Transactional
     public void processReport(ReportCreateRequest request, Long reporterId) {
+        // 경매 존재 확인
+        Auction auction = auctionMapper.findById(request.getAuctionId());
+        if (auction == null) {
+            throw new CustomException(ErrorType.AUCTION_NOT_FOUND);
+        }
+
+        // 경매글에 등록된 판매자 ID와 신고하려는 대상 ID가 다를 경우
+        if (!auction.getSellerId().equals(request.getTargetMemberId())) {
+            throw new CustomException(ErrorType.INVALID_REPORT_TARGET);
+        }
 
         //자기 자신 신고 검증
         if (request.getTargetMemberId().equals(reporterId)) {
@@ -38,8 +50,11 @@ public class ReportServiceImpl implements ReportService {
             throw new CustomException(ErrorType.ALREADY_REPORTED);
         }
 
-        // 동시성 제어를 위한 유저 락
+        // 동시성 제어를 위한 유저 락 ( 대상 유저가 없을 경우)
         Member targetMember = memberMapper.findByIdForUpdate(request.getTargetMemberId());
+        if (targetMember == null) {
+            throw new CustomException(ErrorType.MEMBER_NOT_FOUND);
+        }
 
         // 신고 데이터 저장
         Report report = Report.builder()
