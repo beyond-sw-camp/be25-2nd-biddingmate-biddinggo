@@ -23,4 +23,6 @@ public interface NotificationMapper extends IMybatisCRUD<Notification> {
     void updateReadAtById(@Param("id") Long id, @Param("receiverId") Long receiverId);
 
     int countUnreadByReceiverId(@Param("receiverId") Long receiverId);
+
+    int deleteAdminNoticeNotificationsByNoticeId(@Param("noticeId") Long noticeId);
 }

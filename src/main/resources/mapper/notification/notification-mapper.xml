@@ -63,4 +63,12 @@
           AND receiver_id = #{receiverId}
     </update>
 
+    <delete id="deleteAdminNoticeNotificationsByNoticeId">
+        DELETE FROM notification
+        WHERE type = 'ADMIN_NOTICE'
+          AND url = CONCAT('/notices/', #{noticeId})
+    </delete>
+
+
+
 </mapper>

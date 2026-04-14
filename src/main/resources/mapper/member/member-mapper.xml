@@ -650,10 +650,16 @@
     </select>
 
     <select id="findAllActiveMemberIds" resultType="long">
-        SELECT
-            id
+        SELECT id
         FROM member
         WHERE status = 'ACTIVE'
+    </select>
+
+    <select id="findAllActiveAdminIds" resultType="long">
+        SELECT id
+        FROM member
+        WHERE status = 'ACTIVE'
+          AND role = 'ADMIN'
     </select>
 </mapper>
 

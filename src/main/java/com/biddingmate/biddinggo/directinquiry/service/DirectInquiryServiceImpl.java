@@ -11,6 +11,8 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.notification.model.NotificationType;
+import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DirectInquiryServiceImpl implements DirectInquiryService {
+
     private final DirectInquiryMapper directInquiryMapper;
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     @Transactional
@@ -39,6 +43,14 @@ public class DirectInquiryServiceImpl implements DirectInquiryService {
         if (insert <= 0) {
             throw new CustomException(ErrorType.ADMIN_INQUIRY_CREATED_FAIL);
         }
+
+        notificationPublisher.publishToActiveAdmins(
+                NotificationType.DIRECT_INQUIRY,
+                "새로운 1:1 문의가 등록되었습니다. 문의 #" + directInquiry.getId(),
+                "/admins/direct-inquiries"
+        );
+
+
 
         return CreateDirectInquiryResponse.builder()
                 .id(directInquiry.getId())
