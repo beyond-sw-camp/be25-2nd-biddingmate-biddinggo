@@ -44,7 +44,16 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
             throw new CustomException(ErrorType.NOTICE_CREATE_FAIL);
         }
 
-        publishNoticeNotificationToAllActiveMembers(notice);
+        // sse 알람을 위한 공지(create) 로직
+        String title = notice.getTitle() == null ? "" : notice.getTitle().trim();
+        String body = notice.getContent() == null ? "" : notice.getContent().trim();
+        String content = title.isEmpty() ? body : "[공지] " + title + "\n" + body;
+
+        notificationPublisher.publishToActiveUser(
+                NotificationType.ADMIN_NOTICE,
+                content,
+                null
+        );
 
         return toResponse(notice);
     }
@@ -110,24 +119,4 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
                 .build();
     }
 
-    private void publishNoticeNotificationToAllActiveMembers(Notice notice) {
-
-        List<Long> memberIds = memberMapper.findAllActiveMemberIds();
-        if(memberIds == null || memberIds.isEmpty()) {
-            return;
-        }
-
-        String title = notice.getTitle() == null ? "" : notice.getTitle().trim();
-        String body = notice.getContent() == null ? "" : notice.getContent().trim();
-        String content = title.isEmpty() ? body : "[공지] " + title + "\n" + body;
-
-        for (Long memberId : memberIds) {
-            notificationPublisher.publishNotification(
-                    memberId,
-                    NotificationType.ADMIN_NOTICE,
-                    content,
-                    null
-            );
-        }
-    }
 }
