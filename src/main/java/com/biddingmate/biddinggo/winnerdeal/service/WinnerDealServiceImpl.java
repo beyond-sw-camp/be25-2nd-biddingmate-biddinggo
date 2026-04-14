@@ -344,9 +344,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
         }
 
         if (auction.getInspectionYn() != YesNo.YES
-                || winnerDeal.getStatus() != WinnerDealStatus.PAID
-                || !isShippingInfoRegistered(winnerDeal)
-                || isTrackingNumberRegistered(winnerDeal)) {
+                || winnerDeal.getStatus() != WinnerDealStatus.PAID) {
             throw new CustomException(ErrorType.WINNER_DEAL_TRACKING_NUMBER_REGISTRATION_NOT_ALLOWED);
         }
 
