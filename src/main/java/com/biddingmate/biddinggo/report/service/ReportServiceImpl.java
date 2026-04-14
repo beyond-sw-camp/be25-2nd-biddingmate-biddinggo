@@ -68,16 +68,16 @@ public class ReportServiceImpl implements ReportService {
             throw new CustomException(ErrorType.REPORT_CREATE_FAIL);
         }
 
-        // 누적 횟수 확인 (3회 이상 시 커스텀 정지 로직 실행)
+        // 누적 횟수 확인 (10회 이상 시 커스텀 정지 로직 실행)
         int reportCount = reportMapper.countByTargetMemberId(request.getTargetMemberId());
 
-        if (reportCount >= 3 && targetMember.getStatus() == MemberStatus.ACTIVE) {
+        if (reportCount >= 10 && targetMember.getStatus() == MemberStatus.ACTIVE) {
             processMemberDeactivation(request.getTargetMemberId());
         }
     }
 
     private void processMemberDeactivation(Long targetId) {
-        log.info("신고 3회 누적 유저({}) 정지 프로세스 시작", targetId);
+        log.info("신고 10회 누적 유저({}) 정지 프로세스 시작", targetId);
 
         // 유저 상태를 INACTIVE로 변경
         memberMapper.updateMemberStatus(targetId, MemberStatus.INACTIVE);
