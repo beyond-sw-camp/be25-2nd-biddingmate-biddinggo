@@ -15,6 +15,8 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.request.BasePageRequest;
 import com.biddingmate.biddinggo.common.response.PageResponse;
+import com.biddingmate.biddinggo.notification.model.NotificationType;
+import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
 
     private final AuctionInquiryMapper auctionInquiryMapper;
     private final AuctionMapper auctionMapper;
+    private final NotificationPublisher notificationPublisher;
 
     @Override
     @Transactional
@@ -58,6 +61,15 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
         if (result <= 0) {
             throw new CustomException(ErrorType.AUCTION_INQUIRY_CREATE_FAIL);
         }
+
+        notificationPublisher.publishNotification(
+                auction.getSellerId(),
+                NotificationType.AUCTION_INQUIRY,
+                "경매 #" + auctionId + "에 새로운 문의가 등록되었습니다.",
+                "/auctions/" + auctionId + "/inquiries"
+        );
+
+
 
         return CreateAuctionInquiryResponse.builder()
                 .id(inquiry.getId())
@@ -97,6 +109,13 @@ public class AuctionInquiryServiceImpl implements AuctionInquiryService {
         if (result <= 0) {
             throw new CustomException(ErrorType.AUCTION_INQUIRY_UPDATE_FAIL);
         }
+
+        notificationPublisher.publishNotification(
+                inquiry.getWriterId(),
+                NotificationType.AUCTION_INQUIRY,
+                "문의 #" + inquiry.getId() + "에 판매자 답변이 등록되었습니다,",
+                "/auctions/" + inquiry.getAuctionId() + "/inquiries"
+        );
 
         return AnswerAuctionInquiryResponse.builder()
                 .id(inquiry.getId())

@@ -1,10 +1,13 @@
 package com.biddingmate.biddinggo.notification.service;
 
+import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.notification.dto.CreateNotificationRequest;
 import com.biddingmate.biddinggo.notification.model.NotificationType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class NotificationPublisher {
 
     private final NotificationService notificationService;
+    private final MemberMapper memberMapper;
 
     // 알람 발신을 위한 매서드
     public void publishNotification(Long receiverId, NotificationType type, String content, String url) {
@@ -31,4 +35,28 @@ public class NotificationPublisher {
         }
     }
 
+    public void publishToActiveAdmins(NotificationType type, String content, String url) {
+
+        List<Long> adminIds = memberMapper.findAllActiveAdminIds();
+        if (adminIds == null || adminIds.isEmpty()) {
+            return;
+        }
+
+        for (Long adminId : adminIds) {
+            publishNotification(adminId, type, content, url);
+        }
+
+    }
+
+    public void publishToActiveUser(NotificationType type, String content, String url) {
+
+        List<Long> memberIds = memberMapper.findAllActiveMemberIds();
+        if (memberIds == null || memberIds.isEmpty()) {
+            return;
+        }
+
+        for (Long memberId : memberIds) {
+            publishNotification(memberId, type, content, url);
+        }
+    }
 }

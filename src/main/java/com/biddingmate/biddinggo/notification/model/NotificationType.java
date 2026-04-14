@@ -7,6 +7,8 @@ public enum NotificationType {
     NEW_BID,
     TOP_BID,
     AUCTION_UNSOLD,
-    ADMIN_NOTICE
+    ADMIN_NOTICE,
+    AUCTION_INQUIRY,
+    DIRECT_INQUIRY
 
 }
