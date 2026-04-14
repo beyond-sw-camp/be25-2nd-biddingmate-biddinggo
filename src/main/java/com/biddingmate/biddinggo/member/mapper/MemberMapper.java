@@ -122,4 +122,7 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     MemberSalesAuctionSummaryResponse countMySalesAuctionSummary(@Param("memberId") Long memberId);
 
     Member findByIdForUpdate(@Param("id") Long id);
+
+    List<Long> findAllActiveMemberIds();
+
 }

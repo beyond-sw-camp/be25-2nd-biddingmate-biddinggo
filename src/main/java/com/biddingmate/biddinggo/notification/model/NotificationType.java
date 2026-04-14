@@ -5,5 +5,7 @@ public enum NotificationType {
     WIN,
     NEW_BID,
     TOP_BID,
-    AUCTION_UNSOLD
+    AUCTION_UNSOLD,
+    ADMIN_NOTICE
+
 }

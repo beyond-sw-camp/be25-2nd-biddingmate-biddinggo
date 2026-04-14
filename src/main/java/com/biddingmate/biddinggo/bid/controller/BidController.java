@@ -1,7 +1,7 @@
 package com.biddingmate.biddinggo.bid.controller;
 
 import com.biddingmate.biddinggo.bid.dto.BidListResponse;
-import com.biddingmate.biddinggo.bid.dto.BidResponse;
+import com.biddingmate.biddinggo.bid.dto.BidMaskingResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.dto.CreateBidResponse;
 import com.biddingmate.biddinggo.bid.service.BidApplicationService;
@@ -47,11 +47,11 @@ public class BidController {
 
     @GetMapping("/bids")
     @Operation(summary = "입찰 기록 조회", description = "경매에 대한 입찰 기록을 조회합니다.")
-    public ResponseEntity<ApiResponse<PageResponse<BidResponse>>> getBidsByAuctionId(
+    public ResponseEntity<ApiResponse<PageResponse<BidMaskingResponse>>> getBidsByAuctionId(
             BasePageRequest request,
             @NotNull @RequestParam("auctionId") Long auctionId
     ) {
-        PageResponse<BidResponse> result = bidService.getBidsByAuctionId(request, auctionId);
+        PageResponse<BidMaskingResponse> result = bidService.getBidsByAuctionId(request, auctionId);
 
         return ApiResponse.of(HttpStatus.OK, null, "입찰 기록 조회 성공", result);
     }
