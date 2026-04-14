@@ -9,39 +9,32 @@ import com.biddingmate.biddinggo.inspection.mapper.InspectionMapper;
 import com.biddingmate.biddinggo.inspection.model.Inspection;
 import com.biddingmate.biddinggo.inspection.model.InspectionStatus;
 import com.biddingmate.biddinggo.item.mapper.AuctionItemMapper;
-import com.biddingmate.biddinggo.item.model.AuctionItemStatus;
+import com.biddingmate.biddinggo.item.model.AuctionItem;
 import com.biddingmate.biddinggo.item.model.ItemInspectionStatus;
-import com.biddingmate.biddinggo.item.service.AuctionItemService;
+import com.biddingmate.biddinggo.notification.model.NotificationType;
+import com.biddingmate.biddinggo.notification.service.NotificationPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
-/**
- * inspection 엔티티 생성만 담당하는 서비스 구현체.
- * 트랜잭션은 상위 애플리케이션 서비스에서 시작된 흐름에 참여한다.
- */
 @Service
 @RequiredArgsConstructor
 public class InspectionServiceImpl implements InspectionService {
     private final InspectionMapper inspectionMapper;
     private final AuctionItemMapper auctionItemMapper;
+    private final NotificationPublisher notificationPublisher;
 
     @Override
-    /**
-     * 검수 대상 itemId를 기준으로 inspection 레코드를 생성한다.
-     * 최초 등록 상태는 항상 PENDING으로 시작한다.
-     */
     public Long createInspection(CreateInspectionRequest request, Long itemId) {
         if (itemId == null) {
             throw new CustomException(ErrorType.INVALID_INSPECTION_CREATE_REQUEST);
         }
 
-        // 검수 발송 정보는 선택 입력이므로 null 여부를 분기해서 사용한다.
         CreateInspectionRequest.Inspection inspectionRequest = request.getInspection();
 
-        // inspection 테이블 저장용 모델로 변환한다.
         Inspection inspection = Inspection.builder()
                 .itemId(itemId)
                 .status(InspectionStatus.PENDING)
@@ -50,7 +43,6 @@ public class InspectionServiceImpl implements InspectionService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // inspection 저장 후 생성된 PK를 모델에 주입받는다.
         int inspectionInsertCount = inspectionMapper.insert(inspection);
 
         if (inspectionInsertCount != 1 || inspection.getId() == null) {
@@ -61,10 +53,6 @@ public class InspectionServiceImpl implements InspectionService {
     }
 
     @Override
-    /**
-     * 검수 배송 정보(택배사, 송장 번호)를 사후 등록한다.
-     * 배송 정보는 PENDING 상태의 검수에만 최초 1회 등록 가능하다.
-     */
     public void updateShippingInfo(Long inspectionId, UpdateInspectionShippingRequest request) {
         Inspection inspection = inspectionMapper.findById(inspectionId);
 
@@ -95,34 +83,58 @@ public class InspectionServiceImpl implements InspectionService {
     @Override
     @Transactional
     public void processInspection(Long inspectionId, InspectionProcessRequest request) {
-        // 검수 조회
         Inspection inspection = inspectionMapper.findById(inspectionId);
         if (inspection == null) {
             throw new CustomException(ErrorType.INSPECTION_NOT_FOUND);
         }
 
-        // 이미 처리된 검수인지 체크
-        if (!inspection.getStatus().equals(InspectionStatus.PENDING)) {
+        if (inspection.getStatus() != InspectionStatus.PENDING) {
             throw new CustomException(ErrorType.ALREADY_INSPECTION_STATUS);
         }
 
-        boolean approved = request.isApproved();
+        if (!StringUtils.hasText(inspection.getCarrier()) || !StringUtils.hasText(inspection.getTrackingNumber())) {
+            throw new CustomException(ErrorType.INSPECTION_SHIPPING_INFO_REQUIRED);
+        }
 
-        // 검수 상태 결정
+        boolean approved = request.getApproved();
+
         InspectionStatus status = approved
                 ? InspectionStatus.PASSED
                 : InspectionStatus.FAILED;
 
-        // 검수 상태 업데이트
         inspectionMapper.updateStatus(inspectionId, status, InspectionStatus.PENDING, request.getFailureReason());
 
-        // 물품에 대한 복사본?
         Long auctionItemId = inspection.getItemId();
 
         ItemInspectionStatus itemStatus = approved
                 ? ItemInspectionStatus.PASSED
                 : ItemInspectionStatus.FAILED;
 
-        auctionItemMapper.updateInspectionStatus(auctionItemId, itemStatus, ItemInspectionStatus.PENDING, request.getQuality());
+        auctionItemMapper.updateInspectionStatus(
+                auctionItemId,
+                itemStatus,
+                ItemInspectionStatus.PENDING,
+                request.getQuality()
+        );
+
+        AuctionItem auctionItem = auctionItemMapper.findById(auctionItemId);
+        if (auctionItem != null && auctionItem.getSellerId() != null) {
+            String itemName = StringUtils.hasText(auctionItem.getName())
+                    ? auctionItem.getName()
+                    : "검수 물품";
+
+            String notificationContent = approved
+                    ? "[" + itemName + "] 검수가 승인되었습니다."
+                    : StringUtils.hasText(request.getFailureReason())
+                    ? "[" + itemName + "] 검수가 반려되었습니다. 사유: " + request.getFailureReason()
+                    : "[" + itemName + "] 검수가 반려되었습니다.";
+
+            notificationPublisher.publishNotification(
+                    auctionItem.getSellerId(),
+                    NotificationType.INSPECTION,
+                    notificationContent,
+                    "/inspections/" + inspectionId
+            );
+        }
     }
 }

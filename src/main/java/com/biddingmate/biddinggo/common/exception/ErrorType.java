@@ -73,6 +73,7 @@ public enum ErrorType {
     INVALID_INSPECTION_LIST_REQUEST("inspection-007", "검수물품 목록 조회 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     INVALID_INSPECTION_LIST_STATUS("inspection-008", "검수물품 상태값이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     ALREADY_INSPECTION_STATUS("inspection-009", "이미 검수 완료된 물품입니다.", HttpStatus.CONFLICT),
+    INSPECTION_SHIPPING_INFO_REQUIRED("inspection-010", "운송장 정보가 등록된 검수만 처리할 수 있습니다.", HttpStatus.CONFLICT),
 
     // 파일
     INVALID_FILE_UPLOAD_REQUEST("file-001", "파일 업로드 요청이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
