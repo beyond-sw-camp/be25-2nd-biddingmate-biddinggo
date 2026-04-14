@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,6 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
 
     private final NoticeMapper noticeMapper;
     private final NotificationPublisher notificationPublisher;
-    private final MemberMapper memberMapper;
 
     @Override
     @Transactional
