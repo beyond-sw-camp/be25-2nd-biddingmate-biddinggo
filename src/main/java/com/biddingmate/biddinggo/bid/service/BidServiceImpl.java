@@ -2,6 +2,7 @@ package com.biddingmate.biddinggo.bid.service;
 
 import com.biddingmate.biddinggo.auction.model.Auction;
 import com.biddingmate.biddinggo.bid.dto.BidListResponse;
+import com.biddingmate.biddinggo.bid.dto.BidMaskingResponse;
 import com.biddingmate.biddinggo.bid.dto.BidResponse;
 import com.biddingmate.biddinggo.bid.dto.CreateBidRequest;
 import com.biddingmate.biddinggo.bid.mapper.BidMapper;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,7 +93,7 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    public PageResponse<BidResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId) {
+    public PageResponse<BidMaskingResponse> getBidsByAuctionId(BasePageRequest request, Long auctionId) {
         RowBounds rowBounds = new RowBounds(request.getOffset(), request.getSize());
         String order = request.getOrder();
 
@@ -100,9 +103,29 @@ public class BidServiceImpl implements BidService {
         String sortOrder = order.toUpperCase();
 
         List<BidResponse> bids = bidMapper.getBidsByAuctionId(rowBounds, auctionId, sortOrder);
+        List<BidMaskingResponse> maskingBids = new ArrayList<>(bids.size());
+
+        HashMap<Long, Long> maskingHm = new HashMap<>(); //key: id, value: cnt
+        long cnt = 1L;
+        for(BidResponse bid: bids) {
+            if(!maskingHm.containsKey(bid.getBidderId())) {
+                maskingHm.put(bid.getBidderId(), cnt++);
+            }
+
+            BidMaskingResponse maskingBid = BidMaskingResponse.builder()
+                    .id(bid.getId())
+                    .auctionId(bid.getAuctionId())
+                    .bidderId(maskingHm.get(bid.getBidderId()))
+                    .amount("***")
+                    .createdAt(bid.getCreatedAt())
+                    .build();
+
+            maskingBids.add(maskingBid);
+        }
+
         int bidCount = bidMapper.getBidCount(Map.of("auctionId", auctionId));
 
-        return PageResponse.of(bids, request.getPage(), request.getSize(), bidCount);
+        return PageResponse.of(maskingBids, request.getPage(), request.getSize(), bidCount);
     }
 
     @Override
