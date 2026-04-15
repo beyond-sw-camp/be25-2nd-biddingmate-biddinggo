@@ -7,6 +7,7 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 @Slf4j
@@ -50,6 +53,14 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         if (member == null) {
             throw new CustomException(ErrorType.USER_NOT_FOUND);
+        }
+
+        if (member.getStatus() == MemberStatus.DELETED || member.getStatus() == MemberStatus.INACTIVE) {
+            String redirectUrl = frontendRedirectUri
+                    + "?error=" + URLEncoder.encode("login_blocked_member", StandardCharsets.UTF_8)
+                    + "&message=" + URLEncoder.encode("탈퇴 또는 비활성화된 회원은 로그인할 수 없습니다.", StandardCharsets.UTF_8);
+            getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+            return;
         }
 
         String refreshToken = jwtProvider.createRefreshToken(username);

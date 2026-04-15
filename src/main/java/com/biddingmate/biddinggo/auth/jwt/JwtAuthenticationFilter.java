@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,8 +29,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = jwtProvider.resolveToken(request.getHeader("Authorization"));
 
         if (token != null && jwtProvider.isUsableAccessToken(token)) {
-            Authentication authentication = jwtProvider.createAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                Authentication authentication = jwtProvider.createAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (AuthenticationException e) {
+                SecurityContextHolder.clearContext();
+            }
         }
 
         filterChain.doFilter(request, response);
