@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.member.dto;
 
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +31,9 @@ public class MemberSalesAuctionResponse {
 
     // 경매 타입 (NORMAL, TIME_DEAL, INSPECTION)
     private String auctionType;
+
+    // 검수 여부
+    private YesNo inspectionYn;
 
     // 대표 이미지 URL
     private String imageUrl;

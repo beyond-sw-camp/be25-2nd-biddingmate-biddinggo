@@ -575,6 +575,7 @@
         bidCount,
         endDate,
         auctionType,
+        inspectionYn,
         saleStatus,
         imageUrl
         FROM (

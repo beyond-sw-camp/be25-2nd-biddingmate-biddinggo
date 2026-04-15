@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.auction.dto;
 
 import com.biddingmate.biddinggo.auction.model.AuctionType;
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.item.dto.AuctionItemCreateSource;
 import com.biddingmate.biddinggo.item.dto.ItemImageCreateSource;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -110,6 +111,9 @@ public class CreateAuctionRequest {
         @Schema(description = "즉시 구매가", example = "180000", nullable = true)
         @PositiveOrZero(message = "즉시 구매가는 0 이상이어야 합니다.")
         private Long buyNowPrice;
+
+        @Schema(description = "연장 플래그 (NO: 연장경매 허용, YES: 연장경매 미허용)", example = "NO", nullable = true)
+        private YesNo extensionYn;
 
         @Schema(description = "경매 시작일시", example = "2026-03-15T10:00:00")
         @NotNull(message = "경매 시작일시는 필수입니다.")
