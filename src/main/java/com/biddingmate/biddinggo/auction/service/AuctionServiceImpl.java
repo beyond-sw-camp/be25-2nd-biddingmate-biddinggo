@@ -183,6 +183,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .sellerId(sellerId)
                 .type(request.getAuction().getType())
                 .inspectionYn(YesNo.NO)
+                .extensionYn(resolveExtensionYn(request.getAuction().getExtensionYn()))
                 .startPrice(request.getAuction().getStartPrice())
                 .bidUnit(request.getAuction().getBidUnit())
                 .vickreyPrice(request.getAuction().getVickreyPrice())
@@ -214,6 +215,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .sellerId(sellerId)
                 .type(request.getAuction().getType())
                 .inspectionYn(YesNo.YES)
+                .extensionYn(resolveExtensionYn(request.getAuction().getExtensionYn()))
                 .startPrice(request.getAuction().getStartPrice())
                 .bidUnit(request.getAuction().getBidUnit())
                 .vickreyPrice(request.getAuction().getVickreyPrice())
@@ -294,6 +296,10 @@ public class AuctionServiceImpl implements AuctionService {
                 && auction.getStatus() == AuctionStatus.ON_GOING
                 && !now.isBefore(auction.getStartDate())
                 && !now.isAfter(auction.getEndDate());
+    }
+
+    private YesNo resolveExtensionYn(YesNo extensionYn) {
+        return extensionYn != null ? extensionYn : YesNo.NO;
     }
 
     // 입찰 무효화
