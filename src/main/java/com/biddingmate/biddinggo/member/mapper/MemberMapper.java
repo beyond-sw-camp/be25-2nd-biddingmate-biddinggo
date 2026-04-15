@@ -125,4 +125,6 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
 
     List<Long> findAllActiveMemberIds();
 
+    List<Long> findAllActiveAdminIds();
+
 }

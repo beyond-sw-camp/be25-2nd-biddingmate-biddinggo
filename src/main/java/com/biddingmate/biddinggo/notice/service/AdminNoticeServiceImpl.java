@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,6 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
 
     private final NoticeMapper noticeMapper;
     private final NotificationPublisher notificationPublisher;
-    private final MemberMapper memberMapper;
 
     @Override
     @Transactional
@@ -44,7 +42,16 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
             throw new CustomException(ErrorType.NOTICE_CREATE_FAIL);
         }
 
-        publishNoticeNotificationToAllActiveMembers(notice);
+        // sse 알람을 위한 공지(create) 로직
+        String title = notice.getTitle() == null ? "" : notice.getTitle().trim();
+        String body = notice.getContent() == null ? "" : notice.getContent().trim();
+        String content = title.isEmpty() ? body : "[공지] " + title + "\n" + body;
+
+        notificationPublisher.publishToActiveUsers(
+                NotificationType.ADMIN_NOTICE,
+                content,
+                "/notices/" + notice.getId()
+        );
 
         return toResponse(notice);
     }
@@ -72,6 +79,17 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
 
         Notice updatedNotice = noticeMapper.findById(noticeId);
 
+        String title = updatedNotice.getTitle() == null ? "" : updatedNotice.getTitle().trim();
+        String content = title.isEmpty()
+                ? "[공지 수정] 공지 내용이 수정되었습니다."
+                : "[공지 수정] " + title;
+
+        notificationPublisher.publishToActiveUsers(
+                NotificationType.ADMIN_NOTICE,
+                content,
+                "/notices/" + updatedNotice.getId()
+        );
+
         return toResponse(updatedNotice);
     }
 
@@ -96,6 +114,7 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
             throw new CustomException(ErrorType.NOTICE_DELETE_FAIL);
         }
 
+        notificationPublisher.removeNoticeNotifications(noticeId);
 
     }
 
@@ -110,24 +129,4 @@ public class AdminNoticeServiceImpl implements AdminNoticeService {
                 .build();
     }
 
-    private void publishNoticeNotificationToAllActiveMembers(Notice notice) {
-
-        List<Long> memberIds = memberMapper.findAllActiveMemberIds();
-        if(memberIds == null || memberIds.isEmpty()) {
-            return;
-        }
-
-        String title = notice.getTitle() == null ? "" : notice.getTitle().trim();
-        String body = notice.getContent() == null ? "" : notice.getContent().trim();
-        String content = title.isEmpty() ? body : "[공지] " + title + "\n" + body;
-
-        for (Long memberId : memberIds) {
-            notificationPublisher.publishNotification(
-                    memberId,
-                    NotificationType.ADMIN_NOTICE,
-                    content,
-                    null
-            );
-        }
-    }
 }

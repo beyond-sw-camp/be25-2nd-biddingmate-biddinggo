@@ -11,6 +11,7 @@ import com.biddingmate.biddinggo.inspection.service.InspectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class AdminInspectionController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "관리자용 검수 처리", description = "관리자가 검수 신청을 처리합니다.")
     public ResponseEntity<ApiResponse<Void>> processInspection(@Parameter(description = "검수 ID", example = "1") @PathVariable Long inspectionId,
-                                                               @RequestBody InspectionProcessRequest request) {
+                                                               @Valid @RequestBody InspectionProcessRequest request) {
         inspectionService.processInspection(inspectionId, request);
 
         return ApiResponse.of(HttpStatus.OK, null, "관리자 검수 처리 성공", null);

@@ -284,7 +284,8 @@
                ai.name AS itemName,
                wd.winner_price AS winnerPrice,
                wd.created_at AS createdAt,
-               wd.status AS status
+               wd.status AS status,
+               a.inspection_yn AS inspectionYn
         FROM winner_deal wd
         JOIN auction a ON wd.auction_id = a.id
         JOIN auction_item ai ON a.item_id = ai.id
@@ -326,6 +327,7 @@
                ai.name AS itemName,
                ii.url AS itemImageUrl,
                a.type AS auctionType,
+               a.inspection_yn AS inspectionYn,
                wd.status AS status,
                wd.winner_price AS winnerPrice,
                seller.nickname AS sellerName,

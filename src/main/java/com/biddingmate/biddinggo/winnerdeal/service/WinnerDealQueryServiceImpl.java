@@ -4,7 +4,7 @@ import com.biddingmate.biddinggo.common.exception.CustomException;
 import com.biddingmate.biddinggo.common.exception.ErrorType;
 import com.biddingmate.biddinggo.common.response.PageResponse;
 import com.biddingmate.biddinggo.review.mapper.ReviewMapper;
-import com.biddingmate.biddinggo.auction.model.AuctionType;
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailQueryResult;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealDetailResponse;
 import com.biddingmate.biddinggo.winnerdeal.dto.AdminWinnerDealListRequest;
@@ -149,7 +149,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
             throw new CustomException(ErrorType.WINNER_DEAL_NOT_FOUND);
         }
 
-        boolean inspectionItem = detail.getAuctionType() == AuctionType.INSPECTION;
+        boolean inspectionItem = detail.getInspectionYn() == YesNo.YES;
         boolean shippingAddressRegistered = isShippingAddressRegistered(detail);
         boolean trackingNumberRegistered = isTrackingNumberRegistered(detail);
 
@@ -161,6 +161,7 @@ public class WinnerDealQueryServiceImpl implements WinnerDealQueryService {
                 .itemName(detail.getItemName())
                 .itemImageUrl(detail.getItemImageUrl())
                 .auctionType(detail.getAuctionType())
+                .inspectionYn(detail.getInspectionYn())
                 .inspectionItem(inspectionItem)
                 .status(detail.getStatus())
                 .winnerPrice(detail.getWinnerPrice())

@@ -40,6 +40,9 @@ public class AuctionListResponse {
     @Schema(description = "검수 여부", example = "NO")
     private YesNo inspectionYn;
 
+    @Schema(description = "연장 경매 여부", example = "NO")
+    private YesNo extensionYn;
+
     @Schema(description = "시작가", example = "100000")
     private Long startPrice;
 

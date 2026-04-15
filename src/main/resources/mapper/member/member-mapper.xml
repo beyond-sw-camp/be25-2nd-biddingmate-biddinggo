@@ -29,6 +29,7 @@
 
     <select id="findPurchaseItemsById" parameterType="long" resultType="MemberWonItemResponse">
         SELECT
+                wd.id AS id,
                 ai.name AS itemName,                    -- 상품 이름
                 wd.status AS status,                    -- 거래 상태
                 wd.winner_price AS winnerPrice,         -- 구매 금액
@@ -54,6 +55,7 @@
         SELECT
             ii.url AS imageUrl,                 -- 상품 대표 이미지 URL
             ai.name AS itemName,                -- 상품 이름
+            mb.auction_id AS auctionId,
             COALESCE(a.vickrey_price, a.start_price) AS currentPrice, -- 현재가(차순위가 없으면 시작가)
             mb.myBidPrice AS myBidPrice,        -- 내가 해당 경매에서 입찰한 최고 금액
             a.end_date AS endDate,              -- 경매 종료일
@@ -317,6 +319,7 @@
 
 <select id="findSalesItemsById" parameterType="long" resultType="MemberSalesItemResponse">
     SELECT
+        wd.id AS id,
         ai.name AS itemName,            -- 상품명
         wd.status AS status,            -- 거래 상태
         wd.winner_price AS winnerPrice, -- 판매 금액(낙찰 금액)
@@ -575,6 +578,7 @@
         bidCount,
         endDate,
         auctionType,
+        inspectionYn,
         saleStatus,
         imageUrl
         FROM (
@@ -585,6 +589,7 @@
         a.bid_count AS bidCount,
         a.end_date AS endDate,
         a.type AS auctionType,
+        a.inspection_yn AS inspectionYn,
         CASE
         WHEN a.status = 'PENDING' THEN 'PENDING'
         WHEN a.status = 'ON_GOING' THEN 'ONGOING'
@@ -650,10 +655,16 @@
     </select>
 
     <select id="findAllActiveMemberIds" resultType="long">
-        SELECT
-            id
+        SELECT id
         FROM member
         WHERE status = 'ACTIVE'
+    </select>
+
+    <select id="findAllActiveAdminIds" resultType="long">
+        SELECT id
+        FROM member
+        WHERE status = 'ACTIVE'
+          AND role = 'ADMIN'
     </select>
 </mapper>
 

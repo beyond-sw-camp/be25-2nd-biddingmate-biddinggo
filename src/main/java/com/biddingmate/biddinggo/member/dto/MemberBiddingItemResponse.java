@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MemberBiddingItemResponse {
 
+    // 입찰한 경매 ID
+    private Long auctionId;
+
     // 상품 대표 이미지 URL
     private String imageUrl;
 

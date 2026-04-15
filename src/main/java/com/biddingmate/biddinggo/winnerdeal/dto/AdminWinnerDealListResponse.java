@@ -1,5 +1,6 @@
 package com.biddingmate.biddinggo.winnerdeal.dto;
 
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -36,4 +37,7 @@ public class AdminWinnerDealListResponse {
 
     @Schema(description = "거래 상태", example = "SHIPPED")
     private WinnerDealStatus status;
+
+    @Schema(description = "검수 경매 여부", example = "YES")
+    private YesNo inspectionYn;
 }

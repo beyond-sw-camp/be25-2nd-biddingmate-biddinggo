@@ -1,6 +1,7 @@
 package com.biddingmate.biddinggo.winnerdeal.dto;
 
 import com.biddingmate.biddinggo.auction.model.AuctionType;
+import com.biddingmate.biddinggo.auction.model.YesNo;
 import com.biddingmate.biddinggo.winnerdeal.model.WinnerDealStatus;
 import lombok.Getter;
 
@@ -15,6 +16,7 @@ public class AdminWinnerDealDetailQueryResult {
     private String itemName;
     private String itemImageUrl;
     private AuctionType auctionType;
+    private YesNo inspectionYn;
     private WinnerDealStatus status;
     private Long winnerPrice;
     private String sellerName;
