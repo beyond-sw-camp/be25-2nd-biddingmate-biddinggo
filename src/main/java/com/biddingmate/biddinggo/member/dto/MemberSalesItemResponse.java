@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @Builder
 public class MemberSalesItemResponse {
 
+    // 낙찰 거래 ID
+    private Long id;
+
     // 상품명
     private String itemName;
 

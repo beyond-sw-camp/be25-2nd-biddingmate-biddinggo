@@ -29,6 +29,7 @@
 
     <select id="findPurchaseItemsById" parameterType="long" resultType="MemberWonItemResponse">
         SELECT
+                wd.id AS id,
                 ai.name AS itemName,                    -- 상품 이름
                 wd.status AS status,                    -- 거래 상태
                 wd.winner_price AS winnerPrice,         -- 구매 금액
@@ -318,6 +319,7 @@
 
 <select id="findSalesItemsById" parameterType="long" resultType="MemberSalesItemResponse">
     SELECT
+        wd.id AS id,
         ai.name AS itemName,            -- 상품명
         wd.status AS status,            -- 거래 상태
         wd.winner_price AS winnerPrice, -- 판매 금액(낙찰 금액)
@@ -587,6 +589,7 @@
         a.bid_count AS bidCount,
         a.end_date AS endDate,
         a.type AS auctionType,
+        a.inspection_yn AS inspectionYn,
         CASE
         WHEN a.status = 'PENDING' THEN 'PENDING'
         WHEN a.status = 'ON_GOING' THEN 'ONGOING'
