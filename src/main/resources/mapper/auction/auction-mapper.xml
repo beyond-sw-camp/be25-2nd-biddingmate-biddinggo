@@ -33,6 +33,7 @@
         <result property="status" column="status"/>
         <result property="type" column="type"/>
         <result property="inspectionYn" column="inspection_yn"/>
+        <result property="extensionYn" column="extension_yn"/>
         <result property="startPrice" column="start_price"/>
         <result property="bidUnit" column="bid_unit"/>
         <result property="vickreyPrice" column="vickrey_price"/>
@@ -111,6 +112,7 @@
             COALESCE(sr.seller_review_count, 0) AS seller_review_count,
             a.type,
             a.inspection_yn,
+            a.extension_yn,
             a.status,
             a.start_price,
             a.bid_unit,
@@ -154,6 +156,7 @@
             a.status,
             a.type,
             a.inspection_yn,
+            a.extension_yn,
             a.start_price,
             a.buy_now_price,
             a.vickrey_price,
