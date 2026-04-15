@@ -54,6 +54,7 @@
         SELECT
             ii.url AS imageUrl,                 -- 상품 대표 이미지 URL
             ai.name AS itemName,                -- 상품 이름
+            mb.auction_id AS auctionId,
             COALESCE(a.vickrey_price, a.start_price) AS currentPrice, -- 현재가(차순위가 없으면 시작가)
             mb.myBidPrice AS myBidPrice,        -- 내가 해당 경매에서 입찰한 최고 금액
             a.end_date AS endDate,              -- 경매 종료일
