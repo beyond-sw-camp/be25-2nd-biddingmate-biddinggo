@@ -4,6 +4,7 @@ import com.biddingmate.biddinggo.auth.handler.AccessDeniedHandlerImpl;
 import com.biddingmate.biddinggo.auth.handler.AuthenticationEntryPointImpl;
 import com.biddingmate.biddinggo.auth.jwt.JwtAuthenticationFilter;
 import com.biddingmate.biddinggo.auth.jwt.JwtProvider;
+import com.biddingmate.biddinggo.auth.oauth2.CustomFailureHandler;
 import com.biddingmate.biddinggo.auth.oauth2.CustomSuccessHandler;
 import com.biddingmate.biddinggo.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomFailureHandler customFailureHandler;
     private final CustomSuccessHandler customSuccessHandler;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
@@ -70,6 +72,7 @@ public class SecurityConfig {
                 .oauth2Login((oauth2)-> oauth2
                         .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService)))
+                        .failureHandler(customFailureHandler)
                         .successHandler(customSuccessHandler))
 
 

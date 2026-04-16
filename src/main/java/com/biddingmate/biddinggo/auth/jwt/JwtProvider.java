@@ -95,8 +95,12 @@ public class JwtProvider {
     public void deleteRefreshToken(String accessToken) {
         String username = jwtUtil.getUsername(accessToken);
 
-        redisWrite(() -> redisTemplate.delete(String.format("refresh:%S", username)));
+        deleteRefreshTokenByUsername(username);
 
+    }
+
+    public void deleteRefreshTokenByUsername(String username) {
+        redisWrite(() -> redisTemplate.delete(String.format("refresh:%S", username)));
     }
 
     // 리프레시 토큰 생성

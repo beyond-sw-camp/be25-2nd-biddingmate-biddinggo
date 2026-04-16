@@ -41,6 +41,8 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomException(ErrorType.INVALID_CREDENTIALS);
         }
 
+        validateLoginAllowed(member);
+
         log.info("[Adminlogin] username : {}", username);
 
         // 3. LoginResponse 객체를 생성해서 반환
@@ -124,6 +126,8 @@ public class AuthServiceImpl implements AuthService {
 
         Member member = memberMapper.selectMemberByUsername(jwtUtil.getUsername(refreshToken));
 
+        validateLoginAllowed(member);
+
         return createLoginResponse(member);
 
     }
@@ -187,5 +191,16 @@ public class AuthServiceImpl implements AuthService {
                 .issuedAt(jwtUtil.getIssuedAt(accessToken))
                 .expiredAt(jwtUtil.getExpiredAt(accessToken))
                 .build();
+    }
+
+    private void validateLoginAllowed(Member member) {
+        if (member == null) {
+            throw new CustomException(ErrorType.USER_NOT_FOUND);
+        }
+
+        if (member.getStatus() == MemberStatus.DELETED || member.getStatus() == MemberStatus.INACTIVE) {
+            jwtProvider.deleteRefreshTokenByUsername(member.getUsername());
+            throw new CustomException(ErrorType.FORBIDDEN);
+        }
     }
 }
