@@ -267,7 +267,7 @@
 ---
 # 7.  API 명세서
 ![](img/table.PNG)<br/>
-🔗[API 명세서](https://www.notion.so/31e1072487c38010b4d4f280f3e03481?v=31e1072487c381709755000ca276af3c&source=copy_link)
+🔗[API 명세서](https://www.notion.so/3441072487c3805f8b9df233a87c67d4?v=3441072487c381a8baa3000c235e07f6&source=copy_link)
 <br/>
 
 ---
