@@ -46,6 +46,9 @@ public interface BidMapper extends IMybatisCRUD<Bid> {
     Long findMaxBidAmountByAuctionAndBidder(@Param("auctionId") Long auctionId,
                                             @Param("bidderId") Long memberId);
 
+    Long findMaxBidAmountByAuctionAndBidder2(@Param("auctionId") Long auctionId,
+                                             @Param("bidderId") Long bidderId);
+
     // 비활성화 처리 과정에서 bid 상태가 이미 INACTIVE로 바뀔 수 있으므로 상태와 무관하게 최고 입찰금을 조회.
     Long findMaxBidAmountByAuctionAndBidderRegardlessStatus(@Param("auctionId") Long auctionId,
                                                             @Param("bidderId") Long bidderId);
