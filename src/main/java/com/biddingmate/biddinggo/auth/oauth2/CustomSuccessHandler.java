@@ -59,6 +59,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String redirectUrl = frontendRedirectUri
                     + "?error=" + URLEncoder.encode("login_blocked_member", StandardCharsets.UTF_8)
                     + "&message=" + URLEncoder.encode("탈퇴 또는 비활성화된 회원은 로그인할 수 없습니다.", StandardCharsets.UTF_8);
+            ResponseCookie deleteCookie = jwtCookieService.deleteRefreshTokenCookie();
+            response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
             return;
         }

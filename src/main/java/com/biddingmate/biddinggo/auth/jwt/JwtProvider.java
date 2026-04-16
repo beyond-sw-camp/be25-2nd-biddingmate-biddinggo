@@ -23,7 +23,7 @@ public class JwtProvider {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
     private final RedisTemplate<String, String> redisTemplate;
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 30; // 30분
+    private static final long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 1; // 30분
     private static final long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60L * 24L; // 1일
 
     public String createAccessToken(String username, List<String> authorities, String status) {

@@ -1,10 +1,14 @@
 package com.biddingmate.biddinggo.auth.oauth2;
 
+import com.biddingmate.biddinggo.auth.jwt.JwtCookieService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -16,7 +20,10 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+
+    private final JwtCookieService jwtCookieService;
 
     @Value("${FRONTEND_REDIRECT_URI:http://localhost:5173/auth/callback}")
     private String frontendRedirectUri;
@@ -42,6 +49,9 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
         String redirectUrl = frontendRedirectUri
                 + "?error=" + URLEncoder.encode(errorCode, StandardCharsets.UTF_8)
                 + "&message=" + URLEncoder.encode(message, StandardCharsets.UTF_8);
+
+        ResponseCookie deleteCookie = jwtCookieService.deleteRefreshTokenCookie();
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
         log.warn("[OAuth2 login failed] errorCode={}, message={}", errorCode, message);
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);

@@ -9,6 +9,7 @@ import com.biddingmate.biddinggo.member.model.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -105,9 +106,17 @@ public class AuthController {
     @PostMapping("/refresh")
     @Operation(summary = "토근 재발급")
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(
-            @Parameter(hidden = true) @CookieValue(name = "refresh_token", defaultValue = "") String refreshToken) {
+            @Parameter(hidden = true) @CookieValue(name = "refresh_token", defaultValue = "") String refreshToken,
+            HttpServletResponse response) {
 
-        LoginResponse loginResponse = authService.refreshAccessToken(refreshToken);
+        LoginResponse loginResponse;
+        try {
+            loginResponse = authService.refreshAccessToken(refreshToken);
+        } catch (RuntimeException e) {
+            ResponseCookie responseCookie = jwtCookieService.deleteRefreshTokenCookie();
+            response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+            throw e;
+        }
 
         return ApiResponse.of(HttpStatus.OK,null, "토근 재발급 완료", loginResponse);
 
