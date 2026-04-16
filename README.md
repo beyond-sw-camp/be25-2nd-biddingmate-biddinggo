@@ -80,7 +80,7 @@
 
 # 2.  요구사항 정의서
 ![](img/Srs.png)<br/>
-🔗[ 요구사항 정의서 ](https://docs.google.com/spreadsheets/d/16YGKpTcpo310JjvUu9Q1Nm9atCI-XYx5TB2GD3ocx3E/edit?gid=1771602914#gid=1771602914)
+🔗[ 요구사항 정의서 ](https://docs.google.com/spreadsheets/d/16YGKpTcpo310JjvUu9Q1Nm9atCI-XYx5TB2GD3ocx3E/edit?gid=1901741334#gid=1901741334)
 
 ---
 
@@ -114,6 +114,8 @@
 ---
 
 # 8.  테스트 계획 및 결과 보고서
+![](img/table.PNG)<br/>
+🔗[백엔드 결과 보고서](https://docs.google.com/spreadsheets/d/16YGKpTcpo310JjvUu9Q1Nm9atCI-XYx5TB2GD3ocx3E/edit?gid=1106294099#gid=1106294099)
 <br/>
 
 
