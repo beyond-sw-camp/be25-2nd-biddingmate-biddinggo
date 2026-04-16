@@ -1,7 +1,8 @@
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/1e36c230-8248-44f6-b5f0-971a78c39e9b" />
-</div>
-</br>
+# BiddingGo
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/1e36c230-8248-44f6-b5f0-971a78c39e9b" width="300"/>
+</p>
 
 ---
 
