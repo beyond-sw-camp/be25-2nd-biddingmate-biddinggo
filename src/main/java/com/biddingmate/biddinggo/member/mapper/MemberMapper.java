@@ -68,6 +68,8 @@ public interface MemberMapper extends IMybatisCRUD<Member> {
     // member status를 DELETED로 변경
     void deleteMember(@Param("memberId") Long memberId);
 
+    String findUsernameById(@Param("memberId") Long memberId);
+
     // 판매내역 목록
     List<MemberSalesItemResponse> findSalesByMember(
             @Param("memberId") Long memberId,

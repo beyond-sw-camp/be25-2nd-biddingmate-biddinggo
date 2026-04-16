@@ -8,10 +8,12 @@ import com.biddingmate.biddinggo.auth.dto.OAuth2Response;
 import com.biddingmate.biddinggo.auth.mapper.AuthSocialMapper;
 import com.biddingmate.biddinggo.member.mapper.MemberMapper;
 import com.biddingmate.biddinggo.member.model.Member;
+import com.biddingmate.biddinggo.member.model.MemberStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +73,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             authSocialMapper.saveSocialAccount(member.getId(), provider, providerId);
 
         } else {
+            validateLoginAllowed(member);
 
             member.update(oAuth2Response.getName(), oAuth2Response.getEmail());
             memberMapper.updateMember(member);
@@ -84,5 +87,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         return new CustomOAuth2Member(memberDto);
 
+    }
+
+    private void validateLoginAllowed(Member member) {
+        if (member.getStatus() == MemberStatus.DELETED || member.getStatus() == MemberStatus.INACTIVE) {
+            throw new OAuth2AuthenticationException(
+                    new OAuth2Error("login_blocked_member"),
+                    "탈퇴 또는 비활성화된 회원은 로그인할 수 없습니다."
+            );
+        }
     }
 }

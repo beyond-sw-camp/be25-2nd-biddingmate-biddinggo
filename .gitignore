@@ -40,3 +40,5 @@ out/
 .env
 
 AGENTS.md
+
+.gradle-user-home

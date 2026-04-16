@@ -113,7 +113,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = getMember(memberId);
 
         // 이미 탈퇴한 회원이라면 예외 처리
-        if ("DELETED".equals(member.getStatus())) {
+        if (member.getStatus() == MemberStatus.DELETED) {
             throw new CustomException(ErrorType.ALREADY_DELETED_MEMBER);
         }
 
@@ -134,6 +134,7 @@ public class MemberServiceImpl implements MemberService {
 
         // 탈퇴 처리 (soft delete)
         memberMapper.deleteMember(memberId);
+        eventPublisher.publishEvent(new MemberStatusUpdateEvent(memberId, MemberStatus.DELETED));
     }
 
     @Override
