@@ -51,6 +51,12 @@ public class BidQueryServiceImpl implements BidQueryService {
 
     @Override
     @Transactional(readOnly = true)
+    public Long findMaxBidAmountByAuctionAndBidder2(Long auctionId, Long memberId) {
+        return bidMapper.findMaxBidAmountByAuctionAndBidder2(auctionId, memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Long findMaxBidAmountByAuctionAndBidderRegardlessStatus(Long auctionId, Long bidderId) {
         return bidMapper.findMaxBidAmountByAuctionAndBidderRegardlessStatus(auctionId, bidderId);
     }
