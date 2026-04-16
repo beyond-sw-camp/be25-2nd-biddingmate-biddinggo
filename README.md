@@ -244,7 +244,7 @@
 
 # 4.  ERD
 ![](img/erd.png)<br/>
-🔗[ ERD ](https://www.erdcloud.com/d/KdYRE8i9mnqYda2L5)
+🔗[ ERD ](https://www.erdcloud.com/d/zfbRbiMEYW5M3uegM)
 <br/>
 
 ---
