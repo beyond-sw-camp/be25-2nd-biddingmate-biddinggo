@@ -5,7 +5,7 @@
 
 ---
 
-## BIDDINGMATE
+# Bidding mate
 
 <table>
   
@@ -19,12 +19,12 @@
   </tr>
   
   <tr>
-    <td align="center"><img width="120" alt="김진혁" src="https://github.com/user-attachments/assets/27d1a9a4-a803-45de-8002-186a1205e260" /></td>
-    <td align="center"><img width="120" alt="박선우" src="https://github.com/user-attachments/assets/fe040ec6-8d7a-4af1-b4a5-58379c74d3dd" /></td>   
-    <td align="center"><img width="120" alt="윤정윤" src="https://github.com/user-attachments/assets/3c98cd68-9b89-4f03-8dac-3f657ea15bcb" /></td>   
-    <td align="center"><img width="120" alt="이민경" src="https://github.com/user-attachments/assets/81920388-bd3a-4a1c-8a2d-57a2e2cfb8b9" /></td>  
-    <td align="center"><img width="120" alt="이애은" src="https://github.com/user-attachments/assets/1586f7b5-62d5-4fdd-8006-78c7ea665293" /></td>   
-    <td align="center"><img width="120" alt="한규진" src="https://github.com/user-attachments/assets/9d0339fa-722e-4207-95ed-6b5508b0d478" /></td>  
+    <td align="center"><img width="120" alt="김진혁" src="https://github.com/user-attachments/assets/d44abc12-4269-4be2-a6a9-f76a531a963f" /></td>
+    <td align="center"><img width="120" alt="박선우" src="https://github.com/user-attachments/assets/cf47d2b7-7633-4f17-8cbe-8b6429ceef67" /></td>   
+    <td align="center"><img width="120" alt="윤정윤" src="https://github.com/user-attachments/assets/5cde1533-77e1-4783-8ce9-d48ec236c25d" /></td>   
+    <td align="center"><img width="120" alt="이민경" src="https://github.com/user-attachments/assets/f62ebf05-846f-462e-b4d3-3fa3c58ce4fb" /></td>  
+    <td align="center"><img width="120" alt="이애은" src="https://github.com/user-attachments/assets/79be4278-e3e9-44c5-af71-57d1831e9406" /></td>   
+    <td align="center"><img width="120" alt="한규진" src="https://github.com/user-attachments/assets/45b114ef-0e30-4bcc-94d2-dfd548aa9b7c" /></td>  
   </tr>
 
   <tr>
@@ -57,23 +57,26 @@
 
 1. [프로젝트 개요](#1--프로젝트-개요)
 2. [요구사항 정의서](#2--요구사항-정의서)
-3. [ERD](#3--ERD)
-4. [테이블 정의서](#4--테이블-정의서)
-5. [기술 스택](#5--기술-스택)
+3. [기술 스택](#3--기술-스택)
+4. [ERD](#4--ERD)
+5. [테이블 정의서](#5--테이블-정의서)
 6. [시스템 아키텍처](#6--시스템-아키텍처)
 7. [API 명세서](#7--API-명세서)
-8. [화면 및 기능 설계서](#8--화면-및-기능-설계서)
-9. [테스트 계획 및 결과 보고서](#9--테스트-계획-및-결과-보고서)
-10. [회고](#10--회고)
+8. [테스트 계획 및 결과 보고서](#8--테스트-계획-및-결과-보고서)
+9. [회고](#9--회고)
+
 <br/>
 
 ---
 
+<p align="center">
+<img src="https://github.com/user-attachments/assets/e839d356-1bb6-477b-a87f-feeed40d6e67"  width="1200"/>
+</p>
+
+<br>
 
 # 1.  프로젝트 개요
 <br/> 
-
-# 📌 프로젝트 개요
 
 ## 📍 프로젝트 소개
 **Biddinggo는 실시간 경매 기반의 중고 및 리셀 거래 플랫폼입니다.**  
@@ -177,22 +180,7 @@
 
 ---
 
-# 3.  ERD
-![](img/erd.png)<br/>
-🔗[ ERD ](https://www.erdcloud.com/d/KdYRE8i9mnqYda2L5)
-<br/>
-
----
-
-# 4.  테이블 정의서
-![](img/table.PNG)<br/>
-🔗[MariaDB 테이블 정의서](https://docs.google.com/spreadsheets/d/1OoOrOKj8uusUITQNaMLExuCe3ReM_St3hvvKVMiX4vM/edit?gid=573455609#gid=573455609)
-
-🔗[Supabase 테이블 정의서](https://docs.google.com/spreadsheets/d/1OoOrOKj8uusUITQNaMLExuCe3ReM_St3hvvKVMiX4vM/edit?gid=141144957#gid=141144957)
-<br/>
-
----
-# 5.  기술 스택
+# 3.  기술 스택
 <br/>
 
 ## 🔧 Backend
@@ -251,6 +239,22 @@
 
 ---
 
+# 4.  ERD
+![](img/erd.png)<br/>
+🔗[ ERD ](https://www.erdcloud.com/d/KdYRE8i9mnqYda2L5)
+<br/>
+
+---
+
+# 5.  테이블 정의서
+![](img/table.PNG)<br/>
+🔗[MariaDB 테이블 정의서](https://docs.google.com/spreadsheets/d/1OoOrOKj8uusUITQNaMLExuCe3ReM_St3hvvKVMiX4vM/edit?gid=573455609#gid=573455609)
+
+🔗[Supabase 테이블 정의서](https://docs.google.com/spreadsheets/d/1OoOrOKj8uusUITQNaMLExuCe3ReM_St3hvvKVMiX4vM/edit?gid=141144957#gid=141144957)
+<br/>
+
+---
+
 # 6.  시스템 아키텍처
 <br/>
 
@@ -264,14 +268,8 @@
 <br/>
 
 ---
-# 8.  화면 및 기능 설계서
-![](img/table.PNG)<br/>
-🔗[화면 및 기능 설계서](https://www.figma.com/design/0dOGV93f5reRfWgJiv1rBH/Biddinggo?node-id=185-1330&t=DaXBKBPbxL8Q8Hgr-1)
-<br/>
 
----
-
-# 9.  테스트 계획 및 결과 보고서
+# 8.  테스트 계획 및 결과 보고서
 <br/>
 
 🔗[테스트 계획 및 결과 보고서](https://docs.google.com/spreadsheets/d/16YGKpTcpo310JjvUu9Q1Nm9atCI-XYx5TB2GD3ocx3E/edit?gid=1106294099#gid=1106294099)
@@ -279,7 +277,7 @@
 
 ---
 
-# 10.  회고
+# 9.  회고
 <br/>
 
 #### 김진혁
