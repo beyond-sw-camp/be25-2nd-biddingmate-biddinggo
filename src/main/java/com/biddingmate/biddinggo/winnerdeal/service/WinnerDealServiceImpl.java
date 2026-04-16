@@ -378,7 +378,7 @@ public class WinnerDealServiceImpl implements WinnerDealService {
             throw new CustomException(ErrorType.WINNER_DEAL_CONFIRM_FAILED);
         }
 
-        Long maxBidAmount = bidQueryService.findMaxBidAmountByAuctionAndBidder(winnerDeal.getAuctionId(), memberId);
+        Long maxBidAmount = bidQueryService.findMaxBidAmountByAuctionAndBidder2(winnerDeal.getAuctionId(), memberId);
         long reservedAmount = maxBidAmount != null && maxBidAmount >= winnerDeal.getWinnerPrice()
                 ? maxBidAmount
                 : winnerDeal.getWinnerPrice();
