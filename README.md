@@ -21,7 +21,7 @@
   <tr>
     <td align="center"><img width="120" alt="김진혁" src="https://github.com/user-attachments/assets/27d1a9a4-a803-45de-8002-186a1205e260" /></td>
     <td align="center"><img width="120" alt="박선우" src="https://github.com/user-attachments/assets/fe040ec6-8d7a-4af1-b4a5-58379c74d3dd" /></td>   
-    <td align="center"><img width="120" alt="윤정윤" src="https://github.com/user-attachments/assets/9731f356-670c-4e90-971f-a2ca98814494" /></td>   
+    <td align="center"><img width="120" alt="윤정윤" src="https://github.com/user-attachments/assets/3c98cd68-9b89-4f03-8dac-3f657ea15bcb" /></td>   
     <td align="center"><img width="120" alt="이민경" src="https://github.com/user-attachments/assets/81920388-bd3a-4a1c-8a2d-57a2e2cfb8b9" /></td>  
     <td align="center"><img width="120" alt="이애은" src="https://github.com/user-attachments/assets/1586f7b5-62d5-4fdd-8006-78c7ea665293" /></td>   
     <td align="center"><img width="120" alt="한규진" src="https://github.com/user-attachments/assets/9d0339fa-722e-4207-95ed-6b5508b0d478" /></td>  
