@@ -82,6 +82,7 @@ public class SecurityConfig {
                                 "/api/v1/admin/auth/signup", "/api/v1/admin/auth/login",
                                 "/api/v1/payments/virtual-accounts/deposit",
                                 "/swagger-ui/**", "/v3/api-docs/**",
+                                "/actuator/prometheus", "/actuator/health",
                                 "/api/v1/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/auctions",
