@@ -71,7 +71,7 @@
 6. [시스템 아키텍처](#6--시스템-아키텍처)
 7. [API 명세서](#7--api-명세서)
 8. [테스트 계획 및 결과 보고서](#8--테스트-계획-및-결과-보고서)
-9. [팀 노션](#9--팀-notion)
+9. [팀 notion](#9--팀-notion)
 10. [회고](#10--회고)
 
 <br/>
@@ -281,10 +281,10 @@
 
 ---
 
-# 9.  팀 Notion
+# 9.  팀 notion
 <br/>
 
-🔗[팀 노션](https://www.notion.so/2-2fb1072487c380368604fa96626503a4?source=copy_link)
+🔗[팀 notion](https://www.notion.so/2-2fb1072487c380368604fa96626503a4?source=copy_link)
 <br/>
 
 ---
