@@ -58,9 +58,13 @@ pipeline {
             git config user.name "jenkins-bot"
             git config user.email "jenkins-bot@users.noreply.github.com"
 
-            sed -i "s|image: $GHCR_IMAGE_NAME:.*|image: $GHCR_IMAGE_NAME:$IMAGE_TAG|" $BACKEND_DEPLOYMENT_MANIFEST
+            echo "Before:"
+            grep -n "image:" $BACKEND_DEPLOYMENT_MANIFEST
 
-            grep "image: $GHCR_IMAGE_NAME:$IMAGE_TAG" $BACKEND_DEPLOYMENT_MANIFEST
+            sed -i "s|image: .*be25-2nd-biddingmate-biddinggo.*|image: $GHCR_IMAGE_NAME:$IMAGE_TAG|" $BACKEND_DEPLOYMENT_MANIFEST
+
+            echo "After:"
+            grep -n "$GHCR_IMAGE_NAME:$IMAGE_TAG" $BACKEND_DEPLOYMENT_MANIFEST
 
             git diff -- $BACKEND_DEPLOYMENT_MANIFEST
             git add $BACKEND_DEPLOYMENT_MANIFEST
