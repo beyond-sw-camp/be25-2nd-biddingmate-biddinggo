@@ -60,6 +60,8 @@ pipeline {
 
             sed -i "s|image: $GHCR_IMAGE_NAME:.*|image: $GHCR_IMAGE_NAME:$IMAGE_TAG|" $BACKEND_DEPLOYMENT_MANIFEST
 
+            grep "image: $GHCR_IMAGE_NAME:$IMAGE_TAG" $BACKEND_DEPLOYMENT_MANIFEST
+
             git diff -- $BACKEND_DEPLOYMENT_MANIFEST
             git add $BACKEND_DEPLOYMENT_MANIFEST
             git diff --cached --quiet && echo "No backend image change." || git commit -m "ci: update backend image to $IMAGE_TAG [skip ci]"
